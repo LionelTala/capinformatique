@@ -1,6 +1,5 @@
-// resources/js/pages/Admin/Galerie/Edit.tsx
 import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
 import { ArrowLeftIcon, PencilSquareIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
@@ -26,12 +25,12 @@ export default function Edit({ media }: Props) {
     const [preview, setPreview] = useState<string | null>(media.is_image ? media.url : null);
     const [fileName, setFileName] = useState<string>(media.fichier);
 
-    const { data, setData, put, processing, errors } = useForm({
-        titre: media.titre,
+    const { data, setData, processing, errors } = useForm({
+        titre: media.titre || '',
         description: media.description || '',
         fichier: null as File | null,
-        is_active: media.is_active,
-        ordre: media.ordre,
+        is_active: media.is_active ?? true,
+        ordre: media.ordre ?? 0,
     });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,8 +54,41 @@ export default function Edit({ media }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/galerie/${media.id}`, {
+
+        // 1. Initialiser le FormData manuel requis pour les fichiers sous PHP
+        const formData = new FormData();
+
+        // 🚀 LA CORRECTION CRITIQUE MANQUANTE : Spoofing de méthode pour Laravel
+        formData.append('_method', 'PUT');
+
+        // 2. Remplir le FormData avec les données actuelles du useForm
+        formData.append('titre', data.titre);
+        formData.append('description', data.description || '');
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('ordre', String(data.ordre));
+
+        if (data.fichier) {
+            formData.append('fichier', data.fichier);
+        }
+
+        // Debug local console pour s'assurer du contenu envoyé
+        console.log('📤 Payload Galerie envoyé au serveur :');
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}:`, pair[1]);
+        }
+
+        // 3. Soumettre via router.post vers l'URL d'administration de ta galerie
+        router.post(`/admin/galerie/${media.id}`, formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onSuccess: () => {
+                console.log('✅ Galerie mise à jour avec succès !');
+            },
+            onError: (err) => {
+                console.error('❌ Erreurs de validation reçues :', err);
+            },
         });
     };
 
@@ -159,7 +191,7 @@ export default function Edit({ media }: Props) {
                                             <p className="text-xs text-gray-500 mt-1">{fileName}</p>
                                         </div>
                                     ) : (
-                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
+                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors bg-white">
                                             <PhotoIcon className="w-8 h-8 text-gray-400" />
                                             <span className="text-xs text-gray-500 mt-1">Choisir un fichier</span>
                                             <input
@@ -209,7 +241,7 @@ export default function Edit({ media }: Props) {
                                 </div>
                             </div>
 
-                            {/* Bouton */}
+                            {/* Bouton de soumission */}
                             <button
                                 type="submit"
                                 disabled={processing}

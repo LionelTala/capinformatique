@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// ✅ CORRECTION : App au lieu de app
+use App\Models\PaiementTranche;
 
 class Student extends Model
 {
@@ -81,5 +83,46 @@ class Student extends Model
     public function isActive(): bool
     {
         return $this->user?->is_active ?? false;
+    }
+
+    public function paiementsTranches()
+    {
+        return $this->hasMany(PaiementTranche::class);
+    }
+
+    /**
+     * Numéro de la dernière tranche payée et confirmée.
+     * Retourne 0 immédiatement si l'étudiant n'est pas en formation (vague_id null).
+     */
+    public function derniereTranchePayeeNumero(): int
+    {
+        if (!$this->vague_id) {
+            return 0;
+        }
+
+        $formationId = $this->vague->formation_id;
+
+        return PaiementTranche::where('paiement_tranches.student_id', $this->id)
+            ->whereNotNull('paye_le')
+            ->join('tranches', 'tranches.id', '=', 'paiement_tranches.tranche_id')
+            ->where('tranches.formation_id', $formationId)
+            ->max('tranches.numero') ?? 0;
+    }
+
+    /**
+     * Est-ce que cet étudiant peut accéder à un contenu nécessitant $trancheRequiseNumero ?
+     * RÈGLE D'OR : certification = toujours true, sans aucune requête de tranche.
+     */
+    public function peutAccederContenu(?int $trancheRequiseNumero): bool
+    {
+        if ($this->certification_id) {
+            return true;
+        }
+
+        if (!$trancheRequiseNumero) {
+            return true;
+        }
+
+        return $this->derniereTranchePayeeNumero() >= $trancheRequiseNumero;
     }
 }

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 export const vagues = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ vagues.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 vagues.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ vagues.url = (args: { formationId: string | number } | [formationId: string | nu
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 vagues.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ vagues.get = (args: { formationId: string | number } | [formationId: string | nu
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 vagues.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -63,7 +63,7 @@ vagues.head = (args: { formationId: string | number } | [formationId: string | n
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 const vaguesForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -73,7 +73,7 @@ const vaguesForm = (args: { formationId: string | number } | [formationId: strin
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 vaguesForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -83,7 +83,7 @@ vaguesForm.get = (args: { formationId: string | number } | [formationId: string 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::vagues
-* @see app/Http/Controllers/Admin/EvaluationController.php:92
+* @see app/Http/Controllers/Admin/EvaluationController.php:104
 * @route '/admin/evaluations/vagues/{formationId}'
 */
 vaguesForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -100,7 +100,7 @@ vagues.form = vaguesForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 export const certifications = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -115,7 +115,7 @@ certifications.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 certifications.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -142,7 +142,7 @@ certifications.url = (args: { formationId: string | number } | [formationId: str
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 certifications.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -152,7 +152,7 @@ certifications.get = (args: { formationId: string | number } | [formationId: str
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 certifications.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -162,7 +162,7 @@ certifications.head = (args: { formationId: string | number } | [formationId: st
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 const certificationsForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -172,7 +172,7 @@ const certificationsForm = (args: { formationId: string | number } | [formationI
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 certificationsForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -182,7 +182,7 @@ certificationsForm.get = (args: { formationId: string | number } | [formationId:
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::certifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:109
+* @see app/Http/Controllers/Admin/EvaluationController.php:122
 * @route '/admin/evaluations/certifications/{formationId}'
 */
 certificationsForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -198,8 +198,206 @@ certificationsForm.head = (args: { formationId: string | number } | [formationId
 certifications.form = certificationsForm
 
 /**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+export const studentsByCertification = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: studentsByCertification.url(args, options),
+    method: 'get',
+})
+
+studentsByCertification.definition = {
+    methods: ["get","head"],
+    url: '/admin/evaluations/students-by-certification/{certificationId}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+studentsByCertification.url = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { certificationId: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            certificationId: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        certificationId: args.certificationId,
+    }
+
+    return studentsByCertification.definition.url
+            .replace('{certificationId}', parsedArgs.certificationId.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+studentsByCertification.get = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: studentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+studentsByCertification.head = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: studentsByCertification.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+const studentsByCertificationForm = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: studentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+studentsByCertificationForm.get = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: studentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::studentsByCertification
+* @see app/Http/Controllers/Admin/EvaluationController.php:139
+* @route '/admin/evaluations/students-by-certification/{certificationId}'
+*/
+studentsByCertificationForm.head = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: studentsByCertification.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+studentsByCertification.form = studentsByCertificationForm
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+export const tranches = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: tranches.url(args, options),
+    method: 'get',
+})
+
+tranches.definition = {
+    methods: ["get","head"],
+    url: '/admin/evaluations/tranches/{formationId}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+tranches.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { formationId: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            formationId: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        formationId: args.formationId,
+    }
+
+    return tranches.definition.url
+            .replace('{formationId}', parsedArgs.formationId.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+tranches.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: tranches.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+tranches.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: tranches.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+const tranchesForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: tranches.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+tranchesForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: tranches.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::tranches
+* @see app/Http/Controllers/Admin/EvaluationController.php:156
+* @route '/admin/evaluations/tranches/{formationId}'
+*/
+tranchesForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: tranches.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+tranches.form = tranchesForm
+
+/**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -214,7 +412,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -223,7 +421,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -233,7 +431,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -243,7 +441,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -253,7 +451,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -263,7 +461,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::index
-* @see app/Http/Controllers/Admin/EvaluationController.php:23
+* @see app/Http/Controllers/Admin/EvaluationController.php:24
 * @route '/admin/evaluations'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -280,7 +478,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -295,7 +493,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -304,7 +502,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -314,7 +512,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -324,7 +522,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -334,7 +532,7 @@ const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -344,7 +542,7 @@ createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::create
-* @see app/Http/Controllers/Admin/EvaluationController.php:74
+* @see app/Http/Controllers/Admin/EvaluationController.php:86
 * @route '/admin/evaluations/create'
 */
 createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -361,7 +559,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::store
-* @see app/Http/Controllers/Admin/EvaluationController.php:125
+* @see app/Http/Controllers/Admin/EvaluationController.php:178
 * @route '/admin/evaluations'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -376,7 +574,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::store
-* @see app/Http/Controllers/Admin/EvaluationController.php:125
+* @see app/Http/Controllers/Admin/EvaluationController.php:178
 * @route '/admin/evaluations'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -385,7 +583,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::store
-* @see app/Http/Controllers/Admin/EvaluationController.php:125
+* @see app/Http/Controllers/Admin/EvaluationController.php:178
 * @route '/admin/evaluations'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -395,7 +593,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::store
-* @see app/Http/Controllers/Admin/EvaluationController.php:125
+* @see app/Http/Controllers/Admin/EvaluationController.php:178
 * @route '/admin/evaluations'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -405,7 +603,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::store
-* @see app/Http/Controllers/Admin/EvaluationController.php:125
+* @see app/Http/Controllers/Admin/EvaluationController.php:178
 * @route '/admin/evaluations'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -417,7 +615,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 export const show = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -432,7 +630,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 show.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -465,7 +663,7 @@ show.url = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 show.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -475,7 +673,7 @@ show.get = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 show.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -485,7 +683,7 @@ show.head = (args: { evaluation: number | { id: number } } | [evaluation: number
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 const showForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -495,7 +693,7 @@ const showForm = (args: { evaluation: number | { id: number } } | [evaluation: n
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 showForm.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -505,7 +703,7 @@ showForm.get = (args: { evaluation: number | { id: number } } | [evaluation: num
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::show
-* @see app/Http/Controllers/Admin/EvaluationController.php:313
+* @see app/Http/Controllers/Admin/EvaluationController.php:419
 * @route '/admin/evaluations/{evaluation}'
 */
 showForm.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -522,7 +720,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 export const edit = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -537,7 +735,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 edit.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -570,7 +768,7 @@ edit.url = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 edit.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -580,7 +778,7 @@ edit.get = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 edit.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -590,7 +788,7 @@ edit.head = (args: { evaluation: number | { id: number } } | [evaluation: number
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 const editForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -600,7 +798,7 @@ const editForm = (args: { evaluation: number | { id: number } } | [evaluation: n
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 editForm.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -610,7 +808,7 @@ editForm.get = (args: { evaluation: number | { id: number } } | [evaluation: num
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::edit
-* @see app/Http/Controllers/Admin/EvaluationController.php:381
+* @see app/Http/Controllers/Admin/EvaluationController.php:501
 * @route '/admin/evaluations/{evaluation}/edit'
 */
 editForm.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -627,22 +825,22 @@ edit.form = editForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
 * @route '/admin/evaluations/{evaluation}'
 */
-export const update = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: update.url(args, options),
-    method: 'put',
+    method: 'post',
 })
 
 update.definition = {
-    methods: ["put","patch"],
+    methods: ["post","put"],
     url: '/admin/evaluations/{evaluation}',
-} satisfies RouteDefinition<["put","patch"]>
+} satisfies RouteDefinition<["post","put"]>
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
 * @route '/admin/evaluations/{evaluation}'
 */
 update.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -675,7 +873,17 @@ update.url = (args: { evaluation: number | { id: number } } | [evaluation: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
+* @route '/admin/evaluations/{evaluation}'
+*/
+update.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: update.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::update
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
 * @route '/admin/evaluations/{evaluation}'
 */
 update.put = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -685,32 +893,27 @@ update.put = (args: { evaluation: number | { id: number } } | [evaluation: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
-* @route '/admin/evaluations/{evaluation}'
-*/
-update.patch = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: update.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
 * @route '/admin/evaluations/{evaluation}'
 */
 const updateForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PUT',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
+    action: update.url(args, options),
     method: 'post',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
+* @route '/admin/evaluations/{evaluation}'
+*/
+updateForm.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\EvaluationController::update
+* @see app/Http/Controllers/Admin/EvaluationController.php:536
 * @route '/admin/evaluations/{evaluation}'
 */
 updateForm.put = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -723,26 +926,11 @@ updateForm.put = (args: { evaluation: number | { id: number } } | [evaluation: n
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\Admin\EvaluationController::update
-* @see app/Http/Controllers/Admin/EvaluationController.php:413
-* @route '/admin/evaluations/{evaluation}'
-*/
-updateForm.patch = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
 update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::destroy
-* @see app/Http/Controllers/Admin/EvaluationController.php:482
+* @see app/Http/Controllers/Admin/EvaluationController.php:610
 * @route '/admin/evaluations/{evaluation}'
 */
 export const destroy = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -757,7 +945,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::destroy
-* @see app/Http/Controllers/Admin/EvaluationController.php:482
+* @see app/Http/Controllers/Admin/EvaluationController.php:610
 * @route '/admin/evaluations/{evaluation}'
 */
 destroy.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -790,7 +978,7 @@ destroy.url = (args: { evaluation: number | { id: number } } | [evaluation: numb
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::destroy
-* @see app/Http/Controllers/Admin/EvaluationController.php:482
+* @see app/Http/Controllers/Admin/EvaluationController.php:610
 * @route '/admin/evaluations/{evaluation}'
 */
 destroy.delete = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -800,7 +988,7 @@ destroy.delete = (args: { evaluation: number | { id: number } } | [evaluation: n
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::destroy
-* @see app/Http/Controllers/Admin/EvaluationController.php:482
+* @see app/Http/Controllers/Admin/EvaluationController.php:610
 * @route '/admin/evaluations/{evaluation}'
 */
 const destroyForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -815,7 +1003,7 @@ const destroyForm = (args: { evaluation: number | { id: number } } | [evaluation
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::destroy
-* @see app/Http/Controllers/Admin/EvaluationController.php:482
+* @see app/Http/Controllers/Admin/EvaluationController.php:610
 * @route '/admin/evaluations/{evaluation}'
 */
 destroyForm.delete = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -832,7 +1020,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::toggleActive
-* @see app/Http/Controllers/Admin/EvaluationController.php:513
+* @see app/Http/Controllers/Admin/EvaluationController.php:641
 * @route '/admin/evaluations/{evaluation}/toggle-active'
 */
 export const toggleActive = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -847,7 +1035,7 @@ toggleActive.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::toggleActive
-* @see app/Http/Controllers/Admin/EvaluationController.php:513
+* @see app/Http/Controllers/Admin/EvaluationController.php:641
 * @route '/admin/evaluations/{evaluation}/toggle-active'
 */
 toggleActive.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -880,7 +1068,7 @@ toggleActive.url = (args: { evaluation: number | { id: number } } | [evaluation:
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::toggleActive
-* @see app/Http/Controllers/Admin/EvaluationController.php:513
+* @see app/Http/Controllers/Admin/EvaluationController.php:641
 * @route '/admin/evaluations/{evaluation}/toggle-active'
 */
 toggleActive.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -890,7 +1078,7 @@ toggleActive.post = (args: { evaluation: number | { id: number } } | [evaluation
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::toggleActive
-* @see app/Http/Controllers/Admin/EvaluationController.php:513
+* @see app/Http/Controllers/Admin/EvaluationController.php:641
 * @route '/admin/evaluations/{evaluation}/toggle-active'
 */
 const toggleActiveForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -900,7 +1088,7 @@ const toggleActiveForm = (args: { evaluation: number | { id: number } } | [evalu
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::toggleActive
-* @see app/Http/Controllers/Admin/EvaluationController.php:513
+* @see app/Http/Controllers/Admin/EvaluationController.php:641
 * @route '/admin/evaluations/{evaluation}/toggle-active'
 */
 toggleActiveForm.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -912,7 +1100,7 @@ toggleActive.form = toggleActiveForm
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::resendNotifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:534
+* @see app/Http/Controllers/Admin/EvaluationController.php:662
 * @route '/admin/evaluations/{evaluation}/resend-notifications'
 */
 export const resendNotifications = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -927,7 +1115,7 @@ resendNotifications.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::resendNotifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:534
+* @see app/Http/Controllers/Admin/EvaluationController.php:662
 * @route '/admin/evaluations/{evaluation}/resend-notifications'
 */
 resendNotifications.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -960,7 +1148,7 @@ resendNotifications.url = (args: { evaluation: number | { id: number } } | [eval
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::resendNotifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:534
+* @see app/Http/Controllers/Admin/EvaluationController.php:662
 * @route '/admin/evaluations/{evaluation}/resend-notifications'
 */
 resendNotifications.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -970,7 +1158,7 @@ resendNotifications.post = (args: { evaluation: number | { id: number } } | [eva
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::resendNotifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:534
+* @see app/Http/Controllers/Admin/EvaluationController.php:662
 * @route '/admin/evaluations/{evaluation}/resend-notifications'
 */
 const resendNotificationsForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -980,7 +1168,7 @@ const resendNotificationsForm = (args: { evaluation: number | { id: number } } |
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::resendNotifications
-* @see app/Http/Controllers/Admin/EvaluationController.php:534
+* @see app/Http/Controllers/Admin/EvaluationController.php:662
 * @route '/admin/evaluations/{evaluation}/resend-notifications'
 */
 resendNotificationsForm.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -993,6 +1181,8 @@ resendNotifications.form = resendNotificationsForm
 const evaluations = {
     vagues: Object.assign(vagues, vagues),
     certifications: Object.assign(certifications, certifications),
+    studentsByCertification: Object.assign(studentsByCertification, studentsByCertification),
+    tranches: Object.assign(tranches, tranches),
     index: Object.assign(index, index),
     create: Object.assign(create, create),
     store: Object.assign(store, store),

@@ -1,28 +1,7 @@
-// resources/js/pages/Admin/Formations/Edit.tsx
 import { ArrowLeftIcon, PencilSquareIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
-
-
-interface Formation {
-    id: number;
-    name: string;
-    abbreviation: string;
-    description: string;
-    debouches: string;
-    duration: string;
-    diplome: string;
-    frais: number;
-    image: string | null;
-    image_url: string;
-    lien_externe: string | null;
-    lien_label: string | null;
-    is_active: boolean;
-    order: number;
-}
 
 interface Formation {
     id: number;
@@ -48,7 +27,7 @@ interface Props {
 export default function Edit({ formation }: Props) {
     const [previewImage, setPreviewImage] = useState<string | null>(formation.image_url);
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, processing, errors } = useForm({
         name: formation.name || '',
         abbreviation: formation.abbreviation || '',
         description: formation.description || '',
@@ -78,19 +57,49 @@ export default function Edit({ formation }: Props) {
     const removeImage = () => {
         setData('image', null);
         setPreviewImage(null);
+        const fileInput = document.getElementById('image-input') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Vérifier les données avant envoi
-        console.log('Données envoyées:', {
+        // 1. Initialiser le FormData de manière robuste
+        const formData = new FormData();
+
+        // 🚀 CRITIQUE : Dit à Laravel de traiter cette requête POST comme un PUT
+        formData.append('_method', 'PUT');
+
+        // 2. Transférer tous les champs du state local vers le FormData
+        formData.append('name', data.name);
+        formData.append('abbreviation', data.abbreviation);
+        formData.append('description', data.description);
+        formData.append('debouches', data.debouches);
+        formData.append('duration', data.duration);
+        formData.append('diplome', data.diplome);
+        formData.append('frais', data.frais);
+        formData.append('lien_externe', data.lien_externe);
+        formData.append('lien_label', data.lien_label);
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('order', String(data.order));
+
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+
+        // Debug local console
+        console.log('Données envoyées (Formations):', {
             ...data,
             image: data.image ? 'File present' : null
         });
 
-        // Envoyer le formulaire
-        put(`/admin/formations/${formation.id}`);
+        // 3. Expédier via router.post au lieu de put
+        router.post(`/admin/formations/${formation.id}`, formData, {
+            forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
     };
 
     return (
@@ -164,10 +173,11 @@ export default function Edit({ formation }: Props) {
                                             </button>
                                         </div>
                                     ) : (
-                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
+                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors bg-white">
                                             <span className="text-2xl">📷</span>
                                             <span className="text-xs text-gray-500 mt-1">Ajouter</span>
                                             <input
+                                                id="image-input"
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleImageChange}
@@ -179,37 +189,38 @@ export default function Edit({ formation }: Props) {
                                 {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
                             </div>
 
-                            {/* Grille 2 colonnes */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Durée <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        id="duration"
-                                        type="text"
-                                        value={data.duration}
-                                        onChange={(e) => setData('duration', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
-                                        required
-                                    />
-                                    {errors.duration && <p className="mt-1 text-sm text-red-600">{errors.duration}</p>}
-                                </div>
-                                <div>
-                                    <label htmlFor="diplome" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Diplôme obtenu <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        id="diplome"
-                                        type="text"
-                                        value={data.diplome}
-                                        onChange={(e) => setData('diplome', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
-                                        required
-                                    />
-                                    {errors.diplome && <p className="mt-1 text-sm text-red-600">{errors.diplome}</p>}
-                                </div>
-                            </div>
+                           {/* Grille 2 colonnes */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+        <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+            Durée <span className="text-red-500">*</span>
+        </label>
+        <input
+            id="duration"
+            type="text"
+            value={data.duration}
+            onChange={(e) => setData('duration', e.target.value)}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
+            required
+        />
+        {errors.duration && <p className="mt-1 text-sm text-red-600">{errors.duration}</p>}
+    </div> {/* ✅ Fermeture propre du bloc duration */}
+
+    <div>
+        <label htmlFor="diplome" className="block text-sm font-medium text-gray-700 mb-1">
+            Diplôme obtenu <span className="text-red-500">*</span>
+        </label>
+        <input
+            id="diplome"
+            type="text"
+            value={data.diplome}
+            onChange={(e) => setData('diplome', e.target.value)}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
+            required
+        />
+        {errors.diplome && <p className="mt-1 text-sm text-red-600">{errors.diplome}</p>}
+    </div>
+</div>
 
                             {/* Frais */}
                             <div>

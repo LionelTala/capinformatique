@@ -1,3 +1,4 @@
+// resources/js/pages/Admin/Cours/Index.tsx
 import {
     PlusIcon,
     PencilSquareIcon,
@@ -7,6 +8,8 @@ import {
     BookOpenIcon,
     DocumentTextIcon,
     VideoCameraIcon,
+    UserGroupIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -23,6 +26,12 @@ interface Cours {
     has_video: boolean;
     has_files: boolean;
     total_students: number;
+    mode_envoi: 'groupe' | 'individuel'; // ✅ Ajouté
+    tranche_requise: {
+        id: number;
+        numero: number;
+        montant: number;
+    } | null; // ✅ Ajouté
     formation: {
         id: number;
         name: string;
@@ -112,7 +121,10 @@ export default function Index({ cours }: Props) {
                                             Formation
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Type
+                                            Envoi
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tranche requise
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Vues
@@ -151,13 +163,27 @@ export default function Index({ cours }: Props) {
                                                 {c.formation?.name || '-'}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                                    c.type === 'vague'
-                                                        ? 'bg-blue-100 text-blue-700'
-                                                        : 'bg-purple-100 text-purple-700'
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                    c.mode_envoi === 'individuel'
+                                                        ? 'bg-purple-100 text-purple-700'
+                                                        : 'bg-blue-100 text-blue-700'
                                                 }`}>
-                                                    {c.type === 'vague' ? 'Vague' : 'Certification'}
+                                                    {c.mode_envoi === 'individuel' ? (
+                                                        <UserIcon className="w-3 h-3" />
+                                                    ) : (
+                                                        <UserGroupIcon className="w-3 h-3" />
+                                                    )}
+                                                    {c.mode_envoi === 'individuel' ? 'Individuel' : 'Groupe'}
                                                 </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {c.tranche_requise ? (
+                                                    <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">
+                                                        T{c.tranche_requise.numero}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-gray-400">Tous</span>
+                                                )}
                                             </td>
                                             <td className="px-4 py-3 text-gray-600 text-sm">
                                                 {c.viewed_count} / {c.total_students}

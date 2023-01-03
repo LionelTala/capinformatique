@@ -13,6 +13,9 @@ import {
     ChartBarIcon,
     PhotoIcon,
     UserIcon,
+    EyeIcon,
+    BanknotesIcon,      // ✅ Ajouté pour Tranches
+    CreditCardIcon,     // ✅ Ajouté pour Paiements
 } from '@heroicons/react/24/outline';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -25,7 +28,6 @@ interface AdminLayoutProps {
     title?: string;
 }
 
-
 const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -36,7 +38,6 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
     const devoirCount = props.unreadCountsByType?.['devoir'] ?? 0;
     const candidatureCount = props.unreadCountsByType?.['candidature'] ?? 0;
     const evaluationCount = props.unreadCountsByType?.['evaluation'] ?? 0;
-
 
     const canManageUsers = user?.role === 'super_admin' || user?.role === 'admin_centre';
 
@@ -58,20 +59,24 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
     }
 
     menuItems.push(
+        { label: 'Statistiques visites', href: '/admin/stats-visites', icon: <EyeIcon className="w-5 h-5" /> },
         { label: 'Galerie', href: '/admin/galerie', icon: <PhotoIcon className="w-5 h-5" /> },
         { label: 'Activités', href: '/admin/activites', icon: <CalendarIcon className="w-5 h-5" /> },
         { label: 'Formations', href: '/admin/formations', icon: <AcademicCapIcon className="w-5 h-5" /> },
+        { label: 'Bibliothèque', href: '/admin/bibliotheque', icon: <BookOpenIcon className="w-5 h-5" /> },
         { label: 'Vagues', href: '/admin/vagues', icon: <CalendarIcon className="w-5 h-5" /> },
         { label: 'Certifications', href: '/admin/certifications', icon: <AcademicCapIcon className="w-5 h-5" /> },
         { label: 'Candidatures', href: '/admin/candidatures', icon: <ClipboardDocumentListIcon className="w-5 h-5" />, badge: candidatureCount },
-
         { label: 'Étudiants', href: '/admin/students', icon: <UserGroupIcon className="w-5 h-5" /> },
         { label: 'Cours', href: '/admin/cours', icon: <BookOpenIcon className="w-5 h-5" /> },
         { label: 'Devoirs', href: '/admin/devoirs', icon: <ClipboardDocumentListIcon className="w-5 h-5" />, badge: devoirCount },
         { label: 'Évaluations', href: '/admin/evaluations', icon: <ChartBarIcon className="w-5 h-5" />, badge: evaluationCount },
-        { label: 'Mon Profil', href: '/profil', icon: <UserIcon className="w-5 h-5" />},
 
+        // ✅ NOUVEAUX LIENS POUR TRANCHES ET PAIEMENTS
+        { label: 'Tranches', href: '/admin/tranches', icon: <BanknotesIcon className="w-5 h-5" /> },
+        { label: 'Paiements', href: '/admin/paiements', icon: <CreditCardIcon className="w-5 h-5" /> },
 
+        { label: 'Mon Profil', href: '/profil', icon: <UserIcon className="w-5 h-5" /> },
     );
 
     const getUserInitials = (user: typeof props.auth.user) => {

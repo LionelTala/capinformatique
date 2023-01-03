@@ -1,3 +1,4 @@
+import VisitStatsController from './VisitStatsController'
 import DashboardController from './DashboardController'
 import UserController from './UserController'
 import FormationController from './FormationController'
@@ -10,9 +11,12 @@ import DevoirController from './DevoirController'
 import EvaluationController from './EvaluationController'
 import GalerieController from './GalerieController'
 import ActiviteController from './ActiviteController'
-import NotificationController from './NotificationController'
+import LivreController from './LivreController'
+import TrancheController from './TrancheController'
+import PaiementController from './PaiementController'
 
 const Admin = {
+    VisitStatsController: Object.assign(VisitStatsController, VisitStatsController),
     DashboardController: Object.assign(DashboardController, DashboardController),
     UserController: Object.assign(UserController, UserController),
     FormationController: Object.assign(FormationController, FormationController),
@@ -25,7 +29,9 @@ const Admin = {
     EvaluationController: Object.assign(EvaluationController, EvaluationController),
     GalerieController: Object.assign(GalerieController, GalerieController),
     ActiviteController: Object.assign(ActiviteController, ActiviteController),
-    NotificationController: Object.assign(NotificationController, NotificationController),
+    LivreController: Object.assign(LivreController, LivreController),
+    TrancheController: Object.assign(TrancheController, TrancheController),
+    PaiementController: Object.assign(PaiementController, PaiementController),
 }
 
 export default Admin

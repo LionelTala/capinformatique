@@ -11,12 +11,11 @@ import {
     XCircleIcon,
     DocumentTextIcon,
     UserGroupIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface Evaluation {
     id: number;
@@ -25,6 +24,12 @@ interface Evaluation {
     date: string | null;
     coefficient: number;
     type: string;
+    mode_envoi: 'groupe' | 'individuel';
+    tranche_requise: {
+        id: number;
+        numero: number;
+        montant: number;
+    } | null;
     est_depasse: boolean;
     jours_restants: number | null;
     total_etudiants: number;
@@ -141,6 +146,12 @@ export default function Index({ evaluations }: Props) {
                                             Type
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Envoi
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tranche
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Date
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -187,6 +198,29 @@ export default function Index({ evaluations }: Props) {
                                                 }`}>
                                                     {e.type === 'vague' ? 'Vague' : 'Certification'}
                                                 </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                    e.mode_envoi === 'individuel'
+                                                        ? 'bg-purple-100 text-purple-700'
+                                                        : 'bg-blue-100 text-blue-700'
+                                                }`}>
+                                                    {e.mode_envoi === 'individuel' ? (
+                                                        <UserIcon className="w-3 h-3" />
+                                                    ) : (
+                                                        <UserGroupIcon className="w-3 h-3" />
+                                                    )}
+                                                    {e.mode_envoi === 'individuel' ? 'Individuel' : 'Groupe'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {e.tranche_requise ? (
+                                                    <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">
+                                                        T{e.tranche_requise.numero}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-gray-400">Tous</span>
+                                                )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-col">

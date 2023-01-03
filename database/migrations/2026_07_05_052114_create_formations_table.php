@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('lien_label')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('order')->default(0);
+            $table->string('lien_paiement_total')->nullable();
             $table->timestamps();
         });
     }

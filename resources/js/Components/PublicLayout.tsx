@@ -10,7 +10,8 @@ import {
     CalendarIcon,
     EnvelopeIcon,
     PhotoIcon,
-    HomeIcon
+    HomeIcon,
+    BookOpenIcon
 } from '@heroicons/react/24/outline';
 
 import { Link, usePage } from '@inertiajs/react';
@@ -25,6 +26,7 @@ const navLinks = [
     { label: 'Formations', href: '/formations', icon: <AcademicCapIcon className="w-5 h-5" /> },
     { label: 'Certification', href: '/certification', icon: <SparklesIcon className="w-5 h-5" /> },
     {label: 'Galerie', href: '/galerie', icon: <PhotoIcon className="w-5 h-5" /> },
+    { label: 'Bibliothèque', href: '/bibliotheque', icon: <BookOpenIcon className="w-5 h-5" /> }
  ];
 
 const PublicLayout = ({ children }: Props) => {
@@ -297,7 +299,7 @@ const PublicLayout = ({ children }: Props) => {
                         <p className="mt-4 text-gray-500 text-[10px]">
                             Développé par{' '}
                             <a href="https://wa.me/237659666110" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                                ShebyDev
+                                ShelbyDev
                             </a>
                         </p>
                     </div>

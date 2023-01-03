@@ -706,6 +706,96 @@ toggleActiveForm.post = (args: { formation: number | { id: number } } | [formati
 
 toggleActive.form = toggleActiveForm
 
+/**
+* @see \App\Http\Controllers\Admin\TrancheController::lienTotal
+* @see app/Http/Controllers/Admin/TrancheController.php:156
+* @route '/admin/formations/{formation}/lien-paiement-total'
+*/
+export const lienTotal = (args: { formation: number | { id: number } } | [formation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: lienTotal.url(args, options),
+    method: 'put',
+})
+
+lienTotal.definition = {
+    methods: ["put"],
+    url: '/admin/formations/{formation}/lien-paiement-total',
+} satisfies RouteDefinition<["put"]>
+
+/**
+* @see \App\Http\Controllers\Admin\TrancheController::lienTotal
+* @see app/Http/Controllers/Admin/TrancheController.php:156
+* @route '/admin/formations/{formation}/lien-paiement-total'
+*/
+lienTotal.url = (args: { formation: number | { id: number } } | [formation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { formation: args }
+    }
+
+    if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+        args = { formation: args.id }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            formation: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        formation: typeof args.formation === 'object'
+        ? args.formation.id
+        : args.formation,
+    }
+
+    return lienTotal.definition.url
+            .replace('{formation}', parsedArgs.formation.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\TrancheController::lienTotal
+* @see app/Http/Controllers/Admin/TrancheController.php:156
+* @route '/admin/formations/{formation}/lien-paiement-total'
+*/
+lienTotal.put = (args: { formation: number | { id: number } } | [formation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: lienTotal.url(args, options),
+    method: 'put',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\TrancheController::lienTotal
+* @see app/Http/Controllers/Admin/TrancheController.php:156
+* @route '/admin/formations/{formation}/lien-paiement-total'
+*/
+const lienTotalForm = (args: { formation: number | { id: number } } | [formation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: lienTotal.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PUT',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\TrancheController::lienTotal
+* @see app/Http/Controllers/Admin/TrancheController.php:156
+* @route '/admin/formations/{formation}/lien-paiement-total'
+*/
+lienTotalForm.put = (args: { formation: number | { id: number } } | [formation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: lienTotal.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'PUT',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'post',
+})
+
+lienTotal.form = lienTotalForm
+
 const formations = {
     index: Object.assign(index, index),
     create: Object.assign(create, create),
@@ -715,6 +805,7 @@ const formations = {
     update: Object.assign(update, update),
     destroy: Object.assign(destroy, destroy),
     toggleActive: Object.assign(toggleActive, toggleActive),
+    lienTotal: Object.assign(lienTotal, lienTotal),
 }
 
 export default formations

@@ -22,6 +22,7 @@ class Formation extends Model
         'image',
         'lien_externe',
         'lien_label',
+        'lien_paiement_total',
         'is_active',
         'order',
     ];
@@ -52,9 +53,15 @@ class Formation extends Model
         return $this->hasMany(Certification::class);
     }
 
-    public function vagues()  // ✅ AJOUTER CETTE RELATION
+    public function vagues()
     {
         return $this->hasMany(Vague::class);
+    }
+
+    // ✅ RELATION AVEC LES TRANCHES (À AJOUTER)
+    public function tranches()
+    {
+        return $this->hasMany(Tranche::class);
     }
 
     // ===================== ACCESSORS =====================

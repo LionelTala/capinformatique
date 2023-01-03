@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 export const show = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 show.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ show.url = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 show.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ show.get = (args: { evaluation: number | { id: number } } | [evaluation: number 
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 show.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -69,7 +69,7 @@ show.head = (args: { evaluation: number | { id: number } } | [evaluation: number
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 const showForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +79,7 @@ const showForm = (args: { evaluation: number | { id: number } } | [evaluation: n
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 showForm.get = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -89,7 +89,7 @@ showForm.get = (args: { evaluation: number | { id: number } } | [evaluation: num
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::show
-* @see app/Http/Controllers/Student/EvaluationController.php:94
+* @see app/Http/Controllers/Student/EvaluationController.php:128
 * @route '/student/evaluations/{evaluation}'
 */
 showForm.head = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -106,7 +106,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::soumettre
-* @see app/Http/Controllers/Student/EvaluationController.php:160
+* @see app/Http/Controllers/Student/EvaluationController.php:232
 * @route '/student/evaluations/{evaluation}/soumettre'
 */
 export const soumettre = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -121,7 +121,7 @@ soumettre.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::soumettre
-* @see app/Http/Controllers/Student/EvaluationController.php:160
+* @see app/Http/Controllers/Student/EvaluationController.php:232
 * @route '/student/evaluations/{evaluation}/soumettre'
 */
 soumettre.url = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -154,7 +154,7 @@ soumettre.url = (args: { evaluation: number | { id: number } } | [evaluation: nu
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::soumettre
-* @see app/Http/Controllers/Student/EvaluationController.php:160
+* @see app/Http/Controllers/Student/EvaluationController.php:232
 * @route '/student/evaluations/{evaluation}/soumettre'
 */
 soumettre.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -164,7 +164,7 @@ soumettre.post = (args: { evaluation: number | { id: number } } | [evaluation: n
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::soumettre
-* @see app/Http/Controllers/Student/EvaluationController.php:160
+* @see app/Http/Controllers/Student/EvaluationController.php:232
 * @route '/student/evaluations/{evaluation}/soumettre'
 */
 const soumettreForm = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -174,7 +174,7 @@ const soumettreForm = (args: { evaluation: number | { id: number } } | [evaluati
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::soumettre
-* @see app/Http/Controllers/Student/EvaluationController.php:160
+* @see app/Http/Controllers/Student/EvaluationController.php:232
 * @route '/student/evaluations/{evaluation}/soumettre'
 */
 soumettreForm.post = (args: { evaluation: number | { id: number } } | [evaluation: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

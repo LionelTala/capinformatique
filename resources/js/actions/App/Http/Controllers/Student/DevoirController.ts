@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::index
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 export const show = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 show.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ show.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 show.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -140,7 +140,7 @@ show.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 show.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -150,7 +150,7 @@ show.head = (args: { devoir: number | { id: number } } | [devoir: number | { id:
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 const showForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -160,7 +160,7 @@ const showForm = (args: { devoir: number | { id: number } } | [devoir: number | 
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 showForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -170,7 +170,7 @@ showForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { 
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::show
-* @see app/Http/Controllers/Student/DevoirController.php:93
+* @see app/Http/Controllers/Student/DevoirController.php:133
 * @route '/student/devoirs/{devoir}'
 */
 showForm.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -187,7 +187,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::soumettre
-* @see app/Http/Controllers/Student/DevoirController.php:160
+* @see app/Http/Controllers/Student/DevoirController.php:240
 * @route '/student/devoirs/{devoir}/soumettre'
 */
 export const soumettre = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -202,7 +202,7 @@ soumettre.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::soumettre
-* @see app/Http/Controllers/Student/DevoirController.php:160
+* @see app/Http/Controllers/Student/DevoirController.php:240
 * @route '/student/devoirs/{devoir}/soumettre'
 */
 soumettre.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -235,7 +235,7 @@ soumettre.url = (args: { devoir: number | { id: number } } | [devoir: number | {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::soumettre
-* @see app/Http/Controllers/Student/DevoirController.php:160
+* @see app/Http/Controllers/Student/DevoirController.php:240
 * @route '/student/devoirs/{devoir}/soumettre'
 */
 soumettre.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -245,7 +245,7 @@ soumettre.post = (args: { devoir: number | { id: number } } | [devoir: number | 
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::soumettre
-* @see app/Http/Controllers/Student/DevoirController.php:160
+* @see app/Http/Controllers/Student/DevoirController.php:240
 * @route '/student/devoirs/{devoir}/soumettre'
 */
 const soumettreForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -255,7 +255,7 @@ const soumettreForm = (args: { devoir: number | { id: number } } | [devoir: numb
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::soumettre
-* @see app/Http/Controllers/Student/DevoirController.php:160
+* @see app/Http/Controllers/Student/DevoirController.php:240
 * @route '/student/devoirs/{devoir}/soumettre'
 */
 soumettreForm.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

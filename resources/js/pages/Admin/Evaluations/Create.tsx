@@ -5,12 +5,12 @@ import {
     XMarkIcon,
     DocumentIcon,
     CalendarIcon,
+    UserGroupIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
-import { Head, Link, useForm } from '@inertiajs/react';
-
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface Formation {
     id: number;
@@ -22,11 +22,24 @@ interface Vague {
     id: number;
     name: string;
     date_debut: string;
+    is_active: boolean;
 }
 
 interface Certification {
     id: number;
     titre: string;
+}
+
+interface Student {
+    id: number;
+    name: string;
+    matricule: string;
+}
+
+interface Tranche {
+    id: number;
+    numero: number;
+    montant: number;
 }
 
 interface Props {
@@ -36,18 +49,24 @@ interface Props {
 export default function Create({ formations }: Props) {
     const [vagues, setVagues] = useState<Vague[]>([]);
     const [certifications, setCertifications] = useState<Certification[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [tranches, setTranches] = useState<Tranche[]>([]);
     const [files, setFiles] = useState<File[]>([]);
     const [filePreviews, setFilePreviews] = useState<string[]>([]);
     const [loadingVagues, setLoadingVagues] = useState(false);
     const [loadingCertifications, setLoadingCertifications] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(false);
+    const [loadingTranches, setLoadingTranches] = useState(false);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, processing, errors } = useForm({
         titre: '',
         description: '',
         formation_id: '',
-        type: 'vague',
+        type_destinataire: '',
         vague_id: '',
         certification_id: '',
+        student_id: '',
+        tranche_requise_id: '',
         date: '',
         coefficient: '1',
         is_active: true,
@@ -56,41 +75,98 @@ export default function Create({ formations }: Props) {
         files: [] as File[],
     });
 
+    // Charger les vagues actives
     useEffect(() => {
-        if (data.formation_id && data.type === 'vague') {
+        if (data.formation_id && data.type_destinataire === 'vague') {
             setLoadingVagues(true);
             fetch(`/admin/evaluations/vagues/${data.formation_id}`)
-                .then((res) => res.json())
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then((data) => {
-                    setVagues(data);
+                    setVagues(Array.isArray(data) ? data : []);
                     setLoadingVagues(false);
                 })
-                .catch(() => setLoadingVagues(false));
+                .catch(() => {
+                    setVagues([]);
+                    setLoadingVagues(false);
+                });
         } else {
             setVagues([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
 
+    // Charger les certifications
     useEffect(() => {
-        if (data.formation_id && data.type === 'certification') {
+        if (data.formation_id && data.type_destinataire === 'certification') {
             setLoadingCertifications(true);
             fetch(`/admin/evaluations/certifications/${data.formation_id}`)
-                .then((res) => res.json())
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then((data) => {
-                    setCertifications(data);
+                    setCertifications(Array.isArray(data) ? data : []);
                     setLoadingCertifications(false);
                 })
-                .catch(() => setLoadingCertifications(false));
+                .catch(() => {
+                    setCertifications([]);
+                    setLoadingCertifications(false);
+                });
         } else {
             setCertifications([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
+
+    // Charger les tranches
+    useEffect(() => {
+        if (data.formation_id) {
+            setLoadingTranches(true);
+            fetch(`/admin/evaluations/tranches/${data.formation_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((data) => {
+                    setTranches(Array.isArray(data) ? data : []);
+                    setLoadingTranches(false);
+                })
+                .catch(() => {
+                    setTranches([]);
+                    setLoadingTranches(false);
+                });
+        } else {
+            setTranches([]);
+        }
+    }, [data.formation_id]);
+
+    // Charger les étudiants d'une certification
+    useEffect(() => {
+        if (data.certification_id && data.type_destinataire === 'certification') {
+            setLoadingStudents(true);
+            fetch(`/admin/evaluations/students-by-certification/${data.certification_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((data) => {
+                    setStudents(Array.isArray(data) ? data : []);
+                    setLoadingStudents(false);
+                })
+                .catch(() => {
+                    setStudents([]);
+                    setLoadingStudents(false);
+                });
+        } else {
+            setStudents([]);
+        }
+    }, [data.certification_id, data.type_destinataire]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = Array.from(e.target.files || []);
         setFiles([...files, ...selectedFiles]);
         setData('files', [...files, ...selectedFiles]);
-
         const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
         setFilePreviews([...filePreviews, ...newPreviews]);
     };
@@ -106,8 +182,40 @@ export default function Create({ formations }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/evaluations', {
+
+        const formData = new FormData();
+
+        formData.append('titre', data.titre);
+        formData.append('description', data.description || '');
+        formData.append('formation_id', data.formation_id);
+        formData.append('type', data.type_destinataire);
+        formData.append('mode_envoi', data.type_destinataire === 'vague' ? 'groupe' : 'individuel');
+
+        if (data.type_destinataire === 'vague') {
+            formData.append('vague_id', data.vague_id || '');
+            if (data.tranche_requise_id) {
+                formData.append('tranche_requise_id', data.tranche_requise_id);
+            }
+        } else {
+            formData.append('certification_id', data.certification_id || '');
+            formData.append('student_id', data.student_id || '');
+        }
+
+        if (data.date) formData.append('date', data.date);
+        formData.append('coefficient', data.coefficient);
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('order', String(data.order));
+        formData.append('send_notification', data.send_notification ? '1' : '0');
+
+        data.files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post('/admin/evaluations', formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
     };
 
@@ -168,7 +276,13 @@ export default function Create({ formations }: Props) {
                                 <select
                                     id="formation_id"
                                     value={data.formation_id}
-                                    onChange={(e) => setData('formation_id', e.target.value)}
+                                    onChange={(e) => {
+                                        setData('formation_id', e.target.value);
+                                        setData('type_destinataire', '');
+                                        setData('vague_id', '');
+                                        setData('certification_id', '');
+                                        setData('student_id', '');
+                                    }}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
                                     required
                                 >
@@ -182,89 +296,197 @@ export default function Create({ formations }: Props) {
                                 {errors.formation_id && <p className="mt-1 text-sm text-red-600">{errors.formation_id}</p>}
                             </div>
 
-                            {/* Type */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Destinataires <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex gap-4">
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="vague"
-                                            checked={data.type === 'vague'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Vague</span>
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="certification"
-                                            checked={data.type === 'certification'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Certification</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Vague */}
-                            {data.type === 'vague' && (
+                            {/* Type de destinataire */}
+                            {data.formation_id && (
                                 <div>
-                                    <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Vague <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Type de destinataire <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        id="vague_id"
-                                        value={data.vague_id}
-                                        onChange={(e) => setData('vague_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'vague'}
-                                    >
-                                        <option value="">-- Sélectionnez une vague --</option>
-                                        {loadingVagues ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            vagues.map((v) => (
-                                                <option key={v.id} value={v.id}>
-                                                    {v.name} ({v.date_debut})
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'vague');
+                                                setData('certification_id', '');
+                                                setData('student_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserGroupIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Vague de formation
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi groupé</p>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'certification');
+                                                setData('vague_id', '');
+                                                setData('tranche_requise_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Certification
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi individuel</p>
+                                        </button>
+                                    </div>
+                                    {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
                                 </div>
                             )}
 
-                            {/* Certification */}
-                            {data.type === 'certification' && (
-                                <div>
-                                    <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Certification <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
-                                        id="certification_id"
-                                        value={data.certification_id}
-                                        onChange={(e) => setData('certification_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'certification'}
-                                    >
-                                        <option value="">-- Sélectionnez une certification --</option>
-                                        {loadingCertifications ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            certifications.map((c) => (
-                                                <option key={c.id} value={c.id}>
-                                                    {c.titre}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
-                                </div>
+                            {/* Si Vague de formation */}
+                            {data.type_destinataire === 'vague' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Vague de formation <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="vague_id"
+                                            value={data.vague_id}
+                                            onChange={(e) => setData('vague_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une vague --</option>
+                                            {loadingVagues ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : vagues.length === 0 ? (
+                                                <option value="" disabled>Aucune vague active</option>
+                                            ) : (
+                                                vagues.map((v) => (
+                                                    <option key={v.id} value={v.id}>
+                                                        {v.name} ({v.date_debut})
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="tranche_requise_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Accessible à partir de la tranche
+                                        </label>
+                                        <select
+                                            id="tranche_requise_id"
+                                            value={data.tranche_requise_id}
+                                            onChange={(e) => setData('tranche_requise_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                        >
+                                            <option value="">-- Tous les étudiants --</option>
+                                            {loadingTranches ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                tranches.map((t) => (
+                                                    <option key={t.id} value={t.id}>
+                                                        Tranche {t.numero} - {t.montant.toLocaleString()} FCFA
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Les étudiants devront avoir payé cette tranche pour accéder à l'évaluation
+                                        </p>
+                                        {errors.tranche_requise_id && <p className="mt-1 text-sm text-red-600">{errors.tranche_requise_id}</p>}
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Si Certification */}
+                            {data.type_destinataire === 'certification' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Certification <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="certification_id"
+                                            value={data.certification_id}
+                                            onChange={(e) => {
+                                                setData('certification_id', e.target.value);
+                                                setData('student_id', '');
+                                            }}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une certification --</option>
+                                            {loadingCertifications ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                certifications.map((c) => (
+                                                    <option key={c.id} value={c.id}>
+                                                        {c.titre}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
+                                    </div>
+
+                                    {data.certification_id && (
+                                        <div>
+                                            <label htmlFor="student_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Étudiant <span className="text-red-500">*</span>
+                                            </label>
+                                            <select
+                                                id="student_id"
+                                                value={data.student_id}
+                                                onChange={(e) => setData('student_id', e.target.value)}
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                                required
+                                            >
+                                                <option value="">-- Sélectionnez un étudiant --</option>
+                                                {loadingStudents ? (
+                                                    <option value="" disabled>Chargement...</option>
+                                                ) : (
+                                                    students.map((s) => (
+                                                        <option key={s.id} value={s.id}>
+                                                            {s.name} ({s.matricule})
+                                                        </option>
+                                                    ))
+                                                )}
+                                            </select>
+                                            {errors.student_id && <p className="mt-1 text-sm text-red-600">{errors.student_id}</p>}
+                                        </div>
+                                    )}
+
+                                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                        <p className="text-sm font-medium text-blue-800">Accès total pour les certifications</p>
+                                        <p className="text-xs text-blue-600 mt-1">
+                                            Les étudiants en certification ont accès à toutes les évaluations sans restriction de tranche.
+                                        </p>
+                                    </div>
+                                </>
                             )}
 
                             {/* Date et Coefficient */}
@@ -273,13 +495,18 @@ export default function Create({ formations }: Props) {
                                     <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
                                         Date
                                     </label>
-                                    <input
-                                        id="date"
-                                        type="datetime-local"
-                                        value={data.date}
-                                        onChange={(e) => setData('date', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
-                                    />
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <CalendarIcon className="w-5 h-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            id="date"
+                                            type="datetime-local"
+                                            value={data.date}
+                                            onChange={(e) => setData('date', e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
+                                        />
+                                    </div>
                                     <p className="text-xs text-gray-400 mt-1">Laisser vide pour aucune date</p>
                                     {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
                                 </div>
@@ -304,7 +531,7 @@ export default function Create({ formations }: Props) {
 
                             {/* Fichiers */}
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-3">Fichiers joints (optionnel)</h3>
+                                <h3 className="text-sm font-semibold text-gray-700 mb-3">Fichiers (optionnel)</h3>
                                 <div className="flex items-center gap-4">
                                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
                                         <PlusIcon className="w-8 h-8 text-gray-400" />

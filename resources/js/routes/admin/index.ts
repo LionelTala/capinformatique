@@ -1,4 +1,5 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
+import stats from './stats'
 import users from './users'
 import formations from './formations'
 import certifications from './certifications'
@@ -12,6 +13,9 @@ import evaluations from './evaluations'
 import soumissionsEvaluations from './soumissions-evaluations'
 import galerie from './galerie'
 import activites from './activites'
+import bibliotheque from './bibliotheque'
+import tranches from './tranches'
+import paiements from './paiements'
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
 * @see app/Http/Controllers/Admin/DashboardController.php:18
@@ -94,6 +98,7 @@ dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =
 dashboard.form = dashboardForm
 
 const admin = {
+    stats: Object.assign(stats, stats),
     dashboard: Object.assign(dashboard, dashboard),
     users: Object.assign(users, users),
     formations: Object.assign(formations, formations),
@@ -108,6 +113,9 @@ const admin = {
     soumissionsEvaluations: Object.assign(soumissionsEvaluations, soumissionsEvaluations),
     galerie: Object.assign(galerie, galerie),
     activites: Object.assign(activites, activites),
+    bibliotheque: Object.assign(bibliotheque, bibliotheque),
+    tranches: Object.assign(tranches, tranches),
+    paiements: Object.assign(paiements, paiements),
 }
 
 export default admin

@@ -11,12 +11,12 @@ import {
     CalendarIcon,
     UserGroupIcon,
     ChartBarIcon,
+    UsersIcon,
+    ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface Soumission {
     id: number;
@@ -44,6 +44,7 @@ interface Evaluation {
     est_depasse: boolean;
     jours_restants: number | null;
     type: string;
+    mode_envoi: 'groupe' | 'individuel';
     total_etudiants: number;
     soumissions_count: number;
     soumis_count: number;
@@ -62,6 +63,16 @@ interface Evaluation {
     certification: {
         id: number;
         titre: string;
+    } | null;
+    student: {
+        id: number;
+        name: string;
+        matricule: string;
+    } | null;
+    tranche_requise: {
+        id: number;
+        numero: number;
+        montant: number;
     } | null;
 }
 
@@ -138,15 +149,57 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
 
                     {/* En-tête */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <div className="flex items-start justify-between">
-                            <div>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                            <div className="flex-1">
                                 <h1 className="text-2xl font-bold text-gray-900">{evaluation.titre}</h1>
+
                                 <p className="text-sm text-gray-500 mt-1">
                                     {evaluation.formation?.name} •
                                     {evaluation.type === 'vague'
-                                        ? ` Vague ${evaluation.vague?.name}`
-                                        : ` Certification ${evaluation.certification?.titre}`}
+                                        ? ` Vague ${evaluation.vague?.name || '-'}`
+                                        : ` Certification ${evaluation.certification?.titre || '-'}`}
                                 </p>
+
+                                {/* ✅ MODE D'ENVOI ET TRANCHES */}
+                                <div className="flex flex-wrap items-center gap-3 mt-3">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                                        evaluation.mode_envoi === 'individuel'
+                                            ? 'bg-purple-100 text-purple-700'
+                                            : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                        {evaluation.mode_envoi === 'individuel' ? (
+                                            <UserIcon className="w-4 h-4" />
+                                        ) : (
+                                            <UserGroupIcon className="w-4 h-4" />
+                                        )}
+                                        {evaluation.mode_envoi === 'individuel' ? 'Envoi individuel' : 'Envoi groupe'}
+                                    </span>
+
+                                    {/* ✅ ÉTUDIANT CIBLÉ (si individuel) */}
+                                    {evaluation.mode_envoi === 'individuel' && evaluation.student && (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-200">
+                                            <UsersIcon className="w-4 h-4" />
+                                            {evaluation.student.name} ({evaluation.student.matricule})
+                                        </span>
+                                    )}
+
+                                    {/* ✅ TRANCHES REQUISES */}
+                                    {evaluation.tranche_requise ? (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium border border-yellow-200">
+                                            <ShieldCheckIcon className="w-4 h-4" />
+                                            Tranche {evaluation.tranche_requise.numero} requise
+                                            <span className="ml-1 text-[10px] opacity-75">
+                                                ({evaluation.tranche_requise.montant.toLocaleString()} FCFA)
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium border border-green-200">
+                                            <CheckCircleIcon className="w-4 h-4" />
+                                            Accessible à tous
+                                        </span>
+                                    )}
+                                </div>
+
                                 <div className="flex items-center gap-4 mt-2 text-sm">
                                     {evaluation.date && (
                                         <span className={`flex items-center gap-1 ${evaluation.est_depasse ? 'text-red-500' : 'text-gray-500'}`}>
@@ -157,7 +210,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                                     )}
                                     <span className="flex items-center gap-1 text-gray-500">
                                         <UserGroupIcon className="w-4 h-4" />
-                                        {evaluation.total_etudiants} étudiants
+                                        {evaluation.total_etudiants} étudiant{evaluation.total_etudiants > 1 ? 's' : ''}
                                     </span>
                                     <span className="flex items-center gap-1 text-gray-500">
                                         <ChartBarIcon className="w-4 h-4" />
@@ -165,7 +218,8 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+
+                            <div className="flex gap-2 flex-shrink-0">
                                 {!evaluation.has_notification_sent && (
                                     <button
                                         onClick={() => {
@@ -192,7 +246,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                     {evaluation.description && (
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                             <h2 className="text-sm font-semibold text-gray-700 mb-2">📝 Description</h2>
-                            <p className="text-gray-600 leading-relaxed">{evaluation.description}</p>
+                            <p className="text-gray-600 leading-relaxed whitespace-pre-line">{evaluation.description}</p>
                         </div>
                     )}
 
@@ -201,7 +255,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                             <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                                 <DocumentIcon className="w-5 h-5 text-blue-500" />
-                                Fichiers joints
+                                Fichiers joints ({evaluation.contenu.length})
                             </h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {evaluation.contenu.map((file, index) => (
@@ -210,15 +264,32 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                                         href={file.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                                        className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
                                     >
-                                        <DocumentIcon className="w-5 h-5 text-blue-500" />
-                                        <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                                        <DocumentIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                                        <span className="text-sm text-gray-600 truncate flex-1">{file.name}</span>
+                                        <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            📎
+                                        </span>
                                     </a>
                                 ))}
                             </div>
                         </div>
                     )}
+
+                    {/* Info supplémentaire sur les destinataires */}
+                    <div className="text-xs text-gray-400 bg-gray-50 rounded-xl p-3 mb-6 border border-gray-100">
+                        {evaluation.mode_envoi === 'individuel' ? (
+                            <span>👤 Envoi individuel à un seul étudiant</span>
+                        ) : (
+                            <span>👥 Envoi groupé à {evaluation.total_etudiants} étudiant{evaluation.total_etudiants > 1 ? 's' : ''}</span>
+                        )}
+                        {evaluation.tranche_requise && (
+                            <span className="ml-3">
+                                • 🔒 Tranche {evaluation.tranche_requise.numero} requise
+                            </span>
+                        )}
+                    </div>
 
                     {/* Statistiques */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -244,7 +315,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                         <h2 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
                             <DocumentIcon className="w-5 h-5 text-cab-blue" />
-                            Soumissions
+                            Soumissions ({soumissions.length})
                         </h2>
 
                         {soumissions.length === 0 ? (
@@ -264,7 +335,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                                     </thead>
                                     <tbody>
                                         {soumissions.map((s) => (
-                                            <tr key={s.id} className="border-t border-gray-100">
+                                            <tr key={s.id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
                                                 <td className="px-4 py-2 font-medium text-gray-900">{s.student_name}</td>
                                                 <td className="px-4 py-2">
                                                     {s.fichier && (
@@ -272,9 +343,10 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                                                             href={s.fichier.url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-cab-blue hover:underline text-xs"
+                                                            className="text-cab-blue hover:underline text-xs flex items-center gap-1"
                                                         >
-                                                            📎 {s.fichier.name}
+                                                            <DocumentIcon className="w-3 h-3" />
+                                                            {s.fichier.name}
                                                         </a>
                                                     )}
                                                 </td>
@@ -325,7 +397,7 @@ export default function Show({ evaluation, soumissions, nonSoumis }: Props) {
                             <div className="flex flex-wrap gap-2">
                                 {nonSoumis.map((student) => (
                                     <span key={student.id} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
-                                        {student.name}
+                                        {student.name} ({student.matricule})
                                     </span>
                                 ))}
                             </div>

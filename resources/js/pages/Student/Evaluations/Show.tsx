@@ -8,12 +8,13 @@ import {
     XCircleIcon,
     UserIcon,
     PaperAirplaneIcon,
+    LockClosedIcon,
+    LockOpenIcon,
+    ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
-
 import { useState } from 'react';
 import StudentLayout from '@/Components/Layouts/StudentLayout';
-
 
 interface Evaluation {
     id: number;
@@ -28,6 +29,14 @@ interface Evaluation {
         id: number;
         name: string;
     };
+    est_accessible: boolean;
+    tranche_requise: {
+        id: number;
+        numero: number;
+        montant: number;
+        lien_paiement: string | null;
+    } | null;
+    est_verrouille: boolean;
 }
 
 interface Soumission {
@@ -93,6 +102,68 @@ export default function Show({ evaluation, soumission }: Props) {
         </span>;
     };
 
+    // ✅ Si l'évaluation est verrouillée
+    if (evaluation.est_verrouille) {
+        return (
+            <>
+                <Head title={`${evaluation.titre} - Verrouillé`} />
+
+                <StudentLayout title={evaluation.titre}>
+                    <div className="max-w-3xl">
+                        <Link
+                            href="/student/evaluations"
+                            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-cab-blue transition-colors mb-4"
+                        >
+                            <ArrowLeftIcon className="w-4 h-4" />
+                            Retour à mes évaluations
+                        </Link>
+
+                        <div className="bg-white rounded-2xl p-8 shadow-sm border-2 border-red-200/50 bg-red-50/30 text-center">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                                    <LockClosedIcon className="w-10 h-10 text-red-500" />
+                                </div>
+                                <h1 className="text-2xl font-bold text-gray-900">{evaluation.titre}</h1>
+                                <div className="flex items-center gap-2">
+                                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500" />
+                                    <span className="text-lg font-medium text-yellow-700">
+                                        🔒 Tranche {evaluation.tranche_requise?.numero} requise
+                                    </span>
+                                </div>
+                                {evaluation.tranche_requise?.montant && (
+                                    <p className="text-gray-600">
+                                        Payez la tranche {evaluation.tranche_requise.numero} de{' '}
+                                        <span className="font-semibold">{evaluation.tranche_requise.montant.toLocaleString()} FCFA</span>{' '}
+                                        pour accéder à cette évaluation.
+                                    </p>
+                                )}
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Une fois la tranche payée et validée, vous pourrez soumettre votre évaluation.
+                                </p>
+                                {evaluation.tranche_requise?.lien_paiement ? (
+                                    <a
+                                        href={evaluation.tranche_requise.lien_paiement}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
+                                    >
+                                        <LockOpenIcon className="w-5 h-5" />
+                                        Débloquer
+                                    </a>
+                                ) : (
+                                    <span className="inline-flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-500 rounded-xl text-sm font-medium cursor-not-allowed">
+                                        Lien indisponible
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </StudentLayout>
+            </>
+        );
+    }
+
+    // ✅ Évaluation accessible (normale)
     return (
         <>
             <Head title={`${evaluation.titre} - Détails de l'évaluation`} />

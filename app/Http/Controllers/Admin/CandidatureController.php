@@ -19,91 +19,90 @@ class CandidatureController extends Controller
 {
     // Liste des candidatures
     public function index(Request $request)
-    {
-        try {
-            $query = Candidature::with(['formation', 'certification', 'vague'])
+{
+    try {
+        $query = Candidature::with(['formation', 'certification', 'vague'])
+            ->orderBy('created_at', 'desc');
 
-                ->orderBy('created_at', 'desc')
-                ->paginate(15)
-                ->withQueryString();
-
-            // Filtres
-            if ($request->filled('statut')) {
-                $query->where('statut', $request->statut);
-            }
-
-            if ($request->filled('type')) {
-                $query->where('type', $request->type);
-            }
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('nom', 'LIKE', "%{$search}%")
-                        ->orWhere('prenom', 'LIKE', "%{$search}%")
-                        ->orWhere('email', 'LIKE', "%{$search}%")
-                        ->orWhere('telephone', 'LIKE', "%{$search}%");
-                });
-            }
-
-            $candidatures = $query
-                ->through(function ($candidature) {
-                    return [
-                        'id' => $candidature->id,
-                        'nom_complet' => $candidature->nom_complet,
-                        'email' => $candidature->email,
-                        'telephone' => $candidature->telephone,
-                        'type' => $candidature->type,
-                        'type_label' => $candidature->type_label,
-                        'statut' => $candidature->statut,
-                        'statut_label' => $candidature->statut_label,
-                        'statut_color' => $candidature->statut_color,
-                        'formation' => $candidature->formation ? [
-                            'id' => $candidature->formation->id,
-                            'name' => $candidature->formation->name,
-                            'abbreviation' => $candidature->formation->abbreviation,
-                        ] : null,
-                        'certification' => $candidature->certification ? [
-                            'id' => $candidature->certification->id,
-                            'titre' => $candidature->certification->titre,
-                        ] : null,
-                        'vague' => $candidature->vague ? [
-                            'id' => $candidature->vague->id,
-                            'name' => $candidature->vague->name,
-                        ] : null,
-                        'created_at' => $candidature->created_at->diffForHumans(),
-                        'created_at_full' => $candidature->created_at->format('d/m/Y H:i'),
-                    ];
-                });
-
-            // Statistiques
-            $stats = [
-                'total' => Candidature::count(),
-                'en_attente' => Candidature::where('statut', 'en_attente')->count(),
-                'en_cours' => Candidature::where('statut', 'en_cours')->count(),
-                'admis' => Candidature::where('statut', 'admis')->count(),
-                'refuse' => Candidature::where('statut', 'refuse')->count(),
-            ];
-
-            return Inertia::render('Admin/Candidatures/Index', [
-                'candidatures' => $candidatures,
-                'stats' => $stats,
-                'filters' => [
-                    'statut' => $request->statut,
-                    'type' => $request->type,
-                    'search' => $request->search,
-                ],
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Erreur chargement candidatures', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return redirect()->back()->with('error', '❌ Une erreur est survenue.');
+        // Filtres appliqués sur le Builder, AVANT la pagination
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
         }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'LIKE', "%{$search}%")
+                    ->orWhere('prenom', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('telephone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Pagination faite APRÈS tous les filtres
+        $candidatures = $query
+            ->paginate(15)
+            ->withQueryString()
+            ->through(function ($candidature) {
+                return [
+                    'id' => $candidature->id,
+                    'nom_complet' => $candidature->nom_complet,
+                    'email' => $candidature->email,
+                    'telephone' => $candidature->telephone,
+                    'type' => $candidature->type,
+                    'type_label' => $candidature->type_label,
+                    'statut' => $candidature->statut,
+                    'statut_label' => $candidature->statut_label,
+                    'statut_color' => $candidature->statut_color,
+                    'formation' => $candidature->formation ? [
+                        'id' => $candidature->formation->id,
+                        'name' => $candidature->formation->name,
+                        'abbreviation' => $candidature->formation->abbreviation,
+                    ] : null,
+                    'certification' => $candidature->certification ? [
+                        'id' => $candidature->certification->id,
+                        'titre' => $candidature->certification->titre,
+                    ] : null,
+                    'vague' => $candidature->vague ? [
+                        'id' => $candidature->vague->id,
+                        'name' => $candidature->vague->name,
+                    ] : null,
+                    'created_at' => $candidature->created_at->diffForHumans(),
+                    'created_at_full' => $candidature->created_at->format('d/m/Y H:i'),
+                ];
+            });
+
+        $stats = [
+            'total' => Candidature::count(),
+            'en_attente' => Candidature::where('statut', 'en_attente')->count(),
+            'en_cours' => Candidature::where('statut', 'en_cours')->count(),
+            'admis' => Candidature::where('statut', 'admis')->count(),
+            'refuse' => Candidature::where('statut', 'refuse')->count(),
+        ];
+
+        return Inertia::render('Admin/Candidatures/Index', [
+            'candidatures' => $candidatures,
+            'stats' => $stats,
+            'filters' => [
+                'statut' => $request->statut,
+                'type' => $request->type,
+                'search' => $request->search,
+            ],
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Erreur chargement candidatures', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()->with('error', '❌ Une erreur est survenue.');
     }
+}
 
     // Détail d'une candidature
     public function show(Candidature $candidature)

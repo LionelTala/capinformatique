@@ -18,6 +18,8 @@ class Evaluation extends Model
         'formation_id',
         'vague_id',
         'certification_id',
+        'student_id',        // ✅ AJOUTER
+        'tranche_requise_id',
         'type',
         'is_active',
         'order',
@@ -103,4 +105,14 @@ class Evaluation extends Model
         if (now()->gt($this->date)) return 0;
         return now()->diffInDays($this->date);
     }
+
+    public function student()
+{
+    return $this->belongsTo(Student::class);
+}
+
+public function trancheRequise()
+{
+    return $this->belongsTo(Tranche::class, 'tranche_requise_id');
+}
 }

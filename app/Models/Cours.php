@@ -17,6 +17,9 @@ class Cours extends Model
         'video_title',
         'formation_id',
         'vague_id',
+
+        'student_id',
+        'tranche_requise_id',
         'certification_id',
         'type',
         'is_active',
@@ -48,10 +51,18 @@ class Cours extends Model
     {
         return $this->belongsTo(Certification::class);
     }
+    public function trancheRequise()
+    {
+        return $this->belongsTo(Tranche::class, 'tranche_requise_id');
+    }
 
     public function vues()
     {
         return $this->hasMany(CoursVue::class);
+    }
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
     public function notifications()
@@ -88,7 +99,7 @@ public function getNotViewedStudentsAttribute()
 
 
 
- 
+
 
     public function getReadNotificationsAttribute()
     {
@@ -105,29 +116,41 @@ public function getNotViewedStudentsAttribute()
         return !empty($this->video_url);
     }
 
-    public function getEmbedVideoUrlAttribute(): ?string
-    {
-        if (!$this->video_url) {
-            return null;
-        }
+    // app/Models/Cours.php
 
-        // YouTube
-        if (preg_match('/youtube\.com\/watch\?v=([^&]+)/', $this->video_url, $matches)) {
-            return 'https://www.youtube.com/embed/' . $matches[1];
-        }
+public function getEmbedVideoUrlAttribute()
+{
+    if (!$this->video_url) return null;
 
-        // YouTube short
-        if (preg_match('/youtu\.be\/([^?]+)/', $this->video_url, $matches)) {
-            return 'https://www.youtube.com/embed/' . $matches[1];
+    // YouTube
+    if (strpos($this->video_url, 'youtube.com/watch?v=') !== false) {
+        parse_str(parse_url($this->video_url, PHP_URL_QUERY), $params);
+        if (isset($params['v'])) {
+            // ✅ Paramètres pour un lecteur propre
+            // rel=0 : pas de vidéos suggérées
+            // modestbranding=1 : logo YouTube réduit (disparait presque)
+            // showinfo=0 : pas d'infos
+            // controls=1 : afficher les contrôles
+            // autoplay=0 : ne pas jouer automatiquement
+            // iv_load_policy=3 : pas d'annotations
+            return 'https://www.youtube.com/embed/' . $params['v'] . '?rel=0&modestbranding=1&showinfo=0&controls=1&autoplay=0&iv_load_policy=3';
         }
-
-        // Vimeo
-        if (preg_match('/vimeo\.com\/(\d+)/', $this->video_url, $matches)) {
-            return 'https://player.vimeo.com/video/' . $matches[1];
-        }
-
-        return $this->video_url;
     }
+
+    // YouTube short (youtu.be)
+    if (strpos($this->video_url, 'youtu.be/') !== false) {
+        $videoId = substr(parse_url($this->video_url, PHP_URL_PATH), 1);
+        return 'https://www.youtube.com/embed/' . $videoId . '?rel=0&modestbranding=1&showinfo=0&controls=1&autoplay=0&iv_load_policy=3';
+    }
+
+    // Vimeo
+    if (strpos($this->video_url, 'vimeo.com/') !== false) {
+        $videoId = substr(parse_url($this->video_url, PHP_URL_PATH), 1);
+        return 'https://player.vimeo.com/video/' . $videoId . '?title=0&byline=0&portrait=0';
+    }
+
+    return null;
+}
 
     public function getVideoThumbnailAttribute(): ?string
     {

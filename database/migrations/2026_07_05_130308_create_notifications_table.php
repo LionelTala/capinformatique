@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_creator_id')
                 ->nullable()
-                ->after('user_id')
                 ->constrained('users')
                 ->nullOnDelete();
             $table->string('type')->default('info');

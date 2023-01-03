@@ -1,4 +1,3 @@
-// resources/js/pages/Admin/Cours/Show.tsx
 import {
     ArrowLeftIcon,
     DocumentIcon,
@@ -7,10 +6,12 @@ import {
     CheckCircleIcon,
     ClockIcon,
     EyeIcon,
+    UserGroupIcon,
+    UsersIcon,
+    ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface ViewedStudent {
     id: number;
@@ -25,6 +26,12 @@ interface NotViewedStudent {
     matricule: string;
 }
 
+interface TrancheRequise {
+    id: number;
+    numero: number;
+    montant: number;
+}
+
 interface Cours {
     id: number;
     titre: string;
@@ -35,6 +42,7 @@ interface Cours {
     video_embed_url: string | null;
     video_thumbnail: string | null;
     type: string;
+    mode_envoi: 'groupe' | 'individuel';
     viewed_count: number;
     total_students: number;
     has_notification_sent: boolean;
@@ -51,6 +59,12 @@ interface Cours {
         id: number;
         titre: string;
     } | null;
+    student: {
+        id: number;
+        name: string;
+        matricule: string;
+    } | null;
+    tranche_requise: TrancheRequise | null;
 }
 
 interface Props {
@@ -74,7 +88,7 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
         <>
             <Head title={`${cours.titre} - Détails du cours`} />
 
-            <AdminLayout title={`Détails du cours`}>
+            <AdminLayout title="Détails du cours">
                 <div className="max-w-4xl">
                     <Link
                         href="/admin/cours"
@@ -84,18 +98,65 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                         Retour à la liste
                     </Link>
 
+                    {/* En-tête */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
-                        <div className="flex items-start justify-between">
-                            <div>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                            <div className="flex-1">
                                 <h1 className="text-2xl font-bold text-gray-900">{cours.titre}</h1>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    {cours.formation?.name} •
-                                    {cours.type === 'vague'
-                                        ? ` Vague ${cours.vague?.name}`
-                                        : ` Certification ${cours.certification?.titre}`}
-                                </p>
+
+                                <div className="flex flex-wrap items-center gap-2 mt-2">
+                                    <span className="text-sm text-gray-600">
+                                        {cours.formation?.name}
+                                    </span>
+                                    <span className="text-gray-300">•</span>
+                                    <span className="text-sm text-gray-600">
+                                        {cours.type === 'vague'
+                                            ? `Vague ${cours.vague?.name || '-'}`
+                                            : `Certification ${cours.certification?.titre || '-'}`}
+                                    </span>
+                                </div>
+
+                                {/* Mode d'envoi et Tranche */}
+                                <div className="flex flex-wrap items-center gap-3 mt-3">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                                        cours.mode_envoi === 'individuel'
+                                            ? 'bg-purple-100 text-purple-700'
+                                            : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                        {cours.mode_envoi === 'individuel' ? (
+                                            <UserIcon className="w-4 h-4" />
+                                        ) : (
+                                            <UserGroupIcon className="w-4 h-4" />
+                                        )}
+                                        {cours.mode_envoi === 'individuel' ? 'Envoi individuel' : 'Envoi groupe'}
+                                    </span>
+
+                                    {/* Infos de l'étudiant ciblé */}
+                                    {cours.mode_envoi === 'individuel' && cours.student && (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-200">
+                                            <UsersIcon className="w-4 h-4" />
+                                            {cours.student.name} ({cours.student.matricule})
+                                        </span>
+                                    )}
+
+                                    {cours.tranche_requise ? (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium border border-yellow-200">
+                                            <ShieldCheckIcon className="w-4 h-4" />
+                                            Tranche {cours.tranche_requise.numero} requise
+                                            <span className="ml-1 text-[10px] opacity-75">
+                                                ({cours.tranche_requise.montant.toLocaleString()} FCFA)
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium border border-green-200">
+                                            <CheckCircleIcon className="w-4 h-4" />
+                                            Accessible à tous
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex gap-2">
+
+                            <div className="flex gap-2 flex-shrink-0">
                                 {!cours.has_notification_sent && (
                                     <button
                                         onClick={handleResendNotification}
@@ -118,7 +179,7 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                     {cours.description && (
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                             <h2 className="text-sm font-semibold text-gray-700 mb-2">📝 Description</h2>
-                            <p className="text-gray-600 leading-relaxed">{cours.description}</p>
+                            <p className="text-gray-600 leading-relaxed whitespace-pre-line">{cours.description}</p>
                         </div>
                     )}
 
@@ -136,6 +197,7 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                                         className="w-full h-full"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
+                                        title={cours.video_title || cours.titre}
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
@@ -143,21 +205,13 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                                             href={cours.video_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-white hover:text-blue-400 transition-colors"
+                                            className="text-white hover:text-blue-400 transition-colors flex items-center gap-2"
                                         >
                                             ▶️ Voir la vidéo sur {cours.video_url.includes('youtube') ? 'YouTube' : 'Vimeo'}
                                         </a>
                                     </div>
                                 )}
                             </div>
-                            <a
-                                href={cours.video_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-block mt-3 text-sm text-cab-blue hover:underline"
-                            >
-                                Ouvrir dans un nouvel onglet
-                            </a>
                         </div>
                     )}
 
@@ -166,7 +220,7 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                             <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                                 <DocumentIcon className="w-5 h-5 text-blue-500" />
-                                Fichiers joints
+                                Fichiers joints ({cours.contenu.length})
                             </h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {cours.contenu.map((file, index) => (
@@ -175,10 +229,13 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                                         href={file.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                                        className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
                                     >
-                                        <DocumentIcon className="w-5 h-5 text-blue-500" />
-                                        <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                                        <DocumentIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                                        <span className="text-sm text-gray-600 truncate flex-1">{file.name}</span>
+                                        <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            📎
+                                        </span>
                                     </a>
                                 ))}
                             </div>
@@ -206,18 +263,29 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                             </div>
                         </div>
 
-                        {/* Barre de progression */}
                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-cab-blue rounded-full transition-all duration-500"
                                 style={{ width: `${Math.min(percentage, 100)}%` }}
                             />
                         </div>
+
+                        <div className="mt-4 text-xs text-gray-400 border-t border-gray-100 pt-3">
+                            {cours.mode_envoi === 'individuel' ? (
+                                <span>👤 Envoi individuel à un seul étudiant</span>
+                            ) : (
+                                <span>👥 Envoi groupé à {cours.total_students} étudiant{cours.total_students > 1 ? 's' : ''}</span>
+                            )}
+                            {cours.tranche_requise && (
+                                <span className="ml-3">
+                                    • 🔒 Tranche {cours.tranche_requise.numero} requise
+                                </span>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Liste des étudiants */}
+                    {/* Visionnages étudiants */}
                     <div className="grid md:grid-cols-2 gap-6">
-                        {/* Ont vu */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                                 <CheckCircleIcon className="w-5 h-5 text-green-500" />
@@ -226,9 +294,9 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                             {viewedStudents.length === 0 ? (
                                 <p className="text-sm text-gray-500">Aucun étudiant n'a encore vu ce cours</p>
                             ) : (
-                                <ul className="space-y-2">
+                                <ul className="space-y-2 max-h-96 overflow-y-auto pr-2">
                                     {viewedStudents.map((student) => (
-                                        <li key={student.id} className="flex items-center justify-between text-sm">
+                                        <li key={student.id} className="flex items-center justify-between text-sm p-2 bg-green-50 rounded-lg">
                                             <span className="font-medium text-gray-900">{student.name}</span>
                                             <span className="text-xs text-gray-400">{student.viewed_at}</span>
                                         </li>
@@ -237,7 +305,6 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                             )}
                         </div>
 
-                        {/* N'ont pas vu */}
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                                 <ClockIcon className="w-5 h-5 text-yellow-500" />
@@ -246,9 +313,9 @@ export default function Show({ cours, viewedStudents, notViewedStudents }: Props
                             {notViewedStudents.length === 0 ? (
                                 <p className="text-sm text-gray-500">Tous les étudiants ont vu ce cours</p>
                             ) : (
-                                <ul className="space-y-2">
+                                <ul className="space-y-2 max-h-96 overflow-y-auto pr-2">
                                     {notViewedStudents.map((student) => (
-                                        <li key={student.id} className="flex items-center justify-between text-sm">
+                                        <li key={student.id} className="flex items-center justify-between text-sm p-2 bg-yellow-50 rounded-lg">
                                             <span className="font-medium text-gray-900">{student.name}</span>
                                             <span className="text-xs text-gray-400">{student.matricule}</span>
                                         </li>

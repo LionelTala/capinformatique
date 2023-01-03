@@ -1,17 +1,16 @@
-// resources/js/pages/Admin/Cours/Edit.tsx
 import {
     ArrowLeftIcon,
     PencilSquareIcon,
     XMarkIcon,
     DocumentIcon,
     VideoCameraIcon,
-    PhotoIcon,
+    PlusIcon,
+    UserGroupIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
-import { Head, Link, useForm } from '@inertiajs/react';
-
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface Formation {
     id: number;
@@ -23,11 +22,24 @@ interface Vague {
     id: number;
     name: string;
     date_debut: string;
+    is_active: boolean;
 }
 
 interface Certification {
     id: number;
     titre: string;
+}
+
+interface Student {
+    id: number;
+    name: string;
+    matricule: string;
+}
+
+interface Tranche {
+    id: number;
+    numero: number;
+    montant: number;
 }
 
 interface Cours {
@@ -39,8 +51,11 @@ interface Cours {
     video_title: string | null;
     formation_id: number;
     type: string;
+    mode_envoi: 'groupe' | 'individuel';
     vague_id: number | null;
     certification_id: number | null;
+    student_id: number | null;
+    tranche_requise_id: number | null;
     is_active: boolean;
     order: number;
 }
@@ -53,59 +68,143 @@ interface Props {
 export default function Edit({ cours, formations }: Props) {
     const [vagues, setVagues] = useState<Vague[]>([]);
     const [certifications, setCertifications] = useState<Certification[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [tranches, setTranches] = useState<Tranche[]>([]);
     const [files, setFiles] = useState<File[]>([]);
     const [filePreviews, setFilePreviews] = useState<string[]>([]);
     const [loadingVagues, setLoadingVagues] = useState(false);
     const [loadingCertifications, setLoadingCertifications] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(false);
+    const [loadingTranches, setLoadingTranches] = useState(false);
 
-    const { data, setData, put, processing, errors } = useForm({
-        titre: cours.titre,
+    const initialTypeDestinataire = cours.type;
+
+    const { data, setData, processing, errors } = useForm({
+        titre: cours.titre || '',
         description: cours.description || '',
-        formation_id: cours.formation_id.toString(),
-        type: cours.type,
+        formation_id: cours.formation_id?.toString() || '',
+        type_destinataire: initialTypeDestinataire || '',
         vague_id: cours.vague_id?.toString() || '',
         certification_id: cours.certification_id?.toString() || '',
+        student_id: cours.student_id?.toString() || '',
+        tranche_requise_id: cours.tranche_requise_id?.toString() || '',
         video_url: cours.video_url || '',
         video_title: cours.video_title || '',
-        is_active: cours.is_active,
-        order: cours.order,
+        is_active: !!cours.is_active,
+        order: cours.order ?? 0,
         send_notification: false,
         files: [] as File[],
     });
 
-    // Charger les vagues
+    // 1. Charger les vagues et forcer la valeur sélectionnée du cours
     useEffect(() => {
-        if (data.formation_id && data.type === 'vague') {
+        if (data.formation_id && data.type_destinataire === 'vague') {
             setLoadingVagues(true);
             fetch(`/admin/cours/vagues/${data.formation_id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setVagues(data);
-                    setLoadingVagues(false);
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
                 })
-                .catch(() => setLoadingVagues(false));
+                .then((vaguesData) => {
+                    const list = Array.isArray(vaguesData) ? vaguesData : [];
+                    setVagues(list);
+                    setLoadingVagues(false);
+                    // Si la vague du cours est dans la liste, on s'assure qu'elle est bien liée au state
+                    if (cours.vague_id && list.some(v => v.id === cours.vague_id)) {
+                        setData('vague_id', cours.vague_id.toString());
+                    }
+                })
+                .catch(() => {
+                    setVagues([]);
+                    setLoadingVagues(false);
+                });
+        } else {
+            setVagues([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
 
-    // Charger les certifications
+    // 2. Charger les certifications et forcer la valeur sélectionnée du cours
     useEffect(() => {
-        if (data.formation_id && data.type === 'certification') {
+        if (data.formation_id && data.type_destinataire === 'certification') {
             setLoadingCertifications(true);
             fetch(`/admin/cours/certifications/${data.formation_id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setCertifications(data);
-                    setLoadingCertifications(false);
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
                 })
-                .catch(() => setLoadingCertifications(false));
+                .then((certsData) => {
+                    const list = Array.isArray(certsData) ? certsData : [];
+                    setCertifications(list);
+                    setLoadingCertifications(false);
+                    if (cours.certification_id && list.some(c => c.id === cours.certification_id)) {
+                        setData('certification_id', cours.certification_id.toString());
+                    }
+                })
+                .catch(() => {
+                    setCertifications([]);
+                    setLoadingCertifications(false);
+                });
+        } else {
+            setCertifications([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
+
+    // 3. Charger les tranches et forcer la valeur sélectionnée du cours
+    useEffect(() => {
+        if (data.formation_id) {
+            setLoadingTranches(true);
+            fetch(`/admin/tranches/by-formation/${data.formation_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((tranchesData) => {
+                    const list = Array.isArray(tranchesData) ? tranchesData : [];
+                    setTranches(list);
+                    setLoadingTranches(false);
+                    if (cours.tranche_requise_id && list.some(t => t.id === cours.tranche_requise_id)) {
+                        setData('tranche_requise_id', cours.tranche_requise_id.toString());
+                    }
+                })
+                .catch(() => {
+                    setTranches([]);
+                    setLoadingTranches(false);
+                });
+        } else {
+            setTranches([]);
+        }
+    }, [data.formation_id]);
+
+    // 4. Charger les étudiants et forcer la valeur sélectionnée du cours
+    useEffect(() => {
+        if (data.certification_id && data.type_destinataire === 'certification') {
+            setLoadingStudents(true);
+            fetch(`/admin/cours/students-by-certification/${data.certification_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((studentsData) => {
+                    const list = Array.isArray(studentsData) ? studentsData : [];
+                    setStudents(list);
+                    setLoadingStudents(false);
+                    if (cours.student_id && list.some(s => s.id === cours.student_id)) {
+                        setData('student_id', cours.student_id.toString());
+                    }
+                })
+                .catch(() => {
+                    setStudents([]);
+                    setLoadingStudents(false);
+                });
+        } else {
+            setStudents([]);
+        }
+    }, [data.certification_id, data.type_destinataire]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = Array.from(e.target.files || []);
         setFiles([...files, ...selectedFiles]);
         setData('files', [...files, ...selectedFiles]);
-
         const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
         setFilePreviews([...filePreviews, ...newPreviews]);
     };
@@ -119,17 +218,45 @@ export default function Edit({ cours, formations }: Props) {
         URL.revokeObjectURL(filePreviews[index]);
     };
 
-    const removeExistingFile = (index: number) => {
-        const newContenu = cours.contenu.filter((_, i) => i !== index);
-        // On ne peut pas supprimer directement les fichiers existants via useForm
-        // On va les gérer via un champ caché
-        // Pour simplifier, on utilisera une approche différente
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/cours/${cours.id}`, {
+
+        const formData = new FormData();
+        formData.append('_method', 'PUT'); // Method spoofing requis par Laravel pour les PUT multipart
+
+        formData.append('titre', data.titre);
+        formData.append('description', data.description || '');
+        formData.append('formation_id', data.formation_id);
+        formData.append('type', data.type_destinataire);
+        formData.append('mode_envoi', data.type_destinataire === 'vague' ? 'groupe' : 'individuel');
+
+        if (data.type_destinataire === 'vague') {
+            formData.append('vague_id', data.vague_id || '');
+            formData.append('tranche_requise_id', data.tranche_requise_id || '');
+            formData.append('certification_id', '');
+            formData.append('student_id', '');
+        } else {
+            formData.append('certification_id', data.certification_id || '');
+            formData.append('student_id', data.student_id || '');
+            formData.append('vague_id', '');
+            formData.append('tranche_requise_id', '');
+        }
+
+        if (data.video_url) formData.append('video_url', data.video_url);
+        if (data.video_title) formData.append('video_title', data.video_title);
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('order', String(data.order));
+        formData.append('send_notification', data.send_notification ? '1' : '0');
+
+        data.files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        router.post(`/admin/cours/${cours.id}`, formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
     };
 
@@ -188,7 +315,13 @@ export default function Edit({ cours, formations }: Props) {
                                 <select
                                     id="formation_id"
                                     value={data.formation_id}
-                                    onChange={(e) => setData('formation_id', e.target.value)}
+                                    onChange={(e) => {
+                                        setData('formation_id', e.target.value);
+                                        setData('type_destinataire', '');
+                                        setData('vague_id', '');
+                                        setData('certification_id', '');
+                                        setData('student_id', '');
+                                    }}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
                                     required
                                 >
@@ -202,89 +335,185 @@ export default function Edit({ cours, formations }: Props) {
                                 {errors.formation_id && <p className="mt-1 text-sm text-red-600">{errors.formation_id}</p>}
                             </div>
 
-                            {/* Type */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Destinataires
-                                </label>
-                                <div className="flex gap-4">
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="vague"
-                                            checked={data.type === 'vague'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Vague</span>
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="certification"
-                                            checked={data.type === 'certification'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Certification</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Vague */}
-                            {data.type === 'vague' && (
+                            {/* Type de destinataire */}
+                            {data.formation_id && (
                                 <div>
-                                    <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Vague <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Type de destinataire <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        id="vague_id"
-                                        value={data.vague_id}
-                                        onChange={(e) => setData('vague_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'vague'}
-                                    >
-                                        <option value="">-- Sélectionnez une vague --</option>
-                                        {loadingVagues ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            vagues.map((v) => (
-                                                <option key={v.id} value={v.id}>
-                                                    {v.name} ({v.date_debut})
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'vague');
+                                                setData('certification_id', '');
+                                                setData('student_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserGroupIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Vague de formation
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi groupé</p>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'certification');
+                                                setData('vague_id', '');
+                                                setData('tranche_requise_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Certification
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi individuel</p>
+                                        </button>
+                                    </div>
+                                    {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
                                 </div>
                             )}
 
-                            {/* Certification */}
-                            {data.type === 'certification' && (
-                                <div>
-                                    <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Certification <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
-                                        id="certification_id"
-                                        value={data.certification_id}
-                                        onChange={(e) => setData('certification_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'certification'}
-                                    >
-                                        <option value="">-- Sélectionnez une certification --</option>
-                                        {loadingCertifications ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            certifications.map((c) => (
-                                                <option key={c.id} value={c.id}>
-                                                    {c.titre}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
-                                </div>
+                            {/* Si Vague de formation */}
+                            {data.type_destinataire === 'vague' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Vague de formation <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="vague_id"
+                                            value={data.vague_id}
+                                            onChange={(e) => setData('vague_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une vague --</option>
+                                            {loadingVagues ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                vagues.map((v) => (
+                                                    <option key={v.id} value={v.id}>
+                                                        {v.name} ({v.date_debut})
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="tranche_requise_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Accessible à partir de la tranche
+                                        </label>
+                                        <select
+                                            id="tranche_requise_id"
+                                            value={data.tranche_requise_id}
+                                            onChange={(e) => setData('tranche_requise_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                        >
+                                            <option value="">-- Tous les étudiants (aucune tranche requise) --</option>
+                                            {loadingTranches ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                tranches.map((t) => (
+                                                    <option key={t.id} value={t.id}>
+                                                        Tranche {t.numero} - {t.montant.toLocaleString()} FCFA
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.tranche_requise_id && <p className="mt-1 text-sm text-red-600">{errors.tranche_requise_id}</p>}
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Si Certification */}
+                            {data.type_destinataire === 'certification' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Certification <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="certification_id"
+                                            value={data.certification_id}
+                                            onChange={(e) => {
+                                                setData('certification_id', e.target.value);
+                                                setData('student_id', '');
+                                            }}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une certification --</option>
+                                            {loadingCertifications ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                certifications.map((c) => (
+                                                    <option key={c.id} value={c.id}>
+                                                        {c.titre}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
+                                    </div>
+
+                                    {data.certification_id && (
+                                        <div>
+                                            <label htmlFor="student_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Étudiant <span className="text-red-500">*</span>
+                                            </label>
+                                            <select
+                                                id="student_id"
+                                                value={data.student_id}
+                                                onChange={(e) => setData('student_id', e.target.value)}
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                                required
+                                            >
+                                                <option value="">-- Sélectionnez un étudiant --</option>
+                                                {loadingStudents ? (
+                                                    <option value="" disabled>Chargement...</option>
+                                                ) : (
+                                                    students.map((s) => (
+                                                        <option key={s.id} value={s.id}>
+                                                            {s.name} ({s.matricule})
+                                                        </option>
+                                                    ))
+                                                )}
+                                            </select>
+                                            {errors.student_id && <p className="mt-1 text-sm text-red-600">{errors.student_id}</p>}
+                                        </div>
+                                    )}
+                                </>
                             )}
 
                             {/* Vidéo */}
@@ -304,12 +533,11 @@ export default function Edit({ cours, formations }: Props) {
                                             value={data.video_title}
                                             onChange={(e) => setData('video_title', e.target.value)}
                                             className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
-                                            placeholder="Ex: Tutoriel réseau"
                                         />
                                     </div>
                                     <div>
                                         <label htmlFor="video_url" className="block text-sm font-medium text-gray-700 mb-1">
-                                            URL de la vidéo (YouTube/Vimeo)
+                                            URL de la vidéo
                                         </label>
                                         <input
                                             id="video_url"
@@ -317,7 +545,6 @@ export default function Edit({ cours, formations }: Props) {
                                             value={data.video_url}
                                             onChange={(e) => setData('video_url', e.target.value)}
                                             className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
-                                            placeholder="https://www.youtube.com/watch?v=..."
                                         />
                                     </div>
                                 </div>
@@ -332,12 +559,7 @@ export default function Edit({ cours, formations }: Props) {
                                             <div key={index} className="bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-2">
                                                 <DocumentIcon className="w-4 h-4 text-blue-500" />
                                                 <span className="text-xs text-gray-600 truncate flex-1">{file.name}</span>
-                                                <a
-                                                    href={file.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-cab-blue hover:text-cab-dark text-xs"
-                                                >
+                                                <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-cab-blue hover:text-cab-dark text-xs font-medium">
                                                     Voir
                                                 </a>
                                             </div>
@@ -348,17 +570,12 @@ export default function Edit({ cours, formations }: Props) {
 
                             {/* Nouveaux fichiers */}
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-3">Ajouter des fichiers</h3>
+                                <h3 className="text-sm font-semibold text-gray-700 mb-3">Ajouter des fichiers joints</h3>
                                 <div className="flex items-center gap-4">
-                                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
+                                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors bg-white">
                                         <PlusIcon className="w-8 h-8 text-gray-400" />
-                                        <span className="text-xs text-gray-500 mt-1">Ajouter des fichiers</span>
-                                        <input
-                                            type="file"
-                                            multiple
-                                            onChange={handleFileChange}
-                                            className="hidden"
-                                        />
+                                        <span className="text-xs text-gray-500 mt-1">Sélectionner des documents</span>
+                                        <input type="file" multiple onChange={handleFileChange} className="hidden" />
                                     </label>
                                 </div>
 
@@ -368,11 +585,7 @@ export default function Edit({ cours, formations }: Props) {
                                             <div key={index} className="relative bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-2">
                                                 <DocumentIcon className="w-4 h-4 text-blue-500" />
                                                 <span className="text-xs text-gray-600 truncate flex-1">{file.name}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeFile(index)}
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
+                                                <button type="button" onClick={() => removeFile(index)} className="text-red-500 hover:text-red-700">
                                                     <XMarkIcon className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -421,7 +634,7 @@ export default function Edit({ cours, formations }: Props) {
                                         className="w-4 h-4 text-cab-blue focus:ring-cab-blue border-gray-300 rounded"
                                     />
                                     <label htmlFor="send_notification" className="text-sm text-blue-700 font-medium">
-                                        🔔 Renvoyer une notification aux étudiants (si non déjà envoyé)
+                                        🔔 Renvoyer une notification d'édition aux étudiants concernés
                                     </label>
                                 </div>
                             </div>
@@ -430,22 +643,9 @@ export default function Edit({ cours, formations }: Props) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors disabled:opacity-50"
                             >
-                                {processing ? (
-                                    <>
-                                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Mise à jour en cours...
-                                    </>
-                                ) : (
-                                    <>
-                                        <PencilSquareIcon className="w-5 h-5" />
-                                        Mettre à jour
-                                    </>
-                                )}
+                                {processing ? 'Mise à jour en cours...' : 'Mettre à jour le cours'}
                             </button>
                         </form>
                     </div>

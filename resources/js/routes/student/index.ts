@@ -4,7 +4,7 @@ import devoirsFf4cb6 from './devoirs'
 import evaluationsC33e2b from './evaluations'
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -19,7 +19,7 @@ dashboard.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -28,7 +28,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -38,7 +38,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -48,7 +48,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -58,7 +58,7 @@ const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -68,7 +68,7 @@ dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\Student\DashboardController::dashboard
-* @see app/Http/Controllers/Student/DashboardController.php:15
+* @see app/Http/Controllers/Student/DashboardController.php:19
 * @route '/student/dashboard'
 */
 dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -85,7 +85,7 @@ dashboard.form = dashboardForm
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 export const devoirs = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -100,7 +100,7 @@ devoirs.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 devoirs.url = (options?: RouteQueryOptions) => {
@@ -109,7 +109,7 @@ devoirs.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 devoirs.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -119,7 +119,7 @@ devoirs.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 devoirs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -129,7 +129,7 @@ devoirs.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 const devoirsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -139,7 +139,7 @@ const devoirsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 devoirsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -149,7 +149,7 @@ devoirsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Student\DevoirController::devoirs
-* @see app/Http/Controllers/Student/DevoirController.php:20
+* @see app/Http/Controllers/Student/DevoirController.php:21
 * @route '/student/devoirs'
 */
 devoirsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -166,7 +166,7 @@ devoirs.form = devoirsForm
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 export const evaluations = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -181,7 +181,7 @@ evaluations.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 evaluations.url = (options?: RouteQueryOptions) => {
@@ -190,7 +190,7 @@ evaluations.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 evaluations.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -200,7 +200,7 @@ evaluations.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 evaluations.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -210,7 +210,7 @@ evaluations.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 const evaluationsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -220,7 +220,7 @@ const evaluationsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 evaluationsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -230,7 +230,7 @@ evaluationsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 
 /**
 * @see \App\Http\Controllers\Student\EvaluationController::evaluations
-* @see app/Http/Controllers/Student/EvaluationController.php:20
+* @see app/Http/Controllers/Student/EvaluationController.php:21
 * @route '/student/evaluations'
 */
 evaluationsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

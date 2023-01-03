@@ -73,13 +73,12 @@ class GalerieController extends Controller
             $validated = $request->validate([
                 'titre' => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'fichier' => 'required|file|max:20480', // 20MB max
+                'fichier' => 'required|file|max:20480',
                 'is_active' => 'boolean',
                 'ordre' => 'integer|min:0',
             ]);
 
             $file = $request->file('fichier');
-            $originalName = $file->getClientOriginalName();
             $mimeType = $file->getMimeType();
             $size = $file->getSize();
 
@@ -156,34 +155,40 @@ class GalerieController extends Controller
                 'ordre' => 'integer|min:0',
             ]);
 
-            // Gérer le nouveau fichier si uploadé
+            // ✅ Préparer les données à mettre à jour
+            $updateData = [
+                'titre' => $validated['titre'],
+                'description' => $validated['description'] ?? null,
+                'is_active' => $validated['is_active'] ?? true,
+                'ordre' => $validated['ordre'] ?? 0,
+            ];
+
+            // ✅ Gérer le nouveau fichier si uploadé
             if ($request->hasFile('fichier')) {
                 // Supprimer l'ancien fichier
-                Storage::disk('public')->delete('galerie/' . $galerie->fichier);
+                if ($galerie->fichier) {
+                    Storage::disk('public')->delete('galerie/' . $galerie->fichier);
+                }
 
                 $file = $request->file('fichier');
                 $path = $file->store('galerie', 'public');
                 $filename = basename($path);
 
-                $galerie->fichier = $filename;
-                $galerie->mime_type = $file->getMimeType();
-                $galerie->taille = $file->getSize();
+                $updateData['fichier'] = $filename;
+                $updateData['mime_type'] = $file->getMimeType();
+                $updateData['taille'] = $file->getSize();
 
-                // Mettre à jour le type
+                // Déterminer le type
                 $mimeType = $file->getMimeType();
                 $type = 'document';
                 if (str_starts_with($mimeType, 'image/')) $type = 'image';
                 elseif (str_starts_with($mimeType, 'video/')) $type = 'video';
                 elseif ($mimeType === 'application/pdf') $type = 'pdf';
-                $galerie->type = $type;
+                $updateData['type'] = $type;
             }
 
-            $galerie->update([
-                'titre' => $validated['titre'],
-                'description' => $validated['description'] ?? null,
-                'is_active' => $validated['is_active'] ?? true,
-                'ordre' => $validated['ordre'] ?? 0,
-            ]);
+            // ✅ Mettre à jour avec toutes les données
+            $galerie->update($updateData);
 
             Log::info('Média mis à jour', [
                 'media_id' => $galerie->id,
@@ -213,7 +218,9 @@ class GalerieController extends Controller
             $titre = $galerie->titre;
 
             // Supprimer le fichier du storage
-            Storage::disk('public')->delete('galerie/' . $galerie->fichier);
+            if ($galerie->fichier) {
+                Storage::disk('public')->delete('galerie/' . $galerie->fichier);
+            }
 
             $galerie->delete();
 

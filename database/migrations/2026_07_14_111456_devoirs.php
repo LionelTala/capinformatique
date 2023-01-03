@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('formation_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('vague_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('certification_id')->nullable()->constrained()->nullOnDelete();
+ 
 
             $table->enum('type', ['vague', 'certification'])->default('vague');
             $table->boolean('is_active')->default(true);
@@ -25,6 +26,8 @@ return new class extends Migration
 
             $table->boolean('has_notification_sent')->default(false);
             $table->dateTime('notification_sent_at')->nullable();
+            $table->foreignId('tranche_requise_id')->nullable()->constrained('tranches')->nullOnDelete();
+            $table->foreignId('student_id')->nullable()->constrained()->cascadeOnDelete();
 
             $table->timestamps();
         });

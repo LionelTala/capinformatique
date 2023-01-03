@@ -1,44 +1,72 @@
 // resources/js/pages/Admin/Galerie/Create.tsx
 import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
 import { ArrowLeftIcon, PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 export default function Create() {
     const [preview, setPreview] = useState<string | null>(null);
     const [fileName, setFileName] = useState<string>('');
-
-    const { data, setData, post, processing, errors } = useForm({
-        titre: '',
-        description: '',
-        fichier: null as File | null,
-        is_active: true,
-        ordre: 0,
-    });
+    const [fichier, setFichier] = useState<File | null>(null);
+    const [titre, setTitre] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
+    const [isActive, setIsActive] = useState<boolean>(true);
+    const [ordre, setOrdre] = useState<number>(0);
+    const [processing, setProcessing] = useState<boolean>(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setData('fichier', file);
+            // ✅ Stocker le fichier
+            setFichier(file);
             setFileName(file.name);
+
+            // ✅ Créer la prévisualisation IMMÉDIATEMENT
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreview(reader.result as string);
+            reader.onload = (e) => {
+                setPreview(e.target?.result as string);
             };
             reader.readAsDataURL(file);
         }
     };
 
     const removeFile = () => {
-        setData('fichier', null);
+        setFichier(null);
         setPreview(null);
         setFileName('');
+        // Reset l'input file
+        const fileInput = document.getElementById('file-input') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/galerie', {
+        setProcessing(true);
+        setErrors({});
+
+        const formData = new FormData();
+        formData.append('titre', titre);
+        formData.append('description', description || '');
+        formData.append('is_active', isActive ? '1' : '0');
+        formData.append('ordre', String(ordre));
+
+        if (fichier) {
+            formData.append('fichier', fichier);
+        }
+
+        router.post('/admin/galerie', formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onSuccess: () => {
+                setProcessing(false);
+            },
+            onError: (err) => {
+                setProcessing(false);
+                setErrors(err);
+            },
         });
     };
 
@@ -66,8 +94,8 @@ export default function Create() {
                                 <input
                                     id="titre"
                                     type="text"
-                                    value={data.titre}
-                                    onChange={(e) => setData('titre', e.target.value)}
+                                    value={titre}
+                                    onChange={(e) => setTitre(e.target.value)}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
                                     placeholder="Ex: Photo de la rentrée"
                                     required
@@ -82,8 +110,8 @@ export default function Create() {
                                 </label>
                                 <textarea
                                     id="description"
-                                    value={data.description}
-                                    onChange={(e) => setData('description', e.target.value)}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
                                     rows={3}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors resize-none"
                                     placeholder="Description du média..."
@@ -91,12 +119,13 @@ export default function Create() {
                                 {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
                             </div>
 
-                            {/* Fichier */}
+                            {/* Fichier avec prévisualisation */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Fichier <span className="text-red-500">*</span>
                                 </label>
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    {/* Prévisualisation */}
                                     {preview ? (
                                         <div className="relative">
                                             <img
@@ -111,25 +140,34 @@ export default function Create() {
                                             >
                                                 <XMarkIcon className="w-4 h-4" />
                                             </button>
-                                            <p className="text-xs text-gray-500 mt-1">{fileName}</p>
+                                            <p className="text-xs text-gray-500 mt-1 truncate max-w-[128px]">{fileName}</p>
                                         </div>
                                     ) : (
-                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
-                                            <PhotoIcon className="w-8 h-8 text-gray-400" />
-                                            <span className="text-xs text-gray-500 mt-1">Choisir un fichier</span>
+                                        <div className="w-32 h-32 bg-gray-100 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                                            <PhotoIcon className="w-10 h-10 text-gray-400" />
+                                            <span className="text-xs text-gray-400 mt-1">Aucune image</span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex-1">
+                                        <label className="block w-full cursor-pointer">
+                                            <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl hover:border-cab-blue transition-colors bg-gray-50 hover:bg-gray-100">
+                                                <PhotoIcon className="w-8 h-8 text-gray-400" />
+                                                <span className="text-sm text-gray-500 mt-1">
+                                                    {preview ? 'Changer l\'image' : 'Choisir une image'}
+                                                </span>
+                                                <span className="text-xs text-gray-400 mt-0.5">
+                                                    JPG, PNG, GIF, WEBP jusqu'à 20MB
+                                                </span>
+                                            </div>
                                             <input
+                                                id="file-input"
                                                 type="file"
-                                                accept="image/*,video/*,application/pdf,.doc,.docx"
+                                                accept="image/*"
                                                 onChange={handleFileChange}
                                                 className="hidden"
                                             />
                                         </label>
-                                    )}
-                                    <div>
-                                        <p className="text-xs text-gray-400">
-                                            Formats acceptés : images, vidéos, PDF, documents
-                                        </p>
-                                        <p className="text-xs text-gray-400">Taille max : 20MB</p>
                                     </div>
                                 </div>
                                 {errors.fichier && <p className="mt-1 text-sm text-red-600">{errors.fichier}</p>}
@@ -141,8 +179,8 @@ export default function Create() {
                                     <input
                                         id="is_active"
                                         type="checkbox"
-                                        checked={data.is_active}
-                                        onChange={(e) => setData('is_active', e.target.checked)}
+                                        checked={isActive}
+                                        onChange={(e) => setIsActive(e.target.checked)}
                                         className="w-4 h-4 text-cab-blue focus:ring-cab-blue border-gray-300 rounded"
                                     />
                                     <label htmlFor="is_active" className="text-sm text-gray-700">
@@ -156,8 +194,8 @@ export default function Create() {
                                     <input
                                         id="ordre"
                                         type="number"
-                                        value={data.ordre}
-                                        onChange={(e) => setData('ordre', parseInt(e.target.value) || 0)}
+                                        value={ordre}
+                                        onChange={(e) => setOrdre(parseInt(e.target.value) || 0)}
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
                                         min="0"
                                     />
@@ -167,7 +205,7 @@ export default function Create() {
                             {/* Bouton */}
                             <button
                                 type="submit"
-                                disabled={processing || !data.fichier}
+                                disabled={processing || !fichier}
                                 className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {processing ? (

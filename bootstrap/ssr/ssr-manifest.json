@@ -7,7 +7,7 @@
     "/build/assets/AdminLayout-DAc575Mz.js"
   ],
   "resources/js/Components/Layouts/StudentLayout.tsx": [
-    "/build/assets/StudentLayout-CaJljXGa.js"
+    "/build/assets/StudentLayout-EefxiFTk.js"
   ],
   "resources/js/Components/Loader.tsx": [
     "/build/assets/Home-B9DLt-eQ.js"
@@ -148,31 +148,31 @@
     "/build/assets/Login-DUSsveQh.js"
   ],
   "resources/js/Pages/Profile/Index.tsx": [
-    "/build/assets/Index-BdWIt5CA2.js"
+    "/build/assets/Index-BoZGeg5O2.js"
   ],
   "resources/js/Pages/Student/Cours/Index.tsx": [
-    "/build/assets/Index-DgwG1brk.js"
+    "/build/assets/Index-Bd06939P.js"
   ],
   "resources/js/Pages/Student/Cours/Notifications.tsx": [
-    "/build/assets/Notifications-CaSaodXK.js"
+    "/build/assets/Notifications-CWDWdap0.js"
   ],
   "resources/js/Pages/Student/Cours/Show.tsx": [
-    "/build/assets/Show-Cprcly7r.js"
+    "/build/assets/Show-Bd55a1FC.js"
   ],
   "resources/js/Pages/Student/Dashboard.tsx": [
-    "/build/assets/Dashboard-BxMDN6l9.js"
+    "/build/assets/Dashboard-39tD9gXv.js"
   ],
   "resources/js/Pages/Student/Devoirs/Index.tsx": [
-    "/build/assets/Index-BRKbOta2.js"
+    "/build/assets/Index-CO4q8Qm2.js"
   ],
   "resources/js/Pages/Student/Devoirs/Show.tsx": [
-    "/build/assets/Show-WjZs_6mI.js"
+    "/build/assets/Show-DgFPAMU_.js"
   ],
   "resources/js/Pages/Student/Evaluations/Index.tsx": [
-    "/build/assets/Index-BKm-siv9.js"
+    "/build/assets/Index-BUPV447p.js"
   ],
   "resources/js/Pages/Student/Evaluations/Show.tsx": [
-    "/build/assets/Show-ozZ5W-Ph.js"
+    "/build/assets/Show-q3fJmMPj.js"
   ],
   "resources/js/Pages/public/CandidatureSuccess.tsx": [
     "/build/assets/CandidatureSuccess-Bu_qNhUn.js"

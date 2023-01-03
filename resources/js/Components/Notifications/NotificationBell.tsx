@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import NotificationDropdown from './NotificationDropdown';
 import { showToast } from '@/lib/toast';
 
-
 interface NotificationItem {
     id: number;
     type: string;
@@ -43,16 +42,18 @@ const NotificationBell = () => {
         const channelName = `user.${userId}`;
         const channel = window.Echo.private(channelName);
 
-       channel.listen('.notification.created', (data: NotificationItem) => {
-    setNotifications((prev) => {
-        if ((prev ?? []).some((n) => n.id === data.id)) return prev;
-        return [data, ...(prev ?? [])];
-    });
+        channel.listen('.notification.created', (data: NotificationItem) => {
+            // ✅ une nouvelle notification arrive forcément non lue, on l'ajoute en tête
+            setNotifications((prev) => {
+                if ((prev ?? []).some((n) => n.id === data.id)) return prev;
+                return [data, ...(prev ?? [])];
+            });
 
-    showToast(`📚 ${data.title} — ${data.message}`, 'success', 10000); // 10 secondes
+            showToast(`📚 ${data.title} — ${data.message}`, 'success', 10000);
 
-    router.reload({ only: ['unreadNotificationsCount'] });
-});
+            router.reload({ only: ['unreadNotificationsCount'] });
+        });
+
         return () => {
             try {
                 window.Echo.leave(channelName);
@@ -73,25 +74,25 @@ const NotificationBell = () => {
     }, []);
 
     const fetchNotifications = async () => {
-    try {
-        const res = await fetch('/notifications', {
-            headers: { Accept: 'application/json' },
-        });
+        try {
+            const res = await fetch('/notifications', {
+                headers: { Accept: 'application/json' },
+            });
 
-        if (!res.ok) {
-            console.error('Erreur HTTP notifications:', res.status);
+            if (!res.ok) {
+                console.error('Erreur HTTP notifications:', res.status);
+                setNotifications([]);
+                return;
+            }
+
+            const data = await res.json();
+            // Le backend renvoie maintenant directement un tableau (déjà filtré non-lues)
+            setNotifications(Array.isArray(data) ? data : (Array.isArray(data?.notifications) ? data.notifications : []));
+        } catch (error) {
+            console.error('Erreur récupération notifications:', error);
             setNotifications([]);
-            return;
         }
-
-        const data = await res.json();
-        // ⬇️ Le backend renvoie { notifications: [...], unread_count: N }, pas un tableau brut
-        setNotifications(Array.isArray(data?.notifications) ? data.notifications : []);
-    } catch (error) {
-        console.error('Erreur récupération notifications:', error);
-        setNotifications([]);
-    }
-};
+    };
 
     const toggleDropdown = () => {
         if (!isOpen) fetchNotifications();
@@ -116,13 +117,13 @@ const NotificationBell = () => {
                 <NotificationDropdown
                     notifications={notifications}
                     onMarkAsRead={(id) => {
-                        setNotifications((prev) =>
-                            (prev ?? []).map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
-                        );
+                        // ✅ retire l'item de la liste au lieu de juste marquer read_at
+                        setNotifications((prev) => (prev ?? []).filter((n) => n.id !== id));
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}
                     onMarkAllAsRead={() => {
-                        setNotifications((prev) => (prev ?? []).map((n) => ({ ...n, read_at: new Date().toISOString() })));
+                        // ✅ vide complètement la liste
+                        setNotifications([]);
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}
                     onClose={() => setIsOpen(false)}

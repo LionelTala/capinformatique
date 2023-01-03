@@ -24,6 +24,8 @@ return new class extends Migration
             $table->enum('type', ['vague', 'certification'])->default('vague');
             $table->boolean('is_active')->default(true);
             $table->integer('order')->default(0);
+            $table->foreignId('tranche_requise_id')->nullable()->constrained('tranches')->nullOnDelete();
+            $table->foreignId('student_id')->nullable()->constrained()->cascadeOnDelete();
             $table->boolean('has_notification_sent')->default(false);
             $table->timestamp('notification_sent_at')->nullable();
             $table->timestamps();

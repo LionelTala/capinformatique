@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 export const getVaguesByFormation = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ getVaguesByFormation.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 getVaguesByFormation.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -43,7 +43,7 @@ getVaguesByFormation.url = (args: { formationId: string | number } | [formationI
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 getVaguesByFormation.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ getVaguesByFormation.get = (args: { formationId: string | number } | [formationI
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 getVaguesByFormation.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -63,7 +63,7 @@ getVaguesByFormation.head = (args: { formationId: string | number } | [formation
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 const getVaguesByFormationForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -73,7 +73,7 @@ const getVaguesByFormationForm = (args: { formationId: string | number } | [form
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 getVaguesByFormationForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -83,7 +83,7 @@ getVaguesByFormationForm.get = (args: { formationId: string | number } | [format
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getVaguesByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:91
+* @see app/Http/Controllers/Admin/DevoirController.php:103
 * @route '/admin/devoirs/vagues/{formationId}'
 */
 getVaguesByFormationForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -100,7 +100,7 @@ getVaguesByFormation.form = getVaguesByFormationForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 export const getCertificationsByFormation = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -115,7 +115,7 @@ getCertificationsByFormation.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 getCertificationsByFormation.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -142,7 +142,7 @@ getCertificationsByFormation.url = (args: { formationId: string | number } | [fo
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 getCertificationsByFormation.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -152,7 +152,7 @@ getCertificationsByFormation.get = (args: { formationId: string | number } | [fo
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 getCertificationsByFormation.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -162,7 +162,7 @@ getCertificationsByFormation.head = (args: { formationId: string | number } | [f
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 const getCertificationsByFormationForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -172,7 +172,7 @@ const getCertificationsByFormationForm = (args: { formationId: string | number }
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 getCertificationsByFormationForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -182,7 +182,7 @@ getCertificationsByFormationForm.get = (args: { formationId: string | number } |
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::getCertificationsByFormation
-* @see app/Http/Controllers/Admin/DevoirController.php:108
+* @see app/Http/Controllers/Admin/DevoirController.php:121
 * @route '/admin/devoirs/certifications/{formationId}'
 */
 getCertificationsByFormationForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -198,8 +198,206 @@ getCertificationsByFormationForm.head = (args: { formationId: string | number } 
 getCertificationsByFormation.form = getCertificationsByFormationForm
 
 /**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+export const getStudentsByCertification = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getStudentsByCertification.url(args, options),
+    method: 'get',
+})
+
+getStudentsByCertification.definition = {
+    methods: ["get","head"],
+    url: '/admin/devoirs/students-by-certification/{certificationId}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+getStudentsByCertification.url = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { certificationId: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            certificationId: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        certificationId: args.certificationId,
+    }
+
+    return getStudentsByCertification.definition.url
+            .replace('{certificationId}', parsedArgs.certificationId.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+getStudentsByCertification.get = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getStudentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+getStudentsByCertification.head = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: getStudentsByCertification.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+const getStudentsByCertificationForm = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getStudentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+getStudentsByCertificationForm.get = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getStudentsByCertification.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getStudentsByCertification
+* @see app/Http/Controllers/Admin/DevoirController.php:138
+* @route '/admin/devoirs/students-by-certification/{certificationId}'
+*/
+getStudentsByCertificationForm.head = (args: { certificationId: string | number } | [certificationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getStudentsByCertification.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+getStudentsByCertification.form = getStudentsByCertificationForm
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+export const getTranchesByFormation = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getTranchesByFormation.url(args, options),
+    method: 'get',
+})
+
+getTranchesByFormation.definition = {
+    methods: ["get","head"],
+    url: '/admin/devoirs/tranches/{formationId}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+getTranchesByFormation.url = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { formationId: args }
+    }
+
+    if (Array.isArray(args)) {
+        args = {
+            formationId: args[0],
+        }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+        formationId: args.formationId,
+    }
+
+    return getTranchesByFormation.definition.url
+            .replace('{formationId}', parsedArgs.formationId.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+getTranchesByFormation.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getTranchesByFormation.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+getTranchesByFormation.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: getTranchesByFormation.url(args, options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+const getTranchesByFormationForm = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getTranchesByFormation.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+getTranchesByFormationForm.get = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getTranchesByFormation.url(args, options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::getTranchesByFormation
+* @see app/Http/Controllers/Admin/DevoirController.php:155
+* @route '/admin/devoirs/tranches/{formationId}'
+*/
+getTranchesByFormationForm.head = (args: { formationId: string | number } | [formationId: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: getTranchesByFormation.url(args, {
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+getTranchesByFormation.form = getTranchesByFormationForm
+
+/**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -214,7 +412,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -223,7 +421,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -233,7 +431,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -243,7 +441,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -253,7 +451,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -263,7 +461,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::index
-* @see app/Http/Controllers/Admin/DevoirController.php:23
+* @see app/Http/Controllers/Admin/DevoirController.php:24
 * @route '/admin/devoirs'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -280,7 +478,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -295,7 +493,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -304,7 +502,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -314,7 +512,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -324,7 +522,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -334,7 +532,7 @@ const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -344,7 +542,7 @@ createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::create
-* @see app/Http/Controllers/Admin/DevoirController.php:73
+* @see app/Http/Controllers/Admin/DevoirController.php:85
 * @route '/admin/devoirs/create'
 */
 createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -361,7 +559,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::store
-* @see app/Http/Controllers/Admin/DevoirController.php:124
+* @see app/Http/Controllers/Admin/DevoirController.php:177
 * @route '/admin/devoirs'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -376,7 +574,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::store
-* @see app/Http/Controllers/Admin/DevoirController.php:124
+* @see app/Http/Controllers/Admin/DevoirController.php:177
 * @route '/admin/devoirs'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -385,7 +583,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::store
-* @see app/Http/Controllers/Admin/DevoirController.php:124
+* @see app/Http/Controllers/Admin/DevoirController.php:177
 * @route '/admin/devoirs'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -395,7 +593,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::store
-* @see app/Http/Controllers/Admin/DevoirController.php:124
+* @see app/Http/Controllers/Admin/DevoirController.php:177
 * @route '/admin/devoirs'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -405,7 +603,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::store
-* @see app/Http/Controllers/Admin/DevoirController.php:124
+* @see app/Http/Controllers/Admin/DevoirController.php:177
 * @route '/admin/devoirs'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -417,7 +615,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 export const show = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -432,7 +630,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 show.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -465,7 +663,7 @@ show.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 show.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -475,7 +673,7 @@ show.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 show.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -485,7 +683,7 @@ show.head = (args: { devoir: number | { id: number } } | [devoir: number | { id:
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 const showForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -495,7 +693,7 @@ const showForm = (args: { devoir: number | { id: number } } | [devoir: number | 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 showForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -505,7 +703,7 @@ showForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::show
-* @see app/Http/Controllers/Admin/DevoirController.php:314
+* @see app/Http/Controllers/Admin/DevoirController.php:415
 * @route '/admin/devoirs/{devoir}'
 */
 showForm.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -522,7 +720,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 export const edit = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -537,7 +735,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 edit.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -570,7 +768,7 @@ edit.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 edit.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -580,7 +778,7 @@ edit.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 edit.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -590,7 +788,7 @@ edit.head = (args: { devoir: number | { id: number } } | [devoir: number | { id:
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 const editForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -600,7 +798,7 @@ const editForm = (args: { devoir: number | { id: number } } | [devoir: number | 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 editForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -610,7 +808,7 @@ editForm.get = (args: { devoir: number | { id: number } } | [devoir: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::edit
-* @see app/Http/Controllers/Admin/DevoirController.php:381
+* @see app/Http/Controllers/Admin/DevoirController.php:496
 * @route '/admin/devoirs/{devoir}/edit'
 */
 editForm.head = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -627,22 +825,22 @@ edit.form = editForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
+* @see app/Http/Controllers/Admin/DevoirController.php:530
 * @route '/admin/devoirs/{devoir}'
 */
-export const update = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: update.url(args, options),
-    method: 'put',
+    method: 'post',
 })
 
 update.definition = {
-    methods: ["put","patch"],
+    methods: ["post","put"],
     url: '/admin/devoirs/{devoir}',
-} satisfies RouteDefinition<["put","patch"]>
+} satisfies RouteDefinition<["post","put"]>
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
+* @see app/Http/Controllers/Admin/DevoirController.php:530
 * @route '/admin/devoirs/{devoir}'
 */
 update.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -675,7 +873,17 @@ update.url = (args: { devoir: number | { id: number } } | [devoir: number | { id
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
+* @see app/Http/Controllers/Admin/DevoirController.php:530
+* @route '/admin/devoirs/{devoir}'
+*/
+update.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: update.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::update
+* @see app/Http/Controllers/Admin/DevoirController.php:530
 * @route '/admin/devoirs/{devoir}'
 */
 update.put = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -685,32 +893,27 @@ update.put = (args: { devoir: number | { id: number } } | [devoir: number | { id
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
-* @route '/admin/devoirs/{devoir}'
-*/
-update.patch = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
-    url: update.url(args, options),
-    method: 'patch',
-})
-
-/**
-* @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
+* @see app/Http/Controllers/Admin/DevoirController.php:530
 * @route '/admin/devoirs/{devoir}'
 */
 const updateForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PUT',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
+    action: update.url(args, options),
     method: 'post',
 })
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
+* @see app/Http/Controllers/Admin/DevoirController.php:530
+* @route '/admin/devoirs/{devoir}'
+*/
+updateForm.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+    action: update.url(args, options),
+    method: 'post',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\DevoirController::update
+* @see app/Http/Controllers/Admin/DevoirController.php:530
 * @route '/admin/devoirs/{devoir}'
 */
 updateForm.put = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -723,26 +926,11 @@ updateForm.put = (args: { devoir: number | { id: number } } | [devoir: number | 
     method: 'post',
 })
 
-/**
-* @see \App\Http\Controllers\Admin\DevoirController::update
-* @see app/Http/Controllers/Admin/DevoirController.php:412
-* @route '/admin/devoirs/{devoir}'
-*/
-updateForm.patch = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-    action: update.url(args, {
-        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-            _method: 'PATCH',
-            ...(options?.query ?? options?.mergeQuery ?? {}),
-        }
-    }),
-    method: 'post',
-})
-
 update.form = updateForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::destroy
-* @see app/Http/Controllers/Admin/DevoirController.php:479
+* @see app/Http/Controllers/Admin/DevoirController.php:602
 * @route '/admin/devoirs/{devoir}'
 */
 export const destroy = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -757,7 +945,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::destroy
-* @see app/Http/Controllers/Admin/DevoirController.php:479
+* @see app/Http/Controllers/Admin/DevoirController.php:602
 * @route '/admin/devoirs/{devoir}'
 */
 destroy.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -790,7 +978,7 @@ destroy.url = (args: { devoir: number | { id: number } } | [devoir: number | { i
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::destroy
-* @see app/Http/Controllers/Admin/DevoirController.php:479
+* @see app/Http/Controllers/Admin/DevoirController.php:602
 * @route '/admin/devoirs/{devoir}'
 */
 destroy.delete = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -800,7 +988,7 @@ destroy.delete = (args: { devoir: number | { id: number } } | [devoir: number | 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::destroy
-* @see app/Http/Controllers/Admin/DevoirController.php:479
+* @see app/Http/Controllers/Admin/DevoirController.php:602
 * @route '/admin/devoirs/{devoir}'
 */
 const destroyForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -815,7 +1003,7 @@ const destroyForm = (args: { devoir: number | { id: number } } | [devoir: number
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::destroy
-* @see app/Http/Controllers/Admin/DevoirController.php:479
+* @see app/Http/Controllers/Admin/DevoirController.php:602
 * @route '/admin/devoirs/{devoir}'
 */
 destroyForm.delete = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -832,7 +1020,7 @@ destroy.form = destroyForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::toggleActive
-* @see app/Http/Controllers/Admin/DevoirController.php:510
+* @see app/Http/Controllers/Admin/DevoirController.php:633
 * @route '/admin/devoirs/{devoir}/toggle-active'
 */
 export const toggleActive = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -847,7 +1035,7 @@ toggleActive.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::toggleActive
-* @see app/Http/Controllers/Admin/DevoirController.php:510
+* @see app/Http/Controllers/Admin/DevoirController.php:633
 * @route '/admin/devoirs/{devoir}/toggle-active'
 */
 toggleActive.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -880,7 +1068,7 @@ toggleActive.url = (args: { devoir: number | { id: number } } | [devoir: number 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::toggleActive
-* @see app/Http/Controllers/Admin/DevoirController.php:510
+* @see app/Http/Controllers/Admin/DevoirController.php:633
 * @route '/admin/devoirs/{devoir}/toggle-active'
 */
 toggleActive.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -890,7 +1078,7 @@ toggleActive.post = (args: { devoir: number | { id: number } } | [devoir: number
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::toggleActive
-* @see app/Http/Controllers/Admin/DevoirController.php:510
+* @see app/Http/Controllers/Admin/DevoirController.php:633
 * @route '/admin/devoirs/{devoir}/toggle-active'
 */
 const toggleActiveForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -900,7 +1088,7 @@ const toggleActiveForm = (args: { devoir: number | { id: number } } | [devoir: n
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::toggleActive
-* @see app/Http/Controllers/Admin/DevoirController.php:510
+* @see app/Http/Controllers/Admin/DevoirController.php:633
 * @route '/admin/devoirs/{devoir}/toggle-active'
 */
 toggleActiveForm.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -912,7 +1100,7 @@ toggleActive.form = toggleActiveForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::resendNotifications
-* @see app/Http/Controllers/Admin/DevoirController.php:531
+* @see app/Http/Controllers/Admin/DevoirController.php:654
 * @route '/admin/devoirs/{devoir}/resend-notifications'
 */
 export const resendNotifications = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -927,7 +1115,7 @@ resendNotifications.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::resendNotifications
-* @see app/Http/Controllers/Admin/DevoirController.php:531
+* @see app/Http/Controllers/Admin/DevoirController.php:654
 * @route '/admin/devoirs/{devoir}/resend-notifications'
 */
 resendNotifications.url = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -960,7 +1148,7 @@ resendNotifications.url = (args: { devoir: number | { id: number } } | [devoir: 
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::resendNotifications
-* @see app/Http/Controllers/Admin/DevoirController.php:531
+* @see app/Http/Controllers/Admin/DevoirController.php:654
 * @route '/admin/devoirs/{devoir}/resend-notifications'
 */
 resendNotifications.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -970,7 +1158,7 @@ resendNotifications.post = (args: { devoir: number | { id: number } } | [devoir:
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::resendNotifications
-* @see app/Http/Controllers/Admin/DevoirController.php:531
+* @see app/Http/Controllers/Admin/DevoirController.php:654
 * @route '/admin/devoirs/{devoir}/resend-notifications'
 */
 const resendNotificationsForm = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -980,7 +1168,7 @@ const resendNotificationsForm = (args: { devoir: number | { id: number } } | [de
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::resendNotifications
-* @see app/Http/Controllers/Admin/DevoirController.php:531
+* @see app/Http/Controllers/Admin/DevoirController.php:654
 * @route '/admin/devoirs/{devoir}/resend-notifications'
 */
 resendNotificationsForm.post = (args: { devoir: number | { id: number } } | [devoir: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -992,7 +1180,7 @@ resendNotifications.form = resendNotificationsForm
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::corriger
-* @see app/Http/Controllers/Admin/DevoirController.php:556
+* @see app/Http/Controllers/Admin/DevoirController.php:678
 * @route '/admin/soumissions/{soumission}/corriger'
 */
 export const corriger = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1007,7 +1195,7 @@ corriger.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::corriger
-* @see app/Http/Controllers/Admin/DevoirController.php:556
+* @see app/Http/Controllers/Admin/DevoirController.php:678
 * @route '/admin/soumissions/{soumission}/corriger'
 */
 corriger.url = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -1040,7 +1228,7 @@ corriger.url = (args: { soumission: number | { id: number } } | [soumission: num
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::corriger
-* @see app/Http/Controllers/Admin/DevoirController.php:556
+* @see app/Http/Controllers/Admin/DevoirController.php:678
 * @route '/admin/soumissions/{soumission}/corriger'
 */
 corriger.post = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -1050,7 +1238,7 @@ corriger.post = (args: { soumission: number | { id: number } } | [soumission: nu
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::corriger
-* @see app/Http/Controllers/Admin/DevoirController.php:556
+* @see app/Http/Controllers/Admin/DevoirController.php:678
 * @route '/admin/soumissions/{soumission}/corriger'
 */
 const corrigerForm = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1060,7 +1248,7 @@ const corrigerForm = (args: { soumission: number | { id: number } } | [soumissio
 
 /**
 * @see \App\Http\Controllers\Admin\DevoirController::corriger
-* @see app/Http/Controllers/Admin/DevoirController.php:556
+* @see app/Http/Controllers/Admin/DevoirController.php:678
 * @route '/admin/soumissions/{soumission}/corriger'
 */
 corrigerForm.post = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -1070,6 +1258,6 @@ corrigerForm.post = (args: { soumission: number | { id: number } } | [soumission
 
 corriger.form = corrigerForm
 
-const DevoirController = { getVaguesByFormation, getCertificationsByFormation, index, create, store, show, edit, update, destroy, toggleActive, resendNotifications, corriger }
+const DevoirController = { getVaguesByFormation, getCertificationsByFormation, getStudentsByCertification, getTranchesByFormation, index, create, store, show, edit, update, destroy, toggleActive, resendNotifications, corriger }
 
 export default DevoirController

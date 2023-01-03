@@ -1,8 +1,7 @@
 // resources/js/pages/Student/Dashboard.tsx
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import StudentLayout from '@/Components/Layouts/StudentLayout';
 import {
-    AcademicCapIcon,
     BookOpenIcon,
     ClipboardDocumentListIcon,
     ChartBarIcon,
@@ -14,7 +13,18 @@ import {
     DocumentTextIcon,
     VideoCameraIcon,
     CalendarIcon,
+    CreditCardIcon,
 } from '@heroicons/react/24/outline';
+
+interface TrancheStatus {
+    id: number;
+    numero: number;
+    montant: number;
+    lien_paiement: string | null;
+    est_payee: boolean;
+    est_en_attente: boolean;
+    paiement_id: number | null;
+}
 
 interface StudentInfo {
     id: number;
@@ -24,16 +34,22 @@ interface StudentInfo {
     matricule: string;
     phone: string;
     student_type: string;
+    is_certification: boolean;
     vague: {
         id: number;
         name: string;
         formation: string;
+        formation_id: number;
+        lien_paiement_total: string | null;
     } | null;
     certification: {
         id: number;
         titre: string;
         formation: string;
     } | null;
+    tranches: TrancheStatus[];
+    toutes_tranches_payees: boolean;
+    derniere_tranche_payee: number;
 }
 
 interface Stats {
@@ -42,8 +58,10 @@ interface Stats {
     total_devoirs: number;
     devoirs_soumis: number;
     devoirs_corriges: number;
+    total_evaluations: number;
+    evaluations_soumis: number;
+    evaluations_corriges: number;
     moyenne: number | null;
-    progression: number;
 }
 
 interface DernierCours {
@@ -69,7 +87,8 @@ interface DevoirARendre {
 
 interface DerniereNote {
     id: number;
-    devoir_titre: string;
+    titre: string;
+    type: string;
     note: number | null;
     commentaire: string | null;
     corrected_at: string | null;
@@ -91,34 +110,32 @@ export default function Dashboard({
     devoirsARendre,
     dernieresNotes,
 }: DashboardProps) {
+    const handlePayerTranche = (trancheId: number) => {
+        if (confirm('Confirmer le paiement de cette tranche ?')) {
+            router.post('/student/paiements', {
+                tranche_id: trancheId,
+            });
+        }
+    };
+
     const statsCards = [
         {
             label: 'Cours',
             value: `${stats.cours_vus} / ${stats.total_cours}`,
             icon: <BookOpenIcon className="w-5 h-5" />,
             color: 'bg-blue-500',
-            subtitle: `${stats.progression}% terminés`,
         },
         {
             label: 'Devoirs',
             value: `${stats.devoirs_soumis} / ${stats.total_devoirs}`,
             icon: <ClipboardDocumentListIcon className="w-5 h-5" />,
             color: 'bg-orange-500',
-            subtitle: `${stats.devoirs_corriges} corrigés`,
         },
         {
-            label: 'Moyenne',
-            value: stats.moyenne ? `${stats.moyenne}/20` : '--',
-            icon: <ChartBarIcon className="w-5 h-5" />,
-            color: 'bg-green-500',
-            subtitle: 'Moyenne générale',
-        },
-        {
-            label: 'Progression',
-            value: `${stats.progression}%`,
+            label: 'Évaluations',
+            value: `${stats.evaluations_soumis} / ${stats.total_evaluations}`,
             icon: <ChartBarIcon className="w-5 h-5" />,
             color: 'bg-purple-500',
-            subtitle: 'Avancement global',
         },
     ];
 
@@ -165,8 +182,103 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Statistiques */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {/* Gestion des tranches - UNIQUEMENT pour formations */}
+                {!student.is_certification && student.vague && student.tranches.length > 0 && (
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                <CreditCardIcon className="w-5 h-5 text-cab-blue" />
+                                Suivi des paiements
+                            </h3>
+                            {student.toutes_tranches_payees && (
+                                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                    ✅ Toutes les tranches payées
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            {student.tranches.map((tranche) => (
+                                <div
+                                    key={tranche.id}
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-xl gap-3"
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-medium text-gray-900">
+                                                Tranche {tranche.numero}
+                                            </span>
+                                            <span className="text-sm text-gray-600">
+                                                {tranche.montant.toLocaleString()} FCFA
+                                            </span>
+                                        </div>
+                                        {tranche.est_payee && (
+                                            <span className="inline-flex items-center gap-1 text-sm text-green-600 font-medium">
+                                                <CheckCircleIcon className="w-4 h-4" />
+                                                Payée
+                                            </span>
+                                        )}
+                                        {tranche.est_en_attente && (
+                                            <span className="inline-flex items-center gap-1 text-sm text-yellow-600 font-medium">
+                                                <ClockIcon className="w-4 h-4" />
+                                                En attente de validation
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        {tranche.est_payee ? (
+                                            <span className="px-4 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                                                ✓ Payée
+                                            </span>
+                                        ) : tranche.est_en_attente ? (
+                                            <span className="px-4 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg text-sm font-medium">
+                                                En attente...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                {tranche.lien_paiement ? (
+                                                    <a
+                                                        href={tranche.lien_paiement}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="px-4 py-1.5 bg-cab-blue text-white rounded-lg text-sm font-medium hover:bg-cab-dark transition-colors"
+                                                    >
+                                                        Payer
+                                                    </a>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handlePayerTranche(tranche.id)}
+                                                        className="px-4 py-1.5 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                                                    >
+                                                        Demander paiement
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* ✅ Bouton "Payer toutes les tranches" - Bleu */}
+                        {student.vague.lien_paiement_total && !student.toutes_tranches_payees && (
+                            <div className="mt-4">
+                                <a
+                                    href={student.vague.lien_paiement_total}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block w-full px-4 py-2.5 bg-cab-blue text-white rounded-xl text-sm font-semibold text-center hover:bg-cab-dark transition-colors"
+                                >
+                                    Payer toutes les tranches restantes
+                                </a>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Statistiques - 3 cartes (sans Moyenne) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                     {statsCards.map((stat) => (
                         <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                             <div className="flex items-center justify-between">
@@ -176,23 +288,8 @@ export default function Dashboard({
                                 </div>
                             </div>
                             <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                            <p className="text-xs text-gray-400">{stat.subtitle}</p>
                         </div>
                     ))}
-                </div>
-
-                {/* Progression */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-semibold text-gray-700">Progression globale</h3>
-                        <span className="text-sm font-medium text-cab-blue">{stats.progression}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-cab-blue to-cab-blue/80 rounded-full transition-all duration-500"
-                            style={{ width: `${Math.min(stats.progression, 100)}%` }}
-                        />
-                    </div>
                 </div>
 
                 {/* Derniers cours + Devoirs à rendre */}
@@ -344,7 +441,10 @@ export default function Dashboard({
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">{note.devoir_titre}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm font-medium text-gray-900">{note.titre}</p>
+                                                <span className="text-xs text-gray-400">{note.type}</span>
+                                            </div>
                                             {note.commentaire && (
                                                 <p className="text-xs text-gray-500 line-clamp-1">{note.commentaire}</p>
                                             )}

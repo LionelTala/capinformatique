@@ -1,6 +1,5 @@
-// resources/js/pages/Admin/Activites/Edit.tsx
 import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
 import { ArrowLeftIcon, PencilSquareIcon, XMarkIcon, PhotoIcon, CalendarIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
 
@@ -26,17 +25,17 @@ interface Props {
 export default function Edit({ activite }: Props) {
     const [preview, setPreview] = useState<string | null>(activite.image_url);
 
-    const { data, setData, put, processing, errors } = useForm({
-        title: activite.title,
+    const { data, setData, processing, errors } = useForm({
+        title: activite.title || '',
         excerpt: activite.excerpt || '',
         description: activite.description || '',
         image: null as File | null,
         tag: activite.tag || '',
-        date: activite.date,
+        date: activite.date || '',
         lieu: activite.lieu || '',
         heure: activite.heure || '',
-        is_active: activite.is_active,
-        ordre: activite.ordre,
+        is_active: !!activite.is_active,
+        ordre: activite.ordre ?? 0,
     });
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,12 +53,42 @@ export default function Edit({ activite }: Props) {
     const removeImage = () => {
         setData('image', null);
         setPreview(null);
+        // Optionnel : Réinitialiser l'élément HTML input pour permettre de re-sélectionner le même fichier
+        const fileInput = document.getElementById('image-input') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/activites/${activite.id}`, {
+
+        // 1. Initialiser le conteneur FormData multipart
+        const formData = new FormData();
+
+        // 🚀 CRITIQUE : Spoofing requis par Laravel pour intercepter l'update
+        formData.append('_method', 'PUT');
+
+        // 2. Transférer tous les champs du state local vers le FormData
+        formData.append('title', data.title);
+        formData.append('excerpt', data.excerpt);
+        formData.append('description', data.description);
+        formData.append('tag', data.tag);
+        formData.append('date', data.date);
+        formData.append('lieu', data.lieu);
+        formData.append('heure', data.heure);
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('ordre', String(data.ordre));
+
+        // N'ajouter l'image au payload que si une nouvelle a été sélectionnée
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+
+        // 3. Envoyer via le routeur global d'Inertia en POST
+        router.post(`/admin/activites/${activite.id}`, formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
     };
 
@@ -132,10 +161,11 @@ export default function Edit({ activite }: Props) {
                                             </button>
                                         </div>
                                     ) : (
-                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors">
+                                        <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-cab-blue transition-colors bg-white">
                                             <PhotoIcon className="w-8 h-8 text-gray-400" />
                                             <span className="text-xs text-gray-500 mt-1">Ajouter une image</span>
                                             <input
+                                                id="image-input"
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleImageChange}

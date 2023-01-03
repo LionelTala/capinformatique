@@ -1,4 +1,3 @@
-// resources/js/pages/Admin/Cours/Create.tsx
 import {
     ArrowLeftIcon,
     PlusIcon,
@@ -6,13 +5,12 @@ import {
     DocumentIcon,
     VideoCameraIcon,
     PhotoIcon,
+    UserGroupIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
-import { Head, Link, useForm } from '@inertiajs/react';
-
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
-
 
 interface Formation {
     id: number;
@@ -24,11 +22,24 @@ interface Vague {
     id: number;
     name: string;
     date_debut: string;
+    is_active: boolean;
 }
 
 interface Certification {
     id: number;
     titre: string;
+}
+
+interface Student {
+    id: number;
+    name: string;
+    matricule: string;
+}
+
+interface Tranche {
+    id: number;
+    numero: number;
+    montant: number;
 }
 
 interface Props {
@@ -38,18 +49,25 @@ interface Props {
 export default function Create({ formations }: Props) {
     const [vagues, setVagues] = useState<Vague[]>([]);
     const [certifications, setCertifications] = useState<Certification[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [tranches, setTranches] = useState<Tranche[]>([]);
     const [files, setFiles] = useState<File[]>([]);
     const [filePreviews, setFilePreviews] = useState<string[]>([]);
     const [loadingVagues, setLoadingVagues] = useState(false);
     const [loadingCertifications, setLoadingCertifications] = useState(false);
+    const [loadingStudents, setLoadingStudents] = useState(false);
+    const [loadingTranches, setLoadingTranches] = useState(false);
 
-    const { data, setData, post, processing, errors } = useForm({
+    // useForm est conservé pour gérer l'état local des champs et afficher les erreurs renvoyées par Laravel.
+    const { data, setData, processing, errors } = useForm({
         titre: '',
         description: '',
         formation_id: '',
-        type: 'vague',
+        type_destinataire: '',
         vague_id: '',
         certification_id: '',
+        student_id: '',
+        tranche_requise_id: '',
         video_url: '',
         video_title: '',
         is_active: true,
@@ -58,44 +76,94 @@ export default function Create({ formations }: Props) {
         files: [] as File[],
     });
 
-    // Charger les vagues quand la formation change
     useEffect(() => {
-        if (data.formation_id && data.type === 'vague') {
+        if (data.formation_id && data.type_destinataire === 'vague') {
             setLoadingVagues(true);
             fetch(`/admin/cours/vagues/${data.formation_id}`)
-                .then((res) => res.json())
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then((data) => {
-                    setVagues(data);
+                    setVagues(Array.isArray(data) ? data : []);
                     setLoadingVagues(false);
                 })
-                .catch(() => setLoadingVagues(false));
+                .catch(() => {
+                    setVagues([]);
+                    setLoadingVagues(false);
+                });
         } else {
             setVagues([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
 
-    // Charger les certifications quand la formation change
     useEffect(() => {
-        if (data.formation_id && data.type === 'certification') {
+        if (data.formation_id && data.type_destinataire === 'certification') {
             setLoadingCertifications(true);
             fetch(`/admin/cours/certifications/${data.formation_id}`)
-                .then((res) => res.json())
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then((data) => {
-                    setCertifications(data);
+                    setCertifications(Array.isArray(data) ? data : []);
                     setLoadingCertifications(false);
                 })
-                .catch(() => setLoadingCertifications(false));
+                .catch(() => {
+                    setCertifications([]);
+                    setLoadingCertifications(false);
+                });
         } else {
             setCertifications([]);
         }
-    }, [data.formation_id, data.type]);
+    }, [data.formation_id, data.type_destinataire]);
+
+    useEffect(() => {
+        if (data.formation_id) {
+            setLoadingTranches(true);
+            fetch(`/admin/tranches/by-formation/${data.formation_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((data) => {
+                    setTranches(Array.isArray(data) ? data : []);
+                    setLoadingTranches(false);
+                })
+                .catch(() => {
+                    setTranches([]);
+                    setLoadingTranches(false);
+                });
+        } else {
+            setTranches([]);
+        }
+    }, [data.formation_id]);
+
+    useEffect(() => {
+        if (data.certification_id && data.type_destinataire === 'certification') {
+            setLoadingStudents(true);
+            fetch(`/admin/cours/students-by-certification/${data.certification_id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then((data) => {
+                    setStudents(Array.isArray(data) ? data : []);
+                    setLoadingStudents(false);
+                })
+                .catch(() => {
+                    setStudents([]);
+                    setLoadingStudents(false);
+                });
+        } else {
+            setStudents([]);
+        }
+    }, [data.certification_id, data.type_destinataire]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = Array.from(e.target.files || []);
         setFiles([...files, ...selectedFiles]);
         setData('files', [...files, ...selectedFiles]);
-
-        // Créer les prévisualisations
         const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
         setFilePreviews([...filePreviews, ...newPreviews]);
     };
@@ -111,14 +179,59 @@ export default function Create({ formations }: Props) {
 
     const getFileIcon = (file: File) => {
         if (file.type.startsWith('image/')) return <PhotoIcon className="w-5 h-5" />;
-        if (file.type === 'application/pdf') return <DocumentIcon className="w-5 h-5" />;
         return <DocumentIcon className="w-5 h-5" />;
     };
 
+    // ✅ ENVOI SÉCURISÉ ET DIRECT VIA ROUTER.POST
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/cours', {
+
+        const formData = new FormData();
+
+        // 1. Champs de base requis
+        formData.append('titre', data.titre);
+        formData.append('description', data.description || '');
+        formData.append('formation_id', data.formation_id);
+
+        // 2. Traduction des champs du destinataire attendus par le validateur Laravel
+        formData.append('type', data.type_destinataire); // 'vague' ou 'certification'
+        formData.append('mode_envoi', data.type_destinataire === 'vague' ? 'groupe' : 'individuel');
+
+        // 3. Traitement des cas conditionnels
+        if (data.type_destinataire === 'vague') {
+            formData.append('vague_id', data.vague_id || '');
+            if (data.tranche_requise_id) {
+                formData.append('tranche_requise_id', data.tranche_requise_id);
+            }
+        } else {
+            formData.append('certification_id', data.certification_id || '');
+            formData.append('student_id', data.student_id || '');
+        }
+
+        // 4. Options facultatives du cours
+        if (data.video_url) formData.append('video_url', data.video_url);
+        if (data.video_title) formData.append('video_title', data.video_title);
+        formData.append('is_active', data.is_active ? '1' : '0');
+        formData.append('order', String(data.order));
+        formData.append('send_notification', data.send_notification ? '1' : '0');
+
+        // 5. Injection des fichiers joints
+        data.files.forEach((file) => {
+            formData.append('files[]', file);
+        });
+
+        // Debug local console pour vérification des champs
+        console.log('📤 Payload FormData envoyé :');
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}:`, pair[1]);
+        }
+
+        // Soumission directe via le routeur global d'Inertia
+        router.post('/admin/cours', formData, {
             forceFormData: true,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
     };
 
@@ -179,7 +292,13 @@ export default function Create({ formations }: Props) {
                                 <select
                                     id="formation_id"
                                     value={data.formation_id}
-                                    onChange={(e) => setData('formation_id', e.target.value)}
+                                    onChange={(e) => {
+                                        setData('formation_id', e.target.value);
+                                        setData('type_destinataire', '');
+                                        setData('vague_id', '');
+                                        setData('certification_id', '');
+                                        setData('student_id', '');
+                                    }}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
                                     required
                                 >
@@ -193,89 +312,198 @@ export default function Create({ formations }: Props) {
                                 {errors.formation_id && <p className="mt-1 text-sm text-red-600">{errors.formation_id}</p>}
                             </div>
 
-                            {/* Type */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Destinataires <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex gap-4">
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="vague"
-                                            checked={data.type === 'vague'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Vague</span>
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="radio"
-                                            value="certification"
-                                            checked={data.type === 'certification'}
-                                            onChange={(e) => setData('type', e.target.value as 'vague' | 'certification')}
-                                            className="w-4 h-4 text-cab-blue focus:ring-cab-blue"
-                                        />
-                                        <span className="text-sm text-gray-700">Certification</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Vague */}
-                            {data.type === 'vague' && (
+                            {/* Type de destinataire */}
+                            {data.formation_id && (
                                 <div>
-                                    <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Vague <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Type de destinataire <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        id="vague_id"
-                                        value={data.vague_id}
-                                        onChange={(e) => setData('vague_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'vague'}
-                                    >
-                                        <option value="">-- Sélectionnez une vague --</option>
-                                        {loadingVagues ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            vagues.map((v) => (
-                                                <option key={v.id} value={v.id}>
-                                                    {v.name} ({v.date_debut})
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'vague');
+                                                setData('certification_id', '');
+                                                setData('student_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserGroupIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'vague'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Vague de formation
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi groupé</p>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setData('type_destinataire', 'certification');
+                                                setData('vague_id', '');
+                                                setData('tranche_requise_id', '');
+                                            }}
+                                            className={`p-4 border-2 rounded-xl text-center transition-all ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'border-cab-blue bg-blue-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <UserIcon className={`w-8 h-8 mx-auto mb-2 ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-400'
+                                            }`} />
+                                            <p className={`text-sm font-medium ${
+                                                data.type_destinataire === 'certification'
+                                                    ? 'text-cab-blue'
+                                                    : 'text-gray-600'
+                                            }`}>
+                                                Certification
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-1">Envoi individuel</p>
+                                        </button>
+                                    </div>
+                                    {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
+                                    {errors.mode_envoi && <p className="mt-1 text-sm text-red-600">{errors.mode_envoi}</p>}
                                 </div>
                             )}
 
-                            {/* Certification */}
-                            {data.type === 'certification' && (
-                                <div>
-                                    <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Certification <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
-                                        id="certification_id"
-                                        value={data.certification_id}
-                                        onChange={(e) => setData('certification_id', e.target.value)}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                        required={data.type === 'certification'}
-                                    >
-                                        <option value="">-- Sélectionnez une certification --</option>
-                                        {loadingCertifications ? (
-                                            <option value="" disabled>Chargement...</option>
-                                        ) : (
-                                            certifications.map((c) => (
-                                                <option key={c.id} value={c.id}>
-                                                    {c.titre}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                    {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
-                                </div>
+                            {/* Si Vague de formation */}
+                            {data.type_destinataire === 'vague' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Vague de formation <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="vague_id"
+                                            value={data.vague_id}
+                                            onChange={(e) => setData('vague_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une vague --</option>
+                                            {loadingVagues ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : vagues.length === 0 ? (
+                                                <option value="" disabled>Aucune vague active</option>
+                                            ) : (
+                                                vagues.map((v) => (
+                                                    <option key={v.id} value={v.id}>
+                                                        {v.name} ({v.date_debut})
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="tranche_requise_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Accessible à partir de la tranche
+                                        </label>
+                                        <select
+                                            id="tranche_requise_id"
+                                            value={data.tranche_requise_id}
+                                            onChange={(e) => setData('tranche_requise_id', e.target.value)}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                        >
+                                            <option value="">-- Tous les étudiants --</option>
+                                            {loadingTranches ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                tranches.map((t) => (
+                                                    <option key={t.id} value={t.id}>
+                                                        Tranche {t.numero} - {t.montant.toLocaleString()} FCFA
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Les étudiants devront avoir payé cette tranche pour accéder au cours
+                                        </p>
+                                        {errors.tranche_requise_id && <p className="mt-1 text-sm text-red-600">{errors.tranche_requise_id}</p>}
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Si Certification */}
+                            {data.type_destinataire === 'certification' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="certification_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Certification <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            id="certification_id"
+                                            value={data.certification_id}
+                                            onChange={(e) => {
+                                                setData('certification_id', e.target.value);
+                                                setData('student_id', '');
+                                            }}
+                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                            required
+                                        >
+                                            <option value="">-- Sélectionnez une certification --</option>
+                                            {loadingCertifications ? (
+                                                <option value="" disabled>Chargement...</option>
+                                            ) : (
+                                                certifications.map((c) => (
+                                                    <option key={c.id} value={c.id}>
+                                                        {c.titre}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
+                                        {errors.certification_id && <p className="mt-1 text-sm text-red-600">{errors.certification_id}</p>}
+                                    </div>
+
+                                    {data.certification_id && (
+                                        <div>
+                                            <label htmlFor="student_id" className="block text-sm font-medium text-gray-700 mb-1">
+                                                Étudiant <span className="text-red-500">*</span>
+                                            </label>
+                                            <select
+                                                id="student_id"
+                                                value={data.student_id}
+                                                onChange={(e) => setData('student_id', e.target.value)}
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                                required
+                                            >
+                                                <option value="">-- Sélectionnez un étudiant --</option>
+                                                {loadingStudents ? (
+                                                    <option value="" disabled>Chargement...</option>
+                                                ) : (
+                                                    students.map((s) => (
+                                                        <option key={s.id} value={s.id}>
+                                                            {s.name} ({s.matricule})
+                                                        </option>
+                                                    ))
+                                                )}
+                                            </select>
+                                            {errors.student_id && <p className="mt-1 text-sm text-red-600">{errors.student_id}</p>}
+                                        </div>
+                                    )}
+
+                                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                        <p className="text-sm font-medium text-blue-800">Accès total pour les certifications</p>
+                                        <p className="text-xs text-blue-600 mt-1">
+                                            Les étudiants en certification ont accès à tous les cours sans restriction de tranche.
+                                        </p>
+                                    </div>
+                                </>
                             )}
 
                             {/* Vidéo */}
@@ -331,7 +559,6 @@ export default function Create({ formations }: Props) {
                                     <p className="text-xs text-gray-400">PDF, Images, etc. (Max 20MB par fichier)</p>
                                 </div>
 
-                                {/* Prévisualisation des fichiers */}
                                 {filePreviews.length > 0 && (
                                     <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                                         {files.map((file, index) => (

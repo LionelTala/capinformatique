@@ -8,6 +8,7 @@ use App\Models\Formation;
 use App\Models\Vague;
 use App\Models\Certification;
 use App\Models\Student;
+use App\Models\Tranche;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\SoumissionEvaluation;
@@ -23,10 +24,13 @@ class EvaluationController extends Controller
     public function index()
     {
         try {
-            $evaluations = Evaluation::with(['formation', 'vague', 'certification'])
+            $evaluations = Evaluation::with(['formation', 'vague', 'certification', 'trancheRequise', 'student'])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($e) {
+                    // ✅ Calcul dynamique des destinataires
+                    $destinataires = $this->getDestinataires($e);
+
                     return [
                         'id' => $e->id,
                         'titre' => $e->titre,
@@ -36,13 +40,21 @@ class EvaluationController extends Controller
                         'type' => $e->type,
                         'est_depasse' => $e->est_depasse,
                         'jours_restants' => $e->jours_restants,
-                        'total_etudiants' => $e->students->count(),
+                        'total_etudiants' => $destinataires->count(),
                         'soumissions_count' => $e->soumissions_count,
                         'soumis_count' => $e->soumis_count,
                         'corrige_count' => $e->corrige_count,
-                        'taux_soumission' => $e->taux_soumission,
+                        'taux_soumission' => $destinataires->count() > 0
+                            ? round(($e->soumissions_count / $destinataires->count()) * 100, 1)
+                            : 0,
                         'is_active' => $e->is_active,
                         'has_notification_sent' => $e->has_notification_sent,
+                        'mode_envoi' => $e->student_id ? 'individuel' : 'groupe',
+                        'tranche_requise' => $e->trancheRequise ? [
+                            'id' => $e->trancheRequise->id,
+                            'numero' => $e->trancheRequise->numero,
+                            'montant' => $e->trancheRequise->montant,
+                        ] : null,
                         'formation' => $e->formation ? [
                             'id' => $e->formation->id,
                             'name' => $e->formation->name,
@@ -100,6 +112,7 @@ class EvaluationController extends Controller
                     'id' => $v->id,
                     'name' => $v->name,
                     'date_debut' => $v->date_debut->format('d/m/Y'),
+                    'is_active' => (bool) $v->is_active,
                 ];
             });
 
@@ -116,10 +129,50 @@ class EvaluationController extends Controller
                 return [
                     'id' => $c->id,
                     'titre' => $c->titre,
+                    'is_active' => (bool) $c->is_active,
                 ];
             });
 
         return response()->json($certifications);
+    }
+
+    public function getStudentsByCertification($certificationId)
+    {
+        $students = Student::where('certification_id', $certificationId)
+            ->with('user')
+            ->orderBy('last_name')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => $s->full_name,
+                    'matricule' => $s->matricule,
+                ];
+            });
+
+        return response()->json($students);
+    }
+
+    public function getTranchesByFormation($formationId)
+    {
+        Log::info('🔍 [Evaluation] getTranchesByFormation - Appel', [
+            'formation_id' => $formationId,
+            'user' => auth()->id()
+        ]);
+
+        try {
+            $tranches = Tranche::where('formation_id', $formationId)
+                ->orderBy('numero')
+                ->get(['id', 'numero', 'montant']);
+
+            return response()->json($tranches);
+        } catch (\Exception $e) {
+            Log::error('❌ [Evaluation] getTranchesByFormation - Erreur', [
+                'formation_id' => $formationId,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
@@ -130,8 +183,11 @@ class EvaluationController extends Controller
                 'description' => 'nullable|string',
                 'formation_id' => 'required|exists:formations,id',
                 'type' => 'required|in:vague,certification',
-                'vague_id' => 'required_if:type,vague|nullable|exists:vagues,id',
+                'mode_envoi' => 'required|in:groupe,individuel',
+                'vague_id' => 'required_if:mode_envoi,groupe|nullable|exists:vagues,id',
                 'certification_id' => 'required_if:type,certification|nullable|exists:certifications,id',
+                'student_id' => 'required_if:mode_envoi,individuel|nullable|exists:students,id',
+                'tranche_requise_id' => 'nullable|exists:tranches,id',
                 'date' => 'nullable|date|after:now',
                 'coefficient' => 'nullable|numeric|min:0|max:20',
                 'files' => 'nullable|array',
@@ -163,9 +219,11 @@ class EvaluationController extends Controller
                     'date' => $validated['date'] ?? null,
                     'coefficient' => $validated['coefficient'] ?? 1,
                     'formation_id' => $validated['formation_id'],
-                    'vague_id' => $validated['vague_id'] ?? null,
+                    'vague_id' => $validated['mode_envoi'] === 'groupe' ? $validated['vague_id'] : null,
                     'certification_id' => $validated['certification_id'] ?? null,
                     'type' => $validated['type'],
+                    'student_id' => $validated['mode_envoi'] === 'individuel' ? $validated['student_id'] : null,
+                    'tranche_requise_id' => $validated['tranche_requise_id'] ?? null,
                     'is_active' => $validated['is_active'] ?? true,
                     'order' => $validated['order'] ?? 0,
                 ]);
@@ -180,6 +238,7 @@ class EvaluationController extends Controller
             Log::info('Évaluation créée', [
                 'evaluation_id' => $evaluation->id,
                 'titre' => $evaluation->titre,
+                'mode_envoi' => $validated['mode_envoi'],
                 'created_by' => auth()->id(),
             ]);
 
@@ -200,36 +259,82 @@ class EvaluationController extends Controller
         }
     }
 
+    /**
+     * ✅ Détermine les destinataires réels de l'évaluation avec filtrage dynamique par tranche
+     */
+    private function getDestinataires(Evaluation $evaluation)
+    {
+        Log::info('👥 [Evaluation] getDestinataires', [
+            'evaluation_id' => $evaluation->id,
+            'student_id' => $evaluation->student_id,
+            'vague_id' => $evaluation->vague_id,
+            'tranche_requise_id' => $evaluation->tranche_requise_id
+        ]);
+
+        // Cas 1 : Envoi individuel
+        if ($evaluation->student_id) {
+            $students = Student::where('id', $evaluation->student_id)->get();
+            Log::info('👥 [Evaluation] getDestinataires - Individuel', ['count' => $students->count()]);
+            return $students;
+        }
+
+        // Cas 2 : Envoi groupé par vague
+        if ($evaluation->vague_id) {
+            $students = Student::where('vague_id', $evaluation->vague_id)->get();
+
+            // ✅ Filtrer par tranche en temps réel
+            if ($evaluation->tranche_requise_id) {
+                $tranche = Tranche::find($evaluation->tranche_requise_id);
+                if ($tranche) {
+                    $students = $students->filter(function ($student) use ($tranche) {
+                        return $student->derniereTranchePayeeNumero() >= $tranche->numero;
+                    });
+                    Log::info('👥 [Evaluation] getDestinataires - Filtré par tranche', [
+                        'tranche_numero' => $tranche->numero,
+                        'count' => $students->count()
+                    ]);
+                }
+            }
+
+            Log::info('👥 [Evaluation] getDestinataires - Groupe', ['count' => $students->count()]);
+            return $students;
+        }
+
+        Log::warning('👥 [Evaluation] getDestinataires - Aucun destinataire');
+        return collect();
+    }
+
     private function sendNotifications(Evaluation $evaluation)
     {
-        $students = $evaluation->students;
+        $students = $this->getDestinataires($evaluation);
 
         foreach ($students as $student) {
-            $notification = Notification::create([
-                'user_id' => $student->user_id,
-                'user_creator_id' => auth()->id(),
-                'type' => 'evaluation',
-                'notifiable_type' => Evaluation::class,
-                'notifiable_id' => $evaluation->id,
-                'title' => "📝 Nouvelle évaluation : {$evaluation->titre}",
-                'message' => "Une nouvelle évaluation vous a été assignée. Coefficient : {$evaluation->coefficient}" . ($evaluation->date ? " (Date : " . $evaluation->date->format('d/m/Y H:i') . ")" : ''),
-                'link' => "/student/evaluations/{$evaluation->id}",
-                'data' => [
-                    'action' => 'nouveau',
-                    'evaluation_id' => $evaluation->id,
-                    'titre' => $evaluation->titre,
-                    'coefficient' => $evaluation->coefficient,
-                    'date' => $evaluation->date?->format('d/m/Y H:i'),
-                ],
-                'read_at' => null,
-            ]);
-
             try {
+                $notification = Notification::create([
+                    'user_id' => $student->user_id,
+                    'user_creator_id' => auth()->id(),
+                    'type' => 'evaluation',
+                    'notifiable_type' => Evaluation::class,
+                    'notifiable_id' => $evaluation->id,
+                    'title' => "📝 Nouvelle évaluation : {$evaluation->titre}",
+                    'message' => "Une nouvelle évaluation vous a été assignée. Coefficient : {$evaluation->coefficient}" . ($evaluation->date ? " (Date : " . $evaluation->date->format('d/m/Y H:i') . ")" : ''),
+                    'link' => "/student/evaluations/{$evaluation->id}",
+                    'data' => [
+                        'action' => 'nouveau',
+                        'evaluation_id' => $evaluation->id,
+                        'titre' => $evaluation->titre,
+                        'coefficient' => $evaluation->coefficient,
+                        'date' => $evaluation->date?->format('d/m/Y H:i'),
+                        'mode_envoi' => $evaluation->student_id ? 'individuel' : 'groupe',
+                    ],
+                    'read_at' => null,
+                ]);
+
                 event(new NotificationCreated($notification));
             } catch (\Exception $e) {
                 Log::warning('Erreur broadcast évaluation', [
-                    'user_id' => $student->user_id,
-                    'notification_id' => $notification->id,
+                    'student_id' => $student->id,
+                    'evaluation_id' => $evaluation->id,
                     'message' => $e->getMessage(),
                 ]);
             }
@@ -243,6 +348,7 @@ class EvaluationController extends Controller
         Log::info('Notifications évaluation envoyées', [
             'evaluation_id' => $evaluation->id,
             'students_count' => $students->count(),
+            'mode' => $evaluation->student_id ? 'individuel' : 'groupe',
         ]);
     }
 
@@ -251,29 +357,29 @@ class EvaluationController extends Controller
         $admins = User::whereIn('role', ['super_admin', 'admin_centre', 'admin'])->get();
 
         foreach ($admins as $admin) {
-            $notification = Notification::create([
-                'user_id' => $admin->id,
-                'user_creator_id' => $student->user_id,
-                'type' => 'evaluation',
-                'notifiable_type' => Evaluation::class,
-                'notifiable_id' => $evaluation->id,
-                'title' => "📤 Évaluation soumise",
-                'message' => "{$student->full_name} a soumis l'évaluation '{$evaluation->titre}'.",
-                'link' => "/admin/evaluations/{$evaluation->id}",
-                'data' => [
-                    'action' => 'soumis',
-                    'evaluation_id' => $evaluation->id,
-                    'student_id' => $student->id,
-                    'student_name' => $student->full_name,
-                ],
-                'read_at' => null,
-            ]);
-
             try {
+                $notification = Notification::create([
+                    'user_id' => $admin->id,
+                    'user_creator_id' => $student->user_id,
+                    'type' => 'evaluation',
+                    'notifiable_type' => Evaluation::class,
+                    'notifiable_id' => $evaluation->id,
+                    'title' => "📤 Évaluation soumise",
+                    'message' => "{$student->full_name} a soumis l'évaluation '{$evaluation->titre}'.",
+                    'link' => "/admin/evaluations/{$evaluation->id}",
+                    'data' => [
+                        'action' => 'soumis',
+                        'evaluation_id' => $evaluation->id,
+                        'student_id' => $student->id,
+                        'student_name' => $student->full_name,
+                    ],
+                    'read_at' => null,
+                ]);
+
                 event(new NotificationCreated($notification));
             } catch (\Exception $e) {
                 Log::warning('Erreur broadcast admin évaluation', [
-                    'user_id' => $admin->id,
+                    'admin_id' => $admin->id,
                     'message' => $e->getMessage(),
                 ]);
             }
@@ -282,29 +388,29 @@ class EvaluationController extends Controller
 
     private function notifyStudentCorrection(SoumissionEvaluation $soumission)
     {
-        $notification = Notification::create([
-            'user_id' => $soumission->student->user_id,
-            'user_creator_id' => auth()->id(),
-            'type' => 'evaluation',
-            'notifiable_type' => Evaluation::class,
-            'notifiable_id' => $soumission->evaluation_id,
-            'title' => "✅ Évaluation corrigée",
-            'message' => "Votre évaluation '{$soumission->evaluation->titre}' a été corrigée. Note : {$soumission->note}/20",
-            'link' => "/student/evaluations/{$soumission->evaluation_id}",
-            'data' => [
-                'action' => 'corrige',
-                'evaluation_id' => $soumission->evaluation_id,
-                'titre' => $soumission->evaluation->titre,
-                'note' => $soumission->note,
-            ],
-            'read_at' => null,
-        ]);
-
         try {
+            $notification = Notification::create([
+                'user_id' => $soumission->student->user_id,
+                'user_creator_id' => auth()->id(),
+                'type' => 'evaluation',
+                'notifiable_type' => Evaluation::class,
+                'notifiable_id' => $soumission->evaluation_id,
+                'title' => "✅ Évaluation corrigée",
+                'message' => "Votre évaluation '{$soumission->evaluation->titre}' a été corrigée. Note : {$soumission->note}/20",
+                'link' => "/student/evaluations/{$soumission->evaluation_id}",
+                'data' => [
+                    'action' => 'corrige',
+                    'evaluation_id' => $soumission->evaluation_id,
+                    'titre' => $soumission->evaluation->titre,
+                    'note' => $soumission->note,
+                ],
+                'read_at' => null,
+            ]);
+
             event(new NotificationCreated($notification));
         } catch (\Exception $e) {
             Log::warning('Erreur broadcast correction évaluation', [
-                'user_id' => $soumission->student->user_id,
+                'student_id' => $soumission->student->user_id,
                 'message' => $e->getMessage(),
             ]);
         }
@@ -312,7 +418,10 @@ class EvaluationController extends Controller
 
     public function show(Evaluation $evaluation)
     {
-        $evaluation->load(['formation', 'vague', 'certification']);
+        $evaluation->load(['formation', 'vague', 'certification', 'trancheRequise', 'student']);
+
+        // ✅ Calcul dynamique des destinataires
+        $destinataires = $this->getDestinataires($evaluation);
 
         $soumissions = $evaluation->soumissions()->with('student')->get()->map(function ($s) {
             return [
@@ -332,8 +441,6 @@ class EvaluationController extends Controller
             ];
         });
 
-        $totalStudents = $evaluation->students->count();
-
         return Inertia::render('Admin/Evaluations/Show', [
             'evaluation' => [
                 'id' => $evaluation->id,
@@ -345,11 +452,14 @@ class EvaluationController extends Controller
                 'est_depasse' => $evaluation->est_depasse,
                 'jours_restants' => $evaluation->jours_restants,
                 'type' => $evaluation->type,
-                'total_etudiants' => $totalStudents,
+                'mode_envoi' => $evaluation->student_id ? 'individuel' : 'groupe',
+                'total_etudiants' => $destinataires->count(),
                 'soumissions_count' => $evaluation->soumissions_count,
                 'soumis_count' => $evaluation->soumis_count,
                 'corrige_count' => $evaluation->corrige_count,
-                'taux_soumission' => $evaluation->taux_soumission,
+                'taux_soumission' => $destinataires->count() > 0
+                    ? round(($evaluation->soumissions_count / $destinataires->count()) * 100, 1)
+                    : 0,
                 'has_notification_sent' => $evaluation->has_notification_sent,
                 'notification_sent_at' => $evaluation->notification_sent_at?->format('d/m/Y H:i'),
                 'formation' => $evaluation->formation ? [
@@ -364,9 +474,19 @@ class EvaluationController extends Controller
                     'id' => $evaluation->certification->id,
                     'titre' => $evaluation->certification->titre,
                 ] : null,
+                'student' => $evaluation->student ? [
+                    'id' => $evaluation->student->id,
+                    'name' => $evaluation->student->full_name,
+                    'matricule' => $evaluation->student->matricule,
+                ] : null,
+                'tranche_requise' => $evaluation->trancheRequise ? [
+                    'id' => $evaluation->trancheRequise->id,
+                    'numero' => $evaluation->trancheRequise->numero,
+                    'montant' => $evaluation->trancheRequise->montant,
+                ] : null,
             ],
             'soumissions' => $soumissions,
-            'nonSoumis' => $evaluation->students->reject(function ($student) use ($soumissions) {
+            'nonSoumis' => $destinataires->reject(function ($student) use ($soumissions) {
                 return $soumissions->contains('student_id', $student->id);
             })->map(function ($student) {
                 return [
@@ -374,7 +494,7 @@ class EvaluationController extends Controller
                     'name' => $student->full_name,
                     'matricule' => $student->matricule,
                 ];
-            }),
+            })->values(),
         ]);
     }
 
@@ -401,8 +521,11 @@ class EvaluationController extends Controller
                 'coefficient' => $evaluation->coefficient,
                 'formation_id' => $evaluation->formation_id,
                 'type' => $evaluation->type,
+                'mode_envoi' => $evaluation->student_id ? 'individuel' : 'groupe',
                 'vague_id' => $evaluation->vague_id,
                 'certification_id' => $evaluation->certification_id,
+                'student_id' => $evaluation->student_id,
+                'tranche_requise_id' => $evaluation->tranche_requise_id,
                 'is_active' => $evaluation->is_active,
                 'order' => $evaluation->order,
             ],
@@ -418,8 +541,11 @@ class EvaluationController extends Controller
                 'description' => 'nullable|string',
                 'formation_id' => 'required|exists:formations,id',
                 'type' => 'required|in:vague,certification',
-                'vague_id' => 'required_if:type,vague|nullable|exists:vagues,id',
+                'mode_envoi' => 'required|in:groupe,individuel',
+                'vague_id' => 'required_if:mode_envoi,groupe|nullable|exists:vagues,id',
                 'certification_id' => 'required_if:type,certification|nullable|exists:certifications,id',
+                'student_id' => 'required_if:mode_envoi,individuel|nullable|exists:students,id',
+                'tranche_requise_id' => 'nullable|exists:tranches,id',
                 'date' => 'nullable|date',
                 'coefficient' => 'nullable|numeric|min:0|max:20',
                 'files' => 'nullable|array',
@@ -451,8 +577,10 @@ class EvaluationController extends Controller
                     'date' => $validated['date'] ?? null,
                     'coefficient' => $validated['coefficient'] ?? 1,
                     'formation_id' => $validated['formation_id'],
-                    'vague_id' => $validated['vague_id'] ?? null,
+                    'vague_id' => $validated['mode_envoi'] === 'groupe' ? $validated['vague_id'] : null,
                     'certification_id' => $validated['certification_id'] ?? null,
+                    'student_id' => $validated['mode_envoi'] === 'individuel' ? $validated['student_id'] : null,
+                    'tranche_requise_id' => $validated['tranche_requise_id'] ?? null,
                     'type' => $validated['type'],
                     'is_active' => $validated['is_active'] ?? true,
                     'order' => $validated['order'] ?? 0,

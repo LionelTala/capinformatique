@@ -11,6 +11,7 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::where('user_id', auth()->id())
+            ->whereNull('read_at') // ✅ uniquement les non lues
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get()

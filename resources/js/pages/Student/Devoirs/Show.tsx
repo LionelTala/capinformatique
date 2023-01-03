@@ -8,9 +8,11 @@ import {
     XCircleIcon,
     UserIcon,
     PaperAirplaneIcon,
+    LockClosedIcon,
+    LockOpenIcon,
+    ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
-
 import { useState } from 'react';
 import StudentLayout from '@/Components/Layouts/StudentLayout';
 
@@ -26,6 +28,14 @@ interface Devoir {
         id: number;
         name: string;
     };
+    est_accessible: boolean;
+    tranche_requise: {
+        id: number;
+        numero: number;
+        montant: number;
+        lien : string;
+    } | null;
+    est_verrouille: boolean;
 }
 
 interface Soumission {
@@ -91,6 +101,71 @@ export default function Show({ devoir, soumission }: Props) {
         </span>;
     };
 
+    // ✅ Si le devoir est verrouillé
+    if (devoir.est_verrouille) {
+        return (
+            <>
+                <Head title={`${devoir.titre} - Verrouillé`} />
+
+                <StudentLayout title={devoir.titre}>
+                    <div className="max-w-3xl">
+                        <Link
+                            href="/student/devoirs"
+                            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-cab-blue transition-colors mb-4"
+                        >
+                            <ArrowLeftIcon className="w-4 h-4" />
+                            Retour à mes devoirs
+                        </Link>
+
+                        <div className="bg-white rounded-2xl p-8 shadow-sm border-2 border-red-200/50 bg-red-50/30 text-center">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                                    <LockClosedIcon className="w-10 h-10 text-red-500" />
+                                </div>
+                                <h1 className="text-2xl font-bold text-gray-900">{devoir.titre}</h1>
+                                <div className="flex items-center gap-2">
+                                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500" />
+                                    <span className="text-lg font-medium text-yellow-700">
+                                        🔒 Tranche {devoir.tranche_requise?.numero} requise
+                                    </span>
+                                </div>
+                                {devoir.tranche_requise?.montant && (
+                                    <p className="text-gray-600">
+                                        Payez la tranche {devoir.tranche_requise.numero} de{' '}
+                                        <span className="font-semibold">{devoir.tranche_requise.montant.toLocaleString()} FCFA</span>{' '}
+                                        pour accéder à ce devoir.
+                                    </p>
+                                )}
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Une fois la tranche payée et validée, vous pourrez soumettre votre devoir.
+                                </p>
+                                {
+                                    devoir?.tranche_requise?.lien ? (
+                                        <Link
+                                            href={devoir.tranche_requise.lien}
+                                            className="inline-flex items-center gap-2 px-6 py-3 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
+                                        >
+                                            <LockOpenIcon className="w-5 h-5" />
+                                            Débloquer
+                                        </Link>
+                                    ) : (
+
+                                                <span className="inline-flex items-center gap-1 px-4 py-2 bg-gray-200 text-gray-500 rounded-xl text-sm font-medium shrink-0 mt-1 cursor-not-allowed">
+                                                    <LockOpenIcon className="w-4 h-4" />
+                                                    Lien indisponible
+                                                </span>
+                                    )
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </StudentLayout>
+            </>
+        );
+    }
+
+    // ✅ Devoir accessible (normal)
     return (
         <>
             <Head title={`${devoir.titre} - Détails du devoir`} />
