@@ -23,6 +23,17 @@
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+@supports not (background: color-mix(in oklch, white, black)) {
+    .bg-white\/10 { background-color: rgba(255,255,255,0.1) !important; }
+    .bg-white\/20 { background-color: rgba(255,255,255,0.2) !important; }
+    .bg-black\/50 { background-color: rgba(0,0,0,0.5) !important; }
+    .bg-black\/60 { background-color: rgba(0,0,0,0.6) !important; }
+    .text-white\/60 { color: rgba(255,255,255,0.6) !important; }
+    .text-white\/70 { color: rgba(255,255,255,0.7) !important; }
+    .text-white\/80 { color: rgba(255,255,255,0.8) !important; }
+    .text-white\/85 { color: rgba(255,255,255,0.85) !important; }
+}
+
 
 @media (prefers-reduced-motion: reduce) {
     * {

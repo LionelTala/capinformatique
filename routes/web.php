@@ -22,10 +22,9 @@ Route::get('/preinscription', [CandidatureController::class, 'create'])->name('c
 Route::post('/candidatures', [CandidatureController::class, 'store'])->name('candidature.store');
 Route::get('/candidature/success', [CandidatureController::class, 'success'])->name('candidature.success');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-});
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 // Route for admin dashboard

@@ -177,15 +177,19 @@ const PublicLayout = ({ children }: Props) => {
 
                             {/* ✅ Certification dans le menu mobile */}
                             <li className="pt-1">
-                                <Link
-                                    href="/certification"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 bg-gradient-to-r from-[#1a56db] to-[#1a56db]/80 text-white rounded-xl text-sm font-semibold hover:from-[#0d2a63] hover:to-[#1a56db] transition-all duration-300 shadow-lg shadow-[#1a56db]/25"
-                                >
-                                    <SparklesIcon className="w-5 h-5" />
-                                    Certification en ligne
-                                </Link>
-                            </li>
+    <Link
+        href="/certification"
+        onClick={() => setIsMobileMenuOpen(false)}
+        className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-white rounded-xl text-sm font-semibold transition-all duration-300"
+        style={{
+            background: 'linear-gradient(to right, #1a56db, rgba(26,86,219,0.8))',
+            boxShadow: '0 10px 15px -3px rgba(26,86,219,0.25)',
+        }}
+    >
+        <SparklesIcon className="w-5 h-5" />
+        Certification en ligne
+    </Link>
+</li>
                         </ul>
                     </div>
                 )}

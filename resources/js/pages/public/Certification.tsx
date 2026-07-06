@@ -139,33 +139,67 @@ export default function Certification({ certifications }: Props) {
             <PublicLayout>
 
                 {/* Header */}
-                <section className="relative pt-32 pb-16 bg-gradient-to-r from-cab-dark to-cab-blue">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium border border-white/10 mb-4">
-                                <CheckBadgeIcon className="w-4 h-4" />
-                                Certifications professionnelles
-                            </div>
-                            <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-                                Certifications <span className="text-cab-red">en ligne</span>
-                            </h1>
-                            <p className="mt-4 text-xl text-white/80 max-w-2xl mx-auto">
-                                Obtenez une certification reconnue et boostez votre carrière professionnelle
-                            </p>
-                            <div className="mt-6 flex flex-wrap justify-center gap-4">
-                                <span className="px-4 py-2 bg-white/10 rounded-full text-sm text-white/80 border border-white/10">
-                                    🎓 100% en ligne
-                                </span>
-                                <span className="px-4 py-2 bg-white/10 rounded-full text-sm text-white/80 border border-white/10">
-                                    ⏱️ Flexible
-                                </span>
-                                <span className="px-4 py-2 bg-white/10 rounded-full text-sm text-white/80 border border-white/10">
-                                    📜 Certificat reconnu
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <section
+    className="relative pt-32 pb-16"
+    style={{ background: 'linear-gradient(to right, #0a1f4d, #1a56db)' }}
+>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+            <div
+                className="inline-flex items-center gap-2 px-4 py-2 backdrop-blur-sm rounded-full text-sm font-medium mb-4"
+                style={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    color: 'rgba(255,255,255,0.9)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                }}
+            >
+                <CheckBadgeIcon className="w-4 h-4" />
+                Certifications professionnelles
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white">
+                Certifications <span className="text-[#d21f2f]">en ligne</span>
+            </h1>
+            <p
+                className="mt-4 text-xl max-w-2xl mx-auto"
+                style={{ color: 'rgba(255,255,255,0.8)' }}
+            >
+                Obtenez une certification reconnue et boostez votre carrière professionnelle
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <span
+                    className="px-4 py-2 rounded-full text-sm"
+                    style={{
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                >
+                    🎓 100% en ligne
+                </span>
+                <span
+                    className="px-4 py-2 rounded-full text-sm"
+                    style={{
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                >
+                    ⏱️ Flexible
+                </span>
+                <span
+                    className="px-4 py-2 rounded-full text-sm"
+                    style={{
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.8)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                >
+                    📜 Certificat reconnu
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
 
                 {/* Liste des certifications */}
                 <section className="py-16 bg-gray-50">
@@ -341,33 +375,37 @@ export default function Certification({ certifications }: Props) {
 
                                 {/* Boutons d'action */}
                                 <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
-                                    {selectedCertification.lien_externe && selectedCertification.lien_label && (
-                                        <a
-                                            href={selectedCertification.lien_externe}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex-1 text-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors notranslate"
-                                        >
-                                            {selectedCertification.lien_label}
-                                        </a>
-                                    )}
+    {selectedCertification.lien_externe && selectedCertification.lien_label && (
 
-                                    {/* Bouton principal - Me pré-inscrire */}
-                                    <Link
-                                        href={`/preinscription?certification=${selectedCertification.id}&type=certification`}
-                                        className="flex-1 text-center px-6 py-3 bg-gradient-to-r from-cab-blue to-cab-blue/80 text-white rounded-xl font-semibold hover:from-cab-dark hover:to-cab-blue transition-all duration-300 shadow-lg shadow-cab-blue/25 notranslate flex items-center justify-center gap-2"
-                                    >
-                                        <UserPlusIcon className="w-5 h-5" />
-                                        📝 Me pré-inscrire
-                                    </Link>
+        <a    href={selectedCertification.lien_externe}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors notranslate"
+        >
+            {selectedCertification.lien_label}
+        </a>
+    )}
 
-                                    <button
-                                        onClick={closeModal}
-                                        className="px-6 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors notranslate"
-                                    >
-                                        Fermer
-                                    </button>
-                                </div>
+    {/* Bouton principal - Me pré-inscrire */}
+    <Link
+        href={`/preinscription?certification=${selectedCertification.id}&type=certification`}
+        className="flex-1 text-center px-6 py-3 text-white rounded-xl font-semibold transition-all duration-300 notranslate flex items-center justify-center gap-2"
+        style={{
+            background: 'linear-gradient(to right, #1a56db, rgba(26,86,219,0.8))',
+            boxShadow: '0 10px 15px -3px rgba(26,86,219,0.25)',
+        }}
+    >
+        <UserPlusIcon className="w-5 h-5" />
+        📝 Me pré-inscrire
+    </Link>
+
+    <button
+        onClick={closeModal}
+        className="px-6 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors notranslate"
+    >
+        Fermer
+    </button>
+</div>
 
                                 {/* Note supplémentaire */}
                                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">

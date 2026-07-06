@@ -176,41 +176,52 @@ export default function Formations({ formationsEnLigne }: Props) {
             <PublicLayout>
 
                 {/* Header */}
-                <section className="relative pt-32 pb-16 bg-gradient-to-r from-cab-dark to-cab-blue">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center">
-                            <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-                                Nos <span className="text-cab-red">Formations</span>
-                            </h1>
-                            <p className="mt-4 text-xl text-white/80 max-w-2xl mx-auto">
-                                Découvrez nos formations professionnelles en présentiel ou en ligne
-                            </p>
+                <section
+    className="relative pt-32 pb-16"
+    style={{ background: 'linear-gradient(to right, #0a1f4d, #1a56db)' }}
+>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white">
+                Nos <span className="text-[#d21f2f]">Formations</span>
+            </h1>
+            <p
+                className="mt-4 text-xl max-w-2xl mx-auto"
+                style={{ color: 'rgba(255,255,255,0.8)' }}
+            >
+                Découvrez nos formations professionnelles en présentiel ou en ligne
+            </p>
 
-                            <div className="mt-8 inline-flex bg-white/10 backdrop-blur-sm rounded-xl p-1">
-                                <button
-                                    onClick={() => setActiveTab('presentiel')}
-                                    className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                        activeTab === 'presentiel'
-                                            ? 'bg-white text-cab-blue shadow-lg'
-                                            : 'text-white/70 hover:text-white'
-                                    }`}
-                                >
-                                    📍 Présentiel
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('enligne')}
-                                    className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                        activeTab === 'enligne'
-                                            ? 'bg-white text-cab-blue shadow-lg'
-                                            : 'text-white/70 hover:text-white'
-                                    }`}
-                                >
-                                    💻 En ligne
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            <div
+                className="mt-8 inline-flex rounded-xl p-1"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)' }}
+            >
+                <button
+                    onClick={() => setActiveTab('presentiel')}
+                    className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
+                    style={
+                        activeTab === 'presentiel'
+                            ? { backgroundColor: '#ffffff', color: '#1a56db', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
+                            : { color: 'rgba(255,255,255,0.7)' }
+                    }
+                >
+                    📍 Présentiel
+                </button>
+                <button
+                    onClick={() => setActiveTab('enligne')}
+                    className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
+                    style={
+                        activeTab === 'enligne'
+                            ? { backgroundColor: '#ffffff', color: '#1a56db', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
+                            : { color: 'rgba(255,255,255,0.7)' }
+                    }
+                >
+                    💻 En ligne
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
 
                 {/* Contenu */}
                 <section className="py-16 bg-gray-50">
@@ -443,33 +454,37 @@ export default function Formations({ formationsEnLigne }: Props) {
                                 )}
 
                                 {/* Boutons d'action */}
-                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
-                                    {selectedFormation.lien_externe && selectedFormation.lien_label && (
-                                        <a
-                                            href={selectedFormation.lien_externe}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex-1 text-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors notranslate"
-                                        >
-                                            {selectedFormation.lien_label}
-                                        </a>
-                                    )}
+                               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+    {selectedFormation.lien_externe && selectedFormation.lien_label && (
+        <a
+            href={selectedFormation.lien_externe}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors notranslate"
+        >
+            {selectedFormation.lien_label}
+        </a>
+    )}
 
-                                    <Link
-                                        href={`/preinscription?formation=${selectedFormation.id}&type=formation`}
-                                        className="flex-1 text-center px-6 py-3 bg-gradient-to-r from-cab-blue to-cab-blue/80 text-white rounded-xl font-semibold hover:from-cab-dark hover:to-cab-blue transition-all duration-300 shadow-lg shadow-cab-blue/25 notranslate flex items-center justify-center gap-2"
-                                    >
-                                        <UserPlusIcon className="w-5 h-5" />
-                                        📝 Me pré-inscrire
-                                    </Link>
+    <Link
+        href={`/preinscription?formation=${selectedFormation.id}&type=formation`}
+        className="flex-1 text-center px-6 py-3 text-white rounded-xl font-semibold transition-all duration-300 notranslate flex items-center justify-center gap-2"
+        style={{
+            background: 'linear-gradient(to right, #1a56db, rgba(26,86,219,0.8))',
+            boxShadow: '0 10px 15px -3px rgba(26,86,219,0.25)',
+        }}
+    >
+        <UserPlusIcon className="w-5 h-5" />
+        📝 Me pré-inscrire
+    </Link>
 
-                                    <button
-                                        onClick={closeModal}
-                                        className="px-6 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors notranslate"
-                                    >
-                                        Fermer
-                                    </button>
-                                </div>
+    <button
+        onClick={closeModal}
+        className="px-6 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors notranslate"
+    >
+        Fermer
+    </button>
+</div>
                             </div>
                         </div>
                     </div>

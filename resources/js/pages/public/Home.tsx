@@ -1,5 +1,4 @@
 // resources/js/pages/public/Home.tsx
-import { useState, useEffect } from 'react';
 import {
     AcademicCapIcon,
     ClockIcon,
@@ -19,6 +18,18 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { Head, Link } from '@inertiajs/react';
+import {
+    ArrowRight,
+    ChevronLeft,
+    ChevronRight,
+    BadgeCheck,
+    Users,
+    GraduationCap,
+} from 'lucide-react';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+
 import RevealSection from '@/Components/Home/RevealSection';
 import Loader from '@/Components/Loader';
 import PublicLayout from '@/Components/PublicLayout';
@@ -38,11 +49,11 @@ const heroSlides = [
     },
     {
         id: 2,
-        image: '/assets/images/img2.jpeg',
+        image: '/assets/images/certif.jpg',
         badge: 'Certifications en ligne',
         title: 'Faites certifier vos compétences',
         subtitle: 'Où que vous soyez, à votre rythme',
-        description: 'Nos certifications en ligne vous permettent de valider vos compétences à distance et d\'obtenir un DQP reconnu.'
+        description: 'Nos certifications en ligne vous permettent de valider vos compétences à distance '
     },
     {
         id: 3,
@@ -54,13 +65,15 @@ const heroSlides = [
     }
 ];
 
+const HERO_SLIDE_DURATION = 6500; // ms
+
 const staticActivities = [
     {
         id: 1,
         title: 'Rentrée académique 2026-2027',
         date: '05/10/2026',
         excerpt: 'CEP, BEPC, Probatoire, Bac, étudiants et professionnels — toutes filières ouvertes.',
-        image_url: '/assets/images/img1.jpeg',
+        image_url: '/assets/images/img11.jpg',
         tag: 'Rentrée',
     },
     {
@@ -68,7 +81,7 @@ const staticActivities = [
         title: 'Journées portes ouvertes',
         date: '20/09/2026',
         excerpt: 'Visitez nos ateliers, testez le matériel, échangez avec nos formateurs.',
-        image_url: '/assets/images/img2.jpeg',
+        image_url: '/assets/images/journe.jpg',
         tag: 'Événement',
     },
     {
@@ -76,7 +89,7 @@ const staticActivities = [
         title: 'Session d\'information certification',
         date: '12/09/2026',
         excerpt: 'Tout savoir sur le processus de certification en ligne et le DQP, en 30 minutes.',
-        image_url: '/assets/images/img3.jpeg',
+        image_url: '/assets/images/img10.jpg',
         tag: 'Atelier',
     },
     {
@@ -94,30 +107,6 @@ const avantages = [
     { icon: ShieldCheckIcon, title: 'Formateurs qui exercent', desc: 'Pas des théoriciens : des professionnels qui forment sur ce qu\'ils pratiquent.' },
     { icon: ComputerDesktopIcon, title: 'Salles équipées', desc: 'Ordinateurs, logiciels sous licence, matériel réseau et vidéosurveillance réels.' },
     { icon: ClockIcon, title: 'Cours du jour ou du soir', desc: 'Étudiant, salarié ou en reconversion : un créneau existe pour vous.' },
-];
-
-const temoignages = [
-    {
-        nom: 'Marie Ngo',
-        formation: 'Secrétariat Comptable (2025)',
-        message: 'J\'ai découvert CAB grâce à une ancienne collègue qui y avait fait sa formation. Aujourd\'hui, je suis assistante comptable dans une PME.',
-        initiales: 'MN',
-        color: 'bg-blue-100 text-[#1a56db]'
-    },
-    {
-        nom: 'Kevin Ebogo',
-        formation: 'Réseaux & Maintenance (2024)',
-        message: 'J\'ai cherché longtemps une formation en informatique qui ne soit pas trop théorique. Un ami m\'a parlé de CAB. Après 8 mois, j\'ai ouvert mon propre atelier.',
-        initiales: 'KE',
-        color: 'bg-red-100 text-[#d21f2f]'
-    },
-    {
-        nom: 'Aïcha Moumouni',
-        formation: 'Infographie 2D (2025)',
-        message: 'Je cherchais une formation en graphisme qui me permette de travailler à mon rythme. J\'ai vu la formation en ligne sur le site et j\'ai postulé. Aujourd\'hui je suis graphiste à Douala.',
-        initiales: 'AM',
-        color: 'bg-green-100 text-green-700'
-    }
 ];
 
 const campus = [
@@ -150,45 +139,101 @@ export default function Home() {
     const diplomes = useCountUp(5000, statsVisible);
     const tauxReussite = useCountUp(85, statsVisible);
 
+    // ============================================
     // Hero Carousel
+    // ============================================
     const [currentSlide, setCurrentSlide] = useState(0);
-
-    const goToSlide = (index: number) => {
-        setCurrentSlide(index);
-    };
-
-    const nextSlide = () => {
-        setCurrentSlide((prev) => (prev === heroSlides.length - 1 ? 0 : prev + 1));
-    };
-
-    const prevSlide = () => {
-        setCurrentSlide((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
-    };
-
-    useEffect(() => {
-        const interval = setInterval(nextSlide, 6000);
-        return () => clearInterval(interval);
-    }, []);
+    const [heroPaused, setHeroPaused] = useState(false);
+    const [progressKey, setProgressKey] = useState(0);
+    const [reducedMotion, setReducedMotion] = useState(false);
+    const heroTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const current = heroSlides[currentSlide];
 
-    // Activités Carousel
+    useEffect(() => {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        setReducedMotion(mq.matches);
+        const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+        mq.addEventListener?.('change', handler);
+        return () => mq.removeEventListener?.('change', handler);
+    }, []);
+
+    const goToSlide = useCallback((index: number) => {
+        setCurrentSlide(index);
+        setProgressKey((k) => k + 1);
+    }, []);
+
+    const nextSlide = useCallback(() => {
+        setCurrentSlide((i) => (i + 1) % heroSlides.length);
+        setProgressKey((k) => k + 1);
+    }, []);
+
+    const prevSlide = useCallback(() => {
+        setCurrentSlide((i) => (i - 1 + heroSlides.length) % heroSlides.length);
+        setProgressKey((k) => k + 1);
+    }, []);
+
+    useEffect(() => {
+        if (heroPaused || reducedMotion) return;
+        heroTimeoutRef.current = setTimeout(nextSlide, HERO_SLIDE_DURATION);
+        return () => {
+            if (heroTimeoutRef.current) clearTimeout(heroTimeoutRef.current);
+        };
+    }, [currentSlide, heroPaused, reducedMotion, progressKey, nextSlide]);
+
+    // ============================================
+    // Activités Carousel — toujours 3 slots visibles (gauche/centre/droite), boucle infinie
+    // ============================================
+    const activityTrackRef = useRef<HTMLDivElement>(null);
     const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
     const totalActivities = staticActivities.length;
+    const isScrollingProgrammatically = useRef(false);
 
-    const nextActivity = () => {
-        setCurrentActivityIndex((prev) => (prev + 1) % totalActivities);
+    const getSlotWidth = () => {
+        const track = activityTrackRef.current;
+        const slot = track?.querySelector<HTMLElement>('[data-activity-slot]');
+        if (!track || !slot) return 0;
+        const gap = 16; // gap-4
+        return slot.offsetWidth + gap;
     };
 
-    const prevActivity = () => {
-        setCurrentActivityIndex((prev) => (prev - 1 + totalActivities) % totalActivities);
+    const goToActivity = (index: number) => {
+        const track = activityTrackRef.current;
+        if (!track) return;
+        const clamped = ((index % totalActivities) + totalActivities) % totalActivities;
+        const slotWidth = getSlotWidth();
+
+        isScrollingProgrammatically.current = true;
+        track.scrollTo({ left: clamped * slotWidth, behavior: 'smooth' });
+        setCurrentActivityIndex(clamped);
+
+        // Libère le flag une fois l'animation de scroll terminée
+        setTimeout(() => {
+            isScrollingProgrammatically.current = false;
+        }, 500);
     };
 
+    const nextActivity = () => goToActivity(currentActivityIndex + 1);
+    const prevActivity = () => goToActivity(currentActivityIndex - 1);
+
+    // Détecte l'index centré quand l'utilisateur scrolle/swipe à la main (mobile)
+    const handleActivityScroll = () => {
+        if (isScrollingProgrammatically.current) return;
+        const track = activityTrackRef.current;
+        if (!track) return;
+        const slotWidth = getSlotWidth();
+        if (!slotWidth) return;
+        const index = Math.round(track.scrollLeft / slotWidth);
+        const clamped = ((index % totalActivities) + totalActivities) % totalActivities;
+        setCurrentActivityIndex(clamped);
+    };
+
+    // Défilement automatique (desktop uniquement, comme avant)
     useEffect(() => {
         if (window.innerWidth < 1024) return;
         const interval = setInterval(nextActivity, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [currentActivityIndex]);
 
     // ✅ JSON-LD pour le SEO
     const jsonLd = {
@@ -258,55 +303,37 @@ export default function Home() {
                     "@type": "Course",
                     "name": "Secrétariat Bureautique",
                     "description": "Formation aux métiers du secrétariat et de l'assistanat",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
                     "name": "Secrétariat Comptable",
                     "description": "Formation en comptabilité et secrétariat",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
                     "name": "Logistique et Transit",
                     "description": "Formation en logistique et transport international",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
                     "name": "Infographie 2D & Multimédia",
                     "description": "Formation en graphisme et multimédia",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
                     "name": "Réseaux & Maintenance Informatique",
                     "description": "Formation en administration réseaux et maintenance",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
                     "name": "Vidéosurveillance",
                     "description": "Formation en installation et maintenance de systèmes de vidéosurveillance",
-                    "provider": {
-                        "@type": "EducationalOrganization",
-                        "name": "CAB Informatique"
-                    }
+                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 }
             ]
         }
@@ -314,20 +341,15 @@ export default function Home() {
 
     return (
         <>
-            {/* ============================================ */}
-            {/* ✅ SEO COMPLET AVEC <Head> D'INERTIA */}
-            {/* ============================================ */}
             <Head>
                 <title>CAB Informatique — Formation Professionnelle en Présentiel et en Ligne au Cameroun</title>
 
-                {/* Meta Description */}
                 <meta
                     name="description"
                     content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques à Douala, Yaoundé et Bafoussam. Formations en présentiel et en ligne, DQP reconnu. Inscriptions ouvertes."
                 />
                 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
 
-                {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="CAB Informatique — Centre de Référence de la Formation Professionnelle au Cameroun" />
                 <meta property="og:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
@@ -338,7 +360,6 @@ export default function Home() {
                 <meta property="og:locale" content="fr_CM" />
                 <meta property="og:url" content="https://cab-informatique.com" />
 
-                {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@cabinfo" />
                 <meta name="twitter:creator" content="@cabinfo" />
@@ -346,7 +367,6 @@ export default function Home() {
                 <meta name="twitter:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
                 <meta name="twitter:image" content="/assets/images/og-cab-informatique.jpg" />
 
-                {/* JSON-LD Schema.org */}
                 <script type="application/ld+json">
                     {JSON.stringify(jsonLd)}
                 </script>
@@ -357,134 +377,213 @@ export default function Home() {
             <PublicLayout>
 
                 {/* ============================================ */}
-                {/* 1. HERO CAROUSEL AVEC MINIATURES */}
+                {/* 1. HERO CAROUSEL */}
                 {/* ============================================ */}
-                <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden">
-                    <div className="absolute inset-0 z-0 transition-opacity duration-700">
-                        <img
-                            src={current.image}
-                            alt={current.title}
-                            className="w-full h-full object-cover"
-                            loading="eager"
-                            fetchPriority="high"
+                <section
+                    className="relative h-screen min-h-[640px] max-h-[940px] overflow-hidden bg-[#081428] text-white"
+                    style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+                    onMouseEnter={() => setHeroPaused(true)}
+                    onMouseLeave={() => setHeroPaused(false)}
+                >
+                    <style>{`
+                        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+                        .hc-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+                        .hc-mono { font-family: 'IBM Plex Mono', monospace; }
+
+                        @keyframes hcFadeUp {
+                            from { opacity: 0; transform: translateY(14px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                        .hc-anim { animation: hcFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+                        @media (prefers-reduced-motion: reduce) {
+                            .hc-anim { animation: none; }
+                        }
+
+                        @keyframes hcProgress {
+                            from { transform: scaleX(0); }
+                            to { transform: scaleX(1); }
+                        }
+                        .hc-progress { animation: hcProgress ${HERO_SLIDE_DURATION}ms linear forwards; }
+                        .hc-progress-paused { animation-play-state: paused; }
+                    `}</style>
+
+                    {/* Background image + duotone */}
+                    <div className="absolute inset-0 z-0">
+                        {heroSlides.map((slide, i) => (
+                            <img
+                                key={slide.id}
+                                src={slide.image}
+                                alt=""
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1100ms] ease-out ${
+                                    i === currentSlide ? 'opacity-100' : 'opacity-0'
+                                }`}
+                                loading={i === 0 ? 'eager' : 'lazy'}
+                                fetchPriority={i === 0 ? 'high' : 'auto'}
+                            />
+                        ))}
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                background:
+                                    'linear-gradient(115deg, rgba(8,20,40,0.94) 0%, rgba(15,43,99,0.86) 42%, rgba(15,43,99,0.35) 78%)',
+                            }}
                         />
                         <div
                             className="absolute inset-0"
                             style={{
                                 background:
-                                    'linear-gradient(125deg, rgba(10,31,77,0.92) 0%, rgba(18,58,133,0.80) 50%, rgba(18,58,133,0.30) 100%)',
+                                    'radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.35), transparent 60%)',
                             }}
                         />
                     </div>
 
                     <div className="relative z-10 h-full flex items-center">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
-                            <div className="grid lg:grid-cols-2 gap-12 items-center">
-                                <div className="max-w-2xl">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold border border-white/10 mb-6">
-                                        <span className="w-2 h-2 rounded-full bg-[#f2b705] animate-pulse" />
+                        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 w-full py-16">
+                            <div className="grid lg:grid-cols-[1fr_auto] gap-16 items-end lg:items-center">
+                                {/* Copy block */}
+                                <div key={current.id} className="max-w-2xl">
+                                    <div
+                                        className="hc-anim hc-mono inline-flex items-center gap-2 px-3.5 py-1.5 text-[11px] tracking-[0.16em] uppercase text-white/90 rounded-full border border-white/25 bg-white/[0.06] mb-7"
+                                        style={{ animationDelay: '0ms' }}
+                                    >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#f2b705]" />
                                         {current.badge}
                                     </div>
 
-                                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight text-white">
+                                    <h1
+                                        className="hc-anim hc-display text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-[4.2rem] font-medium tracking-tight"
+                                        style={{ animationDelay: '80ms' }}
+                                    >
                                         {current.title}
                                         <br />
-                                        <span className="text-white/90">
-                                            {current.subtitle}
-                                        </span>
+                                        <span className="text-[#f2b705]">{current.subtitle}</span>
                                     </h1>
 
-                                    <p className="mt-4 text-lg text-white/80 max-w-lg leading-relaxed">
+                                    <p
+                                        className="hc-anim mt-6 text-lg text-white/75 max-w-lg leading-relaxed"
+                                        style={{ animationDelay: '160ms' }}
+                                    >
                                         {current.description}
                                     </p>
 
-                                    <div className="flex flex-wrap gap-4 mt-8">
+                                    <div
+                                        className="hc-anim flex flex-wrap items-center gap-5 mt-10"
+                                        style={{ animationDelay: '240ms' }}
+                                    >
                                         <Link
                                             href="/formations"
-                                            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300"
+                                            className="group inline-flex items-center gap-2 px-7 py-4 bg-[#f2b705] text-[#0f2b63] rounded-full font-semibold hover:bg-white transition-colors duration-300"
                                         >
                                             Découvrir nos formations
-                                            <ArrowRightIcon className="w-4 h-4" />
+                                            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                                         </Link>
                                         <a
                                             href="#activites"
-                                            className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/40 text-white rounded-full font-semibold hover:bg-white/10 hover:border-white transition-all duration-300"
+                                            className="inline-flex items-center gap-2 px-7 py-4 text-white/90 font-medium hover:text-white transition-colors duration-300 border-b border-white/30 hover:border-white"
                                         >
                                             Voir nos activités
-                                            <ArrowRightIcon className="w-4 h-4" />
                                         </a>
                                     </div>
                                 </div>
 
-                                {/* Miniatures */}
-                                <div className="hidden lg:flex flex-col gap-3 items-end">
-                                    {heroSlides.map((slide, index) => (
-                                        <button
-                                            key={slide.id}
-                                            onClick={() => goToSlide(index)}
-                                            className={`relative w-48 h-20 rounded-xl overflow-hidden transition-all duration-300 ${
-                                                index === currentSlide
-                                                    ? 'ring-2 ring-[#f2b705] scale-105 shadow-lg'
-                                                    : 'opacity-60 hover:opacity-90 hover:scale-105'
-                                            }`}
-                                        >
-                                            <img
-                                                src={slide.image}
-                                                alt=""
-                                                className="w-full h-full object-cover"
-                                            />
-                                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                                <span className="text-white text-xs font-medium px-2 text-center line-clamp-2">
-                                                    {slide.badge}
-                                                </span>
-                                            </div>
-                                        </button>
-                                    ))}
+                                {/* Signature element: ledger de programme */}
+                                <div className="hidden lg:flex flex-col w-[19rem] shrink-0">
+                                    <span className="hc-mono text-[11px] tracking-[0.16em] uppercase text-white/45 mb-3 pl-1">
+                                        Programme — {String(currentSlide + 1).padStart(2, '0')} /{' '}
+                                        {String(heroSlides.length).padStart(2, '0')}
+                                    </span>
+                                    <div className="border-t border-white/15">
+                                        {heroSlides.map((slide, index) => {
+                                            const active = index === currentSlide;
+                                            return (
+                                                <button
+                                                    key={slide.id}
+                                                    onClick={() => goToSlide(index)}
+                                                    className="relative w-full text-left py-4 border-b border-white/15 group focus:outline-none"
+                                                    aria-current={active}
+                                                >
+                                                    <span
+                                                        className={`hc-mono text-xs mr-3 transition-colors duration-300 ${
+                                                            active ? 'text-[#f2b705]' : 'text-white/35'
+                                                        }`}
+                                                    >
+                                                        {String(index + 1).padStart(2, '0')}
+                                                    </span>
+                                                    <span
+                                                        className={`text-sm transition-colors duration-300 ${
+                                                            active
+                                                                ? 'text-white font-medium'
+                                                                : 'text-white/50 group-hover:text-white/80'
+                                                        }`}
+                                                    >
+                                                        {slide.badge}
+                                                    </span>
+
+                                                    <span className="absolute left-0 right-0 -bottom-px h-px bg-white/0 overflow-hidden">
+                                                        {active && (
+                                                            <span
+                                                                key={progressKey}
+                                                                className={`block h-full origin-left bg-[#f2b705] hc-progress ${
+                                                                    heroPaused || reducedMotion ? 'hc-progress-paused' : ''
+                                                                }`}
+                                                            />
+                                                        )}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    {/* Arrow controls */}
                     <button
                         onClick={prevSlide}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-300"
+                        aria-label="Diapositive précédente"
+                        className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f2b705]"
                     >
-                        <ChevronLeftIcon className="w-6 h-6" />
+                        <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={nextSlide}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-300"
+                        aria-label="Diapositive suivante"
+                        className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f2b705]"
                     >
-                        <ChevronRightIcon className="w-6 h-6" />
+                        <ChevronRight className="w-5 h-5" />
                     </button>
 
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                    {/* Dots mobile */}
+                    <div className="lg:hidden absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                         {heroSlides.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => goToSlide(index)}
+                                aria-label={`Aller à la diapositive ${index + 1}`}
                                 className={`transition-all duration-300 rounded-full ${
                                     index === currentSlide
-                                        ? 'w-10 h-2.5 bg-white'
-                                        : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/60'
+                                        ? 'w-8 h-2 bg-[#f2b705]'
+                                        : 'w-2 h-2 bg-white/35 hover:bg-white/60'
                                 }`}
                             />
                         ))}
                     </div>
 
-                    <div className="absolute bottom-0 left-0 right-0 z-10 bg-black/40 backdrop-blur-sm border-t border-white/10">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-                            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 text-white/80 text-sm">
+                    {/* Trust bar */}
+                    <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/10 bg-[#081428]/70 backdrop-blur-sm">
+                        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-4">
+                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-10 gap-y-2 text-white/70 text-sm">
                                 <span className="flex items-center gap-2">
-                                    <CheckBadgeIcon className="w-5 h-5 text-[#f2b705]" />
+                                    <BadgeCheck className="w-4 h-4 text-[#f2b705]" />
                                     22 ans d'expérience
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <UserGroupIcon className="w-5 h-5 text-[#f2b705]" />
+                                    <Users className="w-4 h-4 text-[#f2b705]" />
                                     Milliers de diplômés
                                 </span>
                                 <span className="flex items-center gap-2">
-                                    <AcademicCapIcon className="w-5 h-5 text-[#f2b705]" />
+                                    <GraduationCap className="w-4 h-4 text-[#f2b705]" />
                                     DQP reconnu
                                 </span>
                             </div>
@@ -580,7 +679,7 @@ export default function Home() {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
                                 <div className="relative h-48 overflow-hidden">
-                                    <img src="/assets/images/img4.jpeg" alt="Présentiel" className="w-full h-full object-cover" loading="lazy" />
+                                    <img src="/assets/images/img3.jpeg" alt="Présentiel" className="w-full h-full object-cover" loading="lazy" />
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-[#1a56db] text-white rounded-full text-xs font-semibold">Présentiel</div>
                                 </div>
                                 <div className="p-6">
@@ -604,7 +703,7 @@ export default function Home() {
 
                             <div className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
                                 <div className="relative h-48 overflow-hidden">
-                                    <img src="/assets/images/img2.jpeg" alt="En ligne" className="w-full h-full object-cover" loading="lazy" />
+                                    <img src="/assets/images/online.webp" alt="En ligne" className="w-full h-full object-cover" loading="lazy" />
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-[#d21f2f] text-white rounded-full text-xs font-semibold">En ligne</div>
                                 </div>
                                 <div className="p-6">
@@ -685,7 +784,7 @@ export default function Home() {
                 </RevealSection>
 
                 {/* ============================================ */}
-                {/* 6. ACTIVITÉS - CARROUSEL AVEC FOCUS */}
+                {/* 6. ACTIVITÉS - CARROUSEL 3 SLOTS (focus centre) */}
                 {/* ============================================ */}
                 <section id="activites" className="py-20 bg-white scroll-mt-24 overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -701,54 +800,48 @@ export default function Home() {
                         </RevealSection>
 
                         <div className="relative">
-                            {/* Carrousel avec défilement tactile */}
                             <div
-                                className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth hide-scrollbar lg:overflow-visible lg:justify-center"
-                                style={{ scrollBehavior: 'smooth' }}
+                                ref={activityTrackRef}
+                                onScroll={handleActivityScroll}
+                                className="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar lg:overflow-x-hidden"
                             >
                                 {staticActivities.map((activity, index) => {
-                                    const total = staticActivities.length;
-                                    const mid = Math.floor(total / 2);
-                                    const isMiddle = index === mid;
+                                    const isCenter = index === currentActivityIndex;
 
                                     return (
                                         <div
                                             key={activity.id}
-                                            className={`
-                                                flex-shrink-0 w-[85%] sm:w-[70%] lg:w-[30%] snap-center
-                                                transition-all duration-500 ease-in-out
-                                                ${isMiddle ? 'lg:scale-110 lg:z-20' : 'lg:scale-90 lg:z-10'}
-                                                ${!isMiddle ? 'lg:opacity-60' : ''}
-                                            `}
+                                            data-activity-slot
+                                            className="flex-shrink-0 w-[78%] sm:w-[55%] lg:w-[32%] snap-center transition-all duration-500 ease-in-out"
+                                            style={{
+                                                transform: isCenter ? 'scale(1)' : 'scale(0.82)',
+                                                opacity: isCenter ? 1 : 0.55,
+                                            }}
                                         >
-                                            <div className={`
-                                                bg-white rounded-2xl overflow-hidden border transition-all duration-500
-                                                ${isMiddle ? 'border-[#1a56db] shadow-2xl' : 'border-gray-100 shadow-sm'}
-                                            `}>
+                                            <div
+                                                className="bg-white rounded-2xl overflow-hidden border transition-all duration-500"
+                                                style={{
+                                                    borderColor: isCenter ? '#1a56db' : '#f3f4f6',
+                                                    boxShadow: isCenter
+                                                        ? '0 20px 25px -5px rgba(0,0,0,0.15)'
+                                                        : '0 1px 2px rgba(0,0,0,0.05)',
+                                                }}
+                                            >
                                                 <img
                                                     src={activity.image_url}
                                                     alt={activity.title}
                                                     className="w-full h-48 object-cover"
                                                     loading="lazy"
                                                 />
-                                                <div className={`
-                                                    p-5 transition-all duration-500
-                                                    ${isMiddle ? 'bg-white' : 'bg-gray-50'}
-                                                `}>
+                                                <div className={`p-5 transition-all duration-500 ${isCenter ? 'bg-white' : 'bg-gray-50'}`}>
                                                     <span className="text-xs font-semibold text-[#1a56db] bg-blue-50 px-2 py-1 rounded-full">
                                                         {activity.tag}
                                                     </span>
-                                                    <h3 className={`
-                                                        font-bold text-base mt-2 transition-all duration-500
-                                                        ${isMiddle ? 'text-gray-900' : 'text-gray-600'}
-                                                    `}>
+                                                    <h3 className={`font-bold text-base mt-2 transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-600'}`}>
                                                         {activity.title}
                                                     </h3>
                                                     <p className="text-xs text-gray-500 mt-1">{activity.date}</p>
-                                                    <p className={`
-                                                        text-sm mt-2 line-clamp-2 transition-all duration-500
-                                                        ${isMiddle ? 'text-gray-700' : 'text-gray-500'}
-                                                    `}>
+                                                    <p className={`text-sm mt-2 line-clamp-2 transition-colors duration-500 ${isCenter ? 'text-gray-700' : 'text-gray-500'}`}>
                                                         {activity.excerpt}
                                                     </p>
                                                 </div>
@@ -758,52 +851,33 @@ export default function Home() {
                                 })}
                             </div>
 
-                            {/* Flèches - UNIQUEMENT sur desktop */}
                             <button
-                                onClick={() => {
-                                    const container = document.querySelector('.hide-scrollbar');
-                                    if (container) {
-                                        container.scrollBy({ left: -300, behavior: 'smooth' });
-                                    }
-                                }}
+                                onClick={prevActivity}
                                 className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                aria-label="Précédent"
+                                aria-label="Événement précédent"
                             >
                                 <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
                             </button>
                             <button
-                                onClick={() => {
-                                    const container = document.querySelector('.hide-scrollbar');
-                                    if (container) {
-                                        container.scrollBy({ left: 300, behavior: 'smooth' });
-                                    }
-                                }}
+                                onClick={nextActivity}
                                 className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                aria-label="Suivant"
+                                aria-label="Événement suivant"
                             >
                                 <ChevronRightIcon className="w-5 h-5 text-gray-600" />
                             </button>
 
-                            {/* Dots */}
                             <div className="flex justify-center gap-2 mt-6">
                                 {staticActivities.map((_, index) => (
                                     <button
                                         key={index}
-                                        onClick={() => {
-                                            const container = document.querySelector('.hide-scrollbar');
-                                            if (container) {
-                                                const cards = container.querySelectorAll('.snap-center');
-                                                if (cards[index]) {
-                                                    cards[index].scrollIntoView({ behavior: 'smooth', inline: 'center' });
-                                                }
-                                            }
+                                        onClick={() => goToActivity(index)}
+                                        className="rounded-full transition-all duration-300"
+                                        style={{
+                                            width: index === currentActivityIndex ? '2rem' : '0.625rem',
+                                            height: '0.625rem',
+                                            backgroundColor: index === currentActivityIndex ? '#1a56db' : '#d1d5db',
                                         }}
-                                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                                            index === Math.floor(staticActivities.length / 2)
-                                                ? 'w-8 bg-[#1a56db]'
-                                                : 'bg-gray-300 hover:bg-gray-400'
-                                        }`}
-                                        aria-label={`Aller à l'activité ${index + 1}`}
+                                        aria-label={`Aller à l'événement ${index + 1}`}
                                     />
                                 ))}
                             </div>
@@ -811,7 +885,6 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* CSS pour cacher la scrollbar */}
                 <style>{`
                     .hide-scrollbar::-webkit-scrollbar {
                         display: none;
@@ -927,24 +1000,24 @@ export default function Home() {
                         </RevealSection>
 
                         <div className="grid md:grid-cols-3 gap-6">
-                            {campus.map((campus, i) => (
-                                <RevealSection key={campus.ville} delay={i * 100}>
+                            {campus.map((c, i) => (
+                                <RevealSection key={c.ville} delay={i * 100}>
                                     <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 h-full hover:shadow-xl transition-all duration-300">
                                         <div className="flex items-center gap-3 mb-3">
                                             <span className="px-3 py-1 bg-blue-100 text-[#1a56db] rounded-full text-xs font-bold">
-                                                {campus.ville}
+                                                {c.ville}
                                             </span>
-                                            <span className="text-sm font-semibold text-gray-700">{campus.nom}</span>
+                                            <span className="text-sm font-semibold text-gray-700">{c.nom}</span>
                                         </div>
-                                        <p className="text-sm text-gray-600 mb-3">📍 {campus.adresse}</p>
+                                        <p className="text-sm text-gray-600 mb-3">📍 {c.adresse}</p>
                                         <a
-                                            href={`tel:${campus.tel.replace(/\s/g, '')}`}
+                                            href={`tel:${c.tel.replace(/\s/g, '')}`}
                                             className="block text-sm text-gray-500 hover:text-[#1a56db] transition-colors"
                                         >
-                                            📞 {campus.tel}
+                                            📞 {c.tel}
                                         </a>
                                         <a
-                                            href={campus.mapsUrl}
+                                            href={c.mapsUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-block mt-3 text-xs font-medium text-[#1a56db] hover:underline"

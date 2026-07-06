@@ -34,5 +34,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    // config/services.php
+    'gtm' => [
+        'id' => env('GTM_ID'),
+    ],
+    'ga' => [
+        'measurement_id' => env('GA_MEASUREMENT_ID'),
+    ],
 
 ];

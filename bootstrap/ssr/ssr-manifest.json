@@ -1,25 +1,123 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
-  "resources/js/Components/PublicLayout.tsx": [
-    "/build/assets/Home-C4jcrplr.js"
+  "resources/js/Components/Home/RevealSection.tsx": [
+    "/build/assets/Home-CwcjfC7S.js"
   ],
-  "resources/js/Pages/Home.tsx": [
-    "/build/assets/Home-C4jcrplr.js"
+  "resources/js/Components/Layouts/AdminLayout.tsx": [
+    "/build/assets/AdminLayout-oh2Gvric.js"
+  ],
+  "resources/js/Components/Loader.tsx": [
+    "/build/assets/Home-CwcjfC7S.js"
+  ],
+  "resources/js/Components/Notifications/NotificationBell.tsx": [
+    "/build/assets/AdminLayout-oh2Gvric.js"
+  ],
+  "resources/js/Components/Notifications/NotificationDropdown.tsx": [
+    "/build/assets/AdminLayout-oh2Gvric.js"
+  ],
+  "resources/js/Components/PublicLayout.tsx": [
+    "/build/assets/PublicLayout-ngcSENZC.js"
+  ],
+  "resources/js/Pages/Admin/Candidatures/Index.tsx": [
+    "/build/assets/Index-D4xxhXWv.js"
+  ],
+  "resources/js/Pages/Admin/Candidatures/Show.tsx": [
+    "/build/assets/Show-CPCggCBH.js"
+  ],
+  "resources/js/Pages/Admin/Certifications/Create.tsx": [
+    "/build/assets/Create-B2Zi69w6.js"
+  ],
+  "resources/js/Pages/Admin/Certifications/Edit.tsx": [
+    "/build/assets/Edit-BS3O9jBG.js"
+  ],
+  "resources/js/Pages/Admin/Certifications/Index.tsx": [
+    "/build/assets/Index-C-_-EH_X.js"
+  ],
+  "resources/js/Pages/Admin/Dashboard.tsx": [
+    "/build/assets/Dashboard-DnAPGT9R.js"
+  ],
+  "resources/js/Pages/Admin/Formations/Create.tsx": [
+    "/build/assets/Create-BO3jnT7D.js"
+  ],
+  "resources/js/Pages/Admin/Formations/Edit.tsx": [
+    "/build/assets/Edit-DnSuZOzh.js"
+  ],
+  "resources/js/Pages/Admin/Formations/Index.tsx": [
+    "/build/assets/Index-Mtrnk5wo.js"
+  ],
+  "resources/js/Pages/Admin/HeroSlides/Create.tsx": [
+    "/build/assets/Create-Oo6GAeuH.js"
+  ],
+  "resources/js/Pages/Admin/HeroSlides/Edit.tsx": [
+    "/build/assets/Edit-BnJzJNAT.js"
+  ],
+  "resources/js/Pages/Admin/HeroSlides/Index.tsx": [
+    "/build/assets/Index-C4W8MYq7.js"
+  ],
+  "resources/js/Pages/Admin/Users/Create.tsx": [
+    "/build/assets/Create-iOUSZIhr.js"
+  ],
+  "resources/js/Pages/Admin/Users/Index.tsx": [
+    "/build/assets/Index-BVL3EIB9.js"
+  ],
+  "resources/js/Pages/Admin/Vagues/Create.tsx": [
+    "/build/assets/Create-4UwfUIro.js"
+  ],
+  "resources/js/Pages/Admin/Vagues/Edit.tsx": [
+    "/build/assets/Edit-5dVojUdL.js"
+  ],
+  "resources/js/Pages/Admin/Vagues/Index.tsx": [
+    "/build/assets/Index-kfbbJtyo.js"
+  ],
+  "resources/js/Pages/Auth/Login.tsx": [
+    "/build/assets/Login-CrW-jf2U.js"
+  ],
+  "resources/js/Pages/public/CandidatureSuccess.tsx": [
+    "/build/assets/CandidatureSuccess-CEQT1ak1.js"
+  ],
+  "resources/js/Pages/public/Certification.tsx": [
+    "/build/assets/Certification-BCpELvNo.js"
+  ],
+  "resources/js/Pages/public/Components/Hero/Hero.style.css": [
+    "/build/assets/Hero-CJNAbeY2.js",
+    "/build/assets/Hero-bv39tMpQ.css"
+  ],
+  "resources/js/Pages/public/Components/Hero/Hero.tsx": [
+    "/build/assets/Hero-CJNAbeY2.js",
+    "/build/assets/Hero-bv39tMpQ.css"
+  ],
+  "resources/js/Pages/public/Components/Hero/HeroIndicators.tsx": [
+    "/build/assets/HeroIndicators-CBhQdsPY.js"
+  ],
+  "resources/js/Pages/public/Components/Hero/HeroSlide.tsx": [
+    "/build/assets/HeroSlide-CItYGKXM.js"
   ],
   "resources/js/Pages/public/Components/Navigation.tsx": [
-    "/build/assets/Navigation-BNbKp5ep.js"
+    "/build/assets/Navigation-_dFdXFsy.js"
+  ],
+  "resources/js/Pages/public/Formations.tsx": [
+    "/build/assets/Formations-DbwImjo2.js"
   ],
   "resources/js/Pages/public/Home.tsx": [
-    "/build/assets/Home-la_KkjCS.js"
+    "/build/assets/Home-CwcjfC7S.js"
+  ],
+  "resources/js/Pages/public/Preinscription.tsx": [
+    "/build/assets/Preinscription-B4p7ohBZ.js"
   ],
   "resources/js/Pages/welcome.tsx": [
     "/build/assets/welcome-DuzSnRog.js"
   ],
-  "resources/js/hooks/useScroll.ts": [
-    "/build/assets/useScroll-CJAFr_ZD.js"
+  "resources/js/data/formationsPresentiel.ts": [
+    "/build/assets/Formations-DbwImjo2.js"
   ],
-  "resources/js/pages/public/Components/Navigation.tsx": [
-    "/build/assets/Home-C4jcrplr.js"
+  "resources/js/hooks/useCountUp.ts": [
+    "/build/assets/Home-CwcjfC7S.js"
+  ],
+  "resources/js/hooks/useScroll.ts": [
+    "/build/assets/Navigation-_dFdXFsy.js"
+  ],
+  "resources/js/hooks/useScrollReveal.ts": [
+    "/build/assets/Home-CwcjfC7S.js"
   ],
   "resources/js/ssr.tsx": []
 }

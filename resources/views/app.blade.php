@@ -34,23 +34,34 @@
         <!-- Inertia Head -->
         @inertiaHead
 
-        <!-- Scripts de suivi (Google Analytics) -->
-        @if(config('app.env') === 'production')
-            <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GA_MEASUREMENT_ID') }}"></script>
+        @if(app()->environment('production') && config('services.gtm.id'))
+            <!-- Google Tag Manager -->
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','{{ config('services.gtm.id') }}');</script>
+            <!-- End Google Tag Manager -->
+        @endif
+
+        @if(app()->environment('production') && config('services.ga.measurement_id'))
+            <!-- Google Analytics -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.ga.measurement_id') }}"></script>
             <script>
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '{{ env('GA_MEASUREMENT_ID') }}');
+                gtag('config', '{{ config('services.ga.measurement_id') }}');
             </script>
         @endif
     </head>
     <body class="font-sans antialiased notranslate">
-        <!-- Google Tag Manager (noscript) -->
-        @if(config('app.env') === 'production')
+        @if(app()->environment('production') && config('services.gtm.id'))
+            <!-- Google Tag Manager (noscript) -->
             <noscript>
-                <iframe src="https://www.googletagmanager.com/ns.html?id={{ env('GTM_ID') }}" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+                <iframe src="https://www.googletagmanager.com/ns.html?id={{ config('services.gtm.id') }}" height="0" width="0" style="display:none;visibility:hidden"></iframe>
             </noscript>
+            <!-- End Google Tag Manager (noscript) -->
         @endif
 
         @inertia
