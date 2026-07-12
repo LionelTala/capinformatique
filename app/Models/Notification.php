@@ -11,8 +11,9 @@ class Notification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'candidature_id', 'type', 'title', 'message', 'link', 'data', 'read_at',
-    ];
+'user_id', 'student_id', 'candidature_id',
+        'notifiable_id', 'notifiable_type',
+        'type', 'title', 'message', 'link', 'data', 'read_at',  'user_creator_id'  ];
 
     protected $casts = [
         'data' => 'array',
@@ -47,5 +48,9 @@ class Notification extends Model
         if (!$this->read_at) {
             $this->update(['read_at' => now()]);
         }
+    }
+    public function notifiable()
+    {
+        return $this->morphTo();
     }
 }

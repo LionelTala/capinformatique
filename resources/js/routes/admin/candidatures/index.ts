@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::index
-* @see app/Http/Controllers/Admin/CandidatureController.php:20
+* @see app/Http/Controllers/Admin/CandidatureController.php:21
 * @route '/admin/candidatures'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 export const show = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 show.url = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -130,7 +130,7 @@ show.url = (args: { candidature: number | { id: number } } | [candidature: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 show.get = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -140,7 +140,7 @@ show.get = (args: { candidature: number | { id: number } } | [candidature: numbe
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 show.head = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -150,7 +150,7 @@ show.head = (args: { candidature: number | { id: number } } | [candidature: numb
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 const showForm = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -160,7 +160,7 @@ const showForm = (args: { candidature: number | { id: number } } | [candidature:
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 showForm.get = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -170,7 +170,7 @@ showForm.get = (args: { candidature: number | { id: number } } | [candidature: n
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::show
-* @see app/Http/Controllers/Admin/CandidatureController.php:105
+* @see app/Http/Controllers/Admin/CandidatureController.php:109
 * @route '/admin/candidatures/{candidature}'
 */
 showForm.head = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -187,7 +187,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::accepter
-* @see app/Http/Controllers/Admin/CandidatureController.php:185
+* @see app/Http/Controllers/Admin/CandidatureController.php:198
 * @route '/admin/candidatures/{candidature}/accepter'
 */
 export const accepter = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -202,7 +202,7 @@ accepter.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::accepter
-* @see app/Http/Controllers/Admin/CandidatureController.php:185
+* @see app/Http/Controllers/Admin/CandidatureController.php:198
 * @route '/admin/candidatures/{candidature}/accepter'
 */
 accepter.url = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -235,7 +235,7 @@ accepter.url = (args: { candidature: number | { id: number } } | [candidature: n
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::accepter
-* @see app/Http/Controllers/Admin/CandidatureController.php:185
+* @see app/Http/Controllers/Admin/CandidatureController.php:198
 * @route '/admin/candidatures/{candidature}/accepter'
 */
 accepter.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -245,7 +245,7 @@ accepter.post = (args: { candidature: number | { id: number } } | [candidature: 
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::accepter
-* @see app/Http/Controllers/Admin/CandidatureController.php:185
+* @see app/Http/Controllers/Admin/CandidatureController.php:198
 * @route '/admin/candidatures/{candidature}/accepter'
 */
 const accepterForm = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -255,7 +255,7 @@ const accepterForm = (args: { candidature: number | { id: number } } | [candidat
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::accepter
-* @see app/Http/Controllers/Admin/CandidatureController.php:185
+* @see app/Http/Controllers/Admin/CandidatureController.php:198
 * @route '/admin/candidatures/{candidature}/accepter'
 */
 accepterForm.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -267,7 +267,7 @@ accepter.form = accepterForm
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::refuser
-* @see app/Http/Controllers/Admin/CandidatureController.php:318
+* @see app/Http/Controllers/Admin/CandidatureController.php:356
 * @route '/admin/candidatures/{candidature}/refuser'
 */
 export const refuser = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -282,7 +282,7 @@ refuser.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::refuser
-* @see app/Http/Controllers/Admin/CandidatureController.php:318
+* @see app/Http/Controllers/Admin/CandidatureController.php:356
 * @route '/admin/candidatures/{candidature}/refuser'
 */
 refuser.url = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -315,7 +315,7 @@ refuser.url = (args: { candidature: number | { id: number } } | [candidature: nu
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::refuser
-* @see app/Http/Controllers/Admin/CandidatureController.php:318
+* @see app/Http/Controllers/Admin/CandidatureController.php:356
 * @route '/admin/candidatures/{candidature}/refuser'
 */
 refuser.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -325,7 +325,7 @@ refuser.post = (args: { candidature: number | { id: number } } | [candidature: n
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::refuser
-* @see app/Http/Controllers/Admin/CandidatureController.php:318
+* @see app/Http/Controllers/Admin/CandidatureController.php:356
 * @route '/admin/candidatures/{candidature}/refuser'
 */
 const refuserForm = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -335,7 +335,7 @@ const refuserForm = (args: { candidature: number | { id: number } } | [candidatu
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::refuser
-* @see app/Http/Controllers/Admin/CandidatureController.php:318
+* @see app/Http/Controllers/Admin/CandidatureController.php:356
 * @route '/admin/candidatures/{candidature}/refuser'
 */
 refuserForm.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -347,7 +347,7 @@ refuser.form = refuserForm
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::enCours
-* @see app/Http/Controllers/Admin/CandidatureController.php:353
+* @see app/Http/Controllers/Admin/CandidatureController.php:391
 * @route '/admin/candidatures/{candidature}/en-cours'
 */
 export const enCours = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -362,7 +362,7 @@ enCours.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::enCours
-* @see app/Http/Controllers/Admin/CandidatureController.php:353
+* @see app/Http/Controllers/Admin/CandidatureController.php:391
 * @route '/admin/candidatures/{candidature}/en-cours'
 */
 enCours.url = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -395,7 +395,7 @@ enCours.url = (args: { candidature: number | { id: number } } | [candidature: nu
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::enCours
-* @see app/Http/Controllers/Admin/CandidatureController.php:353
+* @see app/Http/Controllers/Admin/CandidatureController.php:391
 * @route '/admin/candidatures/{candidature}/en-cours'
 */
 enCours.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -405,7 +405,7 @@ enCours.post = (args: { candidature: number | { id: number } } | [candidature: n
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::enCours
-* @see app/Http/Controllers/Admin/CandidatureController.php:353
+* @see app/Http/Controllers/Admin/CandidatureController.php:391
 * @route '/admin/candidatures/{candidature}/en-cours'
 */
 const enCoursForm = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -415,7 +415,7 @@ const enCoursForm = (args: { candidature: number | { id: number } } | [candidatu
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::enCours
-* @see app/Http/Controllers/Admin/CandidatureController.php:353
+* @see app/Http/Controllers/Admin/CandidatureController.php:391
 * @route '/admin/candidatures/{candidature}/en-cours'
 */
 enCoursForm.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -427,7 +427,7 @@ enCours.form = enCoursForm
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::attribuerVague
-* @see app/Http/Controllers/Admin/CandidatureController.php:381
+* @see app/Http/Controllers/Admin/CandidatureController.php:419
 * @route '/admin/candidatures/{candidature}/attribuer-vague'
 */
 export const attribuerVague = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -442,7 +442,7 @@ attribuerVague.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::attribuerVague
-* @see app/Http/Controllers/Admin/CandidatureController.php:381
+* @see app/Http/Controllers/Admin/CandidatureController.php:419
 * @route '/admin/candidatures/{candidature}/attribuer-vague'
 */
 attribuerVague.url = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -475,7 +475,7 @@ attribuerVague.url = (args: { candidature: number | { id: number } } | [candidat
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::attribuerVague
-* @see app/Http/Controllers/Admin/CandidatureController.php:381
+* @see app/Http/Controllers/Admin/CandidatureController.php:419
 * @route '/admin/candidatures/{candidature}/attribuer-vague'
 */
 attribuerVague.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -485,7 +485,7 @@ attribuerVague.post = (args: { candidature: number | { id: number } } | [candida
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::attribuerVague
-* @see app/Http/Controllers/Admin/CandidatureController.php:381
+* @see app/Http/Controllers/Admin/CandidatureController.php:419
 * @route '/admin/candidatures/{candidature}/attribuer-vague'
 */
 const attribuerVagueForm = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -495,7 +495,7 @@ const attribuerVagueForm = (args: { candidature: number | { id: number } } | [ca
 
 /**
 * @see \App\Http\Controllers\Admin\CandidatureController::attribuerVague
-* @see app/Http/Controllers/Admin/CandidatureController.php:381
+* @see app/Http/Controllers/Admin/CandidatureController.php:419
 * @route '/admin/candidatures/{candidature}/attribuer-vague'
 */
 attribuerVagueForm.post = (args: { candidature: number | { id: number } } | [candidature: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

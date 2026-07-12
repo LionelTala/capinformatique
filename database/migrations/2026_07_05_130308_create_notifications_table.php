@@ -14,12 +14,18 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('candidature_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_creator_id')
+                ->nullable()
+                ->after('user_id')
+                ->constrained('users')
+                ->nullOnDelete();
             $table->string('type')->default('info');
+
             $table->string('title');
             $table->text('message');
             $table->string('link')->nullable();
             $table->json('data')->nullable();
+            $table->nullableMorphs('notifiable');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });

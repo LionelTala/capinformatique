@@ -7,6 +7,7 @@ use App\Models\Candidature;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Vague;
+use App\Models\Certification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,10 @@ class CandidatureController extends Controller
     {
         try {
             $query = Candidature::with(['formation', 'certification', 'vague'])
-                ->orderBy('created_at', 'desc');
+
+                ->orderBy('created_at', 'desc')
+                ->paginate(15)
+                ->withQueryString();
 
             // Filtres
             if ($request->filled('statut')) {
@@ -42,8 +46,8 @@ class CandidatureController extends Controller
                 });
             }
 
-            $candidatures = $query->get()
-                ->map(function ($candidature) {
+            $candidatures = $query
+                ->through(function ($candidature) {
                     return [
                         'id' => $candidature->id,
                         'nom_complet' => $candidature->nom_complet,
@@ -168,6 +172,8 @@ class CandidatureController extends Controller
                     'id' => $candidature->student->id,
                     'matricule' => $candidature->student->matricule,
                     'nom_complet' => $candidature->student->full_name,
+                    'vague_id' => $candidature->student->vague_id,
+                    'certification_id' => $candidature->student->certification_id,
                 ] : null,
             ];
 
@@ -177,143 +183,175 @@ class CandidatureController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // ...
+            Log::error('Erreur chargement candidature', [
+                'candidature_id' => $candidature->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.candidatures.index')
+                ->with('error', '❌ Une erreur est survenue.');
         }
     }
 
     // Accepter une candidature → Création du compte étudiant
     public function accepter(Candidature $candidature)
-    {
-        try {
-            if ($candidature->statut !== 'en_attente' && $candidature->statut !== 'en_cours') {
+{
+    try {
+        if ($candidature->statut !== 'en_attente' && $candidature->statut !== 'en_cours') {
+            return redirect()->back()
+                ->with('error', '❌ Cette candidature ne peut pas être acceptée.');
+        }
+
+        // ✅ Vérifier selon le type
+        if ($candidature->type === 'formation') {
+            if (!$candidature->formation_id) {
                 return redirect()->back()
-                    ->with('error', '❌ Cette candidature ne peut pas être acceptée.');
+                    ->with('error', '❌ Aucune formation associée à cette candidature.');
             }
 
-            // ✅ Vérifier selon le type
-            if ($candidature->type === 'formation') {
-                if (!$candidature->formation_id) {
-                    return redirect()->back()
-                        ->with('error', '❌ Aucune formation associée à cette candidature.');
-                }
-
-                if (!$candidature->vague_id) {
-                    return redirect()->back()
-                        ->with('error', '❌ Veuillez d\'abord attribuer une vague à cette candidature.');
-                }
-            } else {
-                // ✅ Pour les certifications : vérifier que la certification existe
-                if (!$candidature->certification_id) {
-                    return redirect()->back()
-                        ->with('error', '❌ Aucune certification associée à cette candidature.');
-                }
-
-                // ✅ Vérifier que la certification a bien une formation associée
-                $certification = \App\Models\Certification::with('formation')->find($candidature->certification_id);
-                if (!$certification || !$certification->formation) {
-                    return redirect()->back()
-                        ->with('error', '❌ La certification n\'a pas de formation associée.');
-                }
-            }
-
-            // ✅ Vérifier si un compte existe déjà avec cet email
-            $existingUser = User::where('email', $candidature->email)->first();
-
-            if ($existingUser) {
+            if (!$candidature->vague_id) {
                 return redirect()->back()
-                    ->with('error', "❌ Un compte existe déjà avec l'email {$candidature->email}.");
+                    ->with('error', '❌ Veuillez d\'abord attribuer une vague à cette candidature.');
+            }
+        } else {
+            if (!$candidature->certification_id) {
+                return redirect()->back()
+                    ->with('error', '❌ Aucune certification associée à cette candidature.');
             }
 
-            $result = DB::transaction(function () use ($candidature) {
-                // ✅ Récupérer la formation via la certification si c'est une certification
-                $formationId = $candidature->formation_id;
-                $role = 'student_online';
+            $certification = Certification::with('formation')->find($candidature->certification_id);
+            if (!$certification || !$certification->formation) {
+                return redirect()->back()
+                    ->with('error', '❌ La certification n\'a pas de formation associée.');
+            }
+        }
 
-                if ($candidature->type === 'certification') {
-                    $certification = \App\Models\Certification::with('formation')->find($candidature->certification_id);
-                    if ($certification && $certification->formation) {
-                        $formationId = $certification->formation->id;
-                        $role = 'student_certif';
-                    }
+        // ✅ Vérifier si un compte existe déjà
+        $existingUser = User::where('email', $candidature->email)->first();
+
+        if ($existingUser) {
+            return redirect()->back()
+                ->with('error', "❌ Un compte existe déjà avec l'email {$candidature->email}.");
+        }
+
+        $result = DB::transaction(function () use ($candidature) {
+            // ✅ Récupérer la formation
+            $formationId = $candidature->formation_id;
+            $role = 'student_online';
+
+            if ($candidature->type === 'certification') {
+                $certification = Certification::with('formation')->find($candidature->certification_id);
+                if ($certification && $certification->formation) {
+                    $formationId = $certification->formation->id;
+                    $role = 'student_certif';
                 }
+            }
 
-                // 1. Générer le matricule
-                $matricule = $this->genererMatricule($formationId);
+            // 1. Générer le matricule
+            $matricule = $this->genererMatricule($formationId);
 
-                // 2. Générer le username
-                $username = $this->genererUsername($candidature->prenom, $candidature->nom);
+            // 2. Générer le username
+            $username = $this->genererUsername($candidature->prenom, $candidature->nom);
 
-                // 3. Créer l'utilisateur
-                $user = User::create([
-                    'name' => $username,
-                    'email' => $candidature->email,
-                    'password' => Hash::make($matricule),
-                    'role' => $role,
-                    'is_active' => true,
-                ]);
-
-                // 4. Créer l'étudiant
-                $student = Student::create([
-                    'user_id' => $user->id,
-                    'first_name' => $candidature->prenom,
-                    'last_name' => $candidature->nom,
-                    'phone' => $candidature->telephone,
-                    'matricule' => $matricule,
-                    'school_level' => $candidature->niveau_scolaire,
-                    'student_type' => $candidature->type === 'formation' ? 'online' : 'certification',
-                ]);
-
-                // 5. Mettre à jour la candidature
-                $candidature->update([
-                    'statut' => 'admis',
-                    'user_id' => $user->id,
-                    'student_id' => $student->id,
-                    'traite_le' => now(),
-                    'traite_par' => auth()->id(),
-                ]);
-
-                // 6. Incrémenter les inscrits dans la vague (seulement pour formations)
-                if ($candidature->type === 'formation' && $candidature->vague_id) {
-                    $vague = Vague::find($candidature->vague_id);
-                    if ($vague) {
-                        $vague->increment('inscrits');
-                    }
-                }
-
-                Log::info('Candidature acceptée - Compte créé', [
-                    'candidature_id' => $candidature->id,
-                    'type' => $candidature->type,
-                    'student_id' => $student->id,
-                    'matricule' => $matricule,
-                    'role' => $role,
-                    'admin_id' => auth()->id(),
-                ]);
-
-                return [
-                    'student' => $student,
-                    'user' => $user,
-                    'matricule' => $matricule,
-                    'username' => $username,
-                ];
-            });
-
-            return redirect()->route('admin.candidatures.index')
-                ->with('success', "✅ Candidature de {$candidature->nom_complet} acceptée ! Compte créé avec matricule {$result['matricule']}.");
-
-        } catch (\Exception $e) {
-            Log::error('Erreur acceptation candidature', [
-                'candidature_id' => $candidature->id,
-                'type' => $candidature->type,
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+            // 3. Créer l'utilisateur
+            $user = User::create([
+                'name' => $username,
+                'email' => $candidature->email,
+                'password' => Hash::make($matricule),
+                'role' => $role,
+                'is_active' => true,
             ]);
 
-            return redirect()->back()
-                ->with('error', '❌ Une erreur est survenue lors de l\'acceptation.');
-        }
+            // ✅ 4. Créer l'étudiant AVEC vague_id ou certification_id
+            $studentData = [
+                'user_id' => $user->id,
+                'first_name' => $candidature->prenom,
+                'last_name' => $candidature->nom,
+                'phone' => $candidature->telephone,
+                'matricule' => $matricule,
+                'school_level' => $candidature->niveau_scolaire,
+            ];
+
+            // ✅ AJOUT CRUCIAL : Assigner la vague ou la certification
+            if ($candidature->type === 'formation' && $candidature->vague_id) {
+                $studentData['vague_id'] = $candidature->vague_id;
+                Log::info('Assignation vague', [
+                    'student' => $candidature->prenom . ' ' . $candidature->nom,
+                    'vague_id' => $candidature->vague_id,
+                ]);
+            } elseif ($candidature->type === 'certification' && $candidature->certification_id) {
+                $studentData['certification_id'] = $candidature->certification_id;
+                Log::info('Assignation certification', [
+                    'student' => $candidature->prenom . ' ' . $candidature->nom,
+                    'certification_id' => $candidature->certification_id,
+                ]);
+            } else {
+                // 🔴 Si ni vague ni certification, on log l'erreur
+                Log::error('Étudiant créé sans affectation', [
+                    'candidature_id' => $candidature->id,
+                    'type' => $candidature->type,
+                    'vague_id' => $candidature->vague_id,
+                    'certification_id' => $candidature->certification_id,
+                ]);
+            }
+
+            $student = Student::create($studentData);
+
+            // 5. Mettre à jour la candidature
+            $candidature->update([
+                'statut' => 'admis',
+                'user_id' => $user->id,
+                'student_id' => $student->id,
+                'traite_le' => now(),
+                'traite_par' => auth()->id(),
+            ]);
+
+            // 6. Incrémenter les inscrits dans la vague
+            if ($candidature->type === 'formation' && $candidature->vague_id) {
+                $vague = Vague::find($candidature->vague_id);
+                if ($vague) {
+                    $vague->increment('inscrits');
+                    Log::info('Vague incrémentée', [
+                        'vague_id' => $candidature->vague_id,
+                        'nouveau_total' => $vague->inscrits,
+                    ]);
+                }
+            }
+
+            Log::info('Candidature acceptée - Compte créé', [
+                'candidature_id' => $candidature->id,
+                'type' => $candidature->type,
+                'student_id' => $student->id,
+                'matricule' => $matricule,
+                'vague_id' => $candidature->vague_id,
+                'certification_id' => $candidature->certification_id,
+                'admin_id' => auth()->id(),
+            ]);
+
+            return [
+                'student' => $student,
+                'user' => $user,
+                'matricule' => $matricule,
+                'username' => $username,
+            ];
+        });
+
+        return redirect()->route('admin.candidatures.index')
+            ->with('success', "✅ Candidature de {$candidature->nom_complet} acceptée ! Compte créé avec matricule {$result['matricule']}.");
+
+    } catch (\Exception $e) {
+        Log::error('Erreur acceptation candidature', [
+            'candidature_id' => $candidature->id,
+            'type' => $candidature->type,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()
+            ->with('error', '❌ Une erreur est survenue lors de l\'acceptation.');
     }
-
-
+}
     // Refuser une candidature
     public function refuser(Candidature $candidature)
     {

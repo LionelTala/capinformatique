@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::create
-* @see app/Http/Controllers/Public/CandidatureController.php:20
+* @see app/Http/Controllers/Public/CandidatureController.php:22
 * @route '/preinscription'
 */
 createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::store
-* @see app/Http/Controllers/Public/CandidatureController.php:80
+* @see app/Http/Controllers/Public/CandidatureController.php:82
 * @route '/candidatures'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::store
-* @see app/Http/Controllers/Public/CandidatureController.php:80
+* @see app/Http/Controllers/Public/CandidatureController.php:82
 * @route '/candidatures'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::store
-* @see app/Http/Controllers/Public/CandidatureController.php:80
+* @see app/Http/Controllers/Public/CandidatureController.php:82
 * @route '/candidatures'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::store
-* @see app/Http/Controllers/Public/CandidatureController.php:80
+* @see app/Http/Controllers/Public/CandidatureController.php:82
 * @route '/candidatures'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::store
-* @see app/Http/Controllers/Public/CandidatureController.php:80
+* @see app/Http/Controllers/Public/CandidatureController.php:82
 * @route '/candidatures'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 export const success = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -153,7 +153,7 @@ success.definition = {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 success.url = (options?: RouteQueryOptions) => {
@@ -162,7 +162,7 @@ success.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -172,7 +172,7 @@ success.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -182,7 +182,7 @@ success.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 const successForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -192,7 +192,7 @@ const successForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 successForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -202,7 +202,7 @@ successForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Public\CandidatureController::success
-* @see app/Http/Controllers/Public/CandidatureController.php:153
+* @see app/Http/Controllers/Public/CandidatureController.php:161
 * @route '/candidature/success'
 */
 successForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

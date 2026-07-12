@@ -1,4 +1,3 @@
-// resources/js/pages/Admin/Candidatures/Show.tsx
 import {
     ArrowLeftIcon,
     UserIcon,
@@ -23,7 +22,6 @@ import { Head, Link, router } from '@inertiajs/react';
 
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
-
 
 interface Candidature {
     id: number;
@@ -65,6 +63,8 @@ interface Candidature {
         id: number;
         matricule: string;
         nom_complet: string;
+        vague_id: number | null;          // ✅ Ajouté
+        certification_id: number | null;  // ✅ Ajouté
     } | null;
 }
 
@@ -159,6 +159,16 @@ export default function Show({ candidature, vagues = [] }: Props) {
         const phone = candidature.telephone.replace(/[^0-9]/g, '');
         return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     };
+
+    // ✅ Déterminer si l'étudiant a une vague ou une certification
+    const getStudentType = () => {
+        if (!candidature.student) return null;
+        if (candidature.student.vague_id) return 'vague';
+        if (candidature.student.certification_id) return 'certification';
+        return null;
+    };
+
+    const studentType = getStudentType();
 
     // Déterminer si les actions sont disponibles
     const canAccept = candidature.statut === 'en_attente' || candidature.statut === 'en_cours';
@@ -300,6 +310,27 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                         <span className="text-xs text-green-500">(matricule)</span>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* ✅ Ajout des informations Vague / Certification */}
+                            <div className="mt-4 pt-4 border-t border-green-200">
+                                <p className="text-xs text-green-600 font-medium mb-2">📋 Affectation</p>
+                                {studentType === 'vague' ? (
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">
+                                        <BuildingOfficeIcon className="w-4 h-4" />
+                                        Étudiant en ligne (Vague)
+                                    </div>
+                                ) : studentType === 'certification' ? (
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium">
+                                        <AcademicCapIcon className="w-4 h-4" />
+                                        Étudiant en certification
+                                    </div>
+                                ) : (
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium">
+                                        <ExclamationTriangleIcon className="w-4 h-4" />
+                                        Non affecté
+                                    </div>
+                                )}
                             </div>
 
                             {/* Actions de transmission */}

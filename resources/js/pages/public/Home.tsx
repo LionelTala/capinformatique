@@ -29,7 +29,6 @@ import {
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-
 import RevealSection from '@/Components/Home/RevealSection';
 import Loader from '@/Components/Loader';
 import PublicLayout from '@/Components/PublicLayout';
@@ -37,7 +36,21 @@ import PublicLayout from '@/Components/PublicLayout';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
-// Données des slides Hero
+// ✅ Interface des props
+interface Activite {
+    id: number;
+    title: string;
+    date: string;
+    excerpt: string | null;
+    image_url: string;
+    tag: string | null;
+}
+
+interface HomeProps {
+    activites: Activite[];
+}
+
+// Données des slides Hero (statiques)
 const heroSlides = [
     {
         id: 1,
@@ -53,7 +66,7 @@ const heroSlides = [
         badge: 'Certifications en ligne',
         title: 'Faites certifier vos compétences',
         subtitle: 'Où que vous soyez, à votre rythme',
-        description: 'Nos certifications en ligne vous permettent de valider vos compétences à distance '
+        description: 'Nos certifications en ligne vous permettent de valider vos compétences à distance.'
     },
     {
         id: 3,
@@ -65,42 +78,7 @@ const heroSlides = [
     }
 ];
 
-const HERO_SLIDE_DURATION = 6500; // ms
-
-const staticActivities = [
-    {
-        id: 1,
-        title: 'Rentrée académique 2026-2027',
-        date: '05/10/2026',
-        excerpt: 'CEP, BEPC, Probatoire, Bac, étudiants et professionnels — toutes filières ouvertes.',
-        image_url: '/assets/images/img11.jpg',
-        tag: 'Rentrée',
-    },
-    {
-        id: 2,
-        title: 'Journées portes ouvertes',
-        date: '20/09/2026',
-        excerpt: 'Visitez nos ateliers, testez le matériel, échangez avec nos formateurs.',
-        image_url: '/assets/images/journe.jpg',
-        tag: 'Événement',
-    },
-    {
-        id: 3,
-        title: 'Session d\'information certification',
-        date: '12/09/2026',
-        excerpt: 'Tout savoir sur le processus de certification en ligne et le DQP, en 30 minutes.',
-        image_url: '/assets/images/img10.jpg',
-        tag: 'Atelier',
-    },
-    {
-        id: 4,
-        title: 'Remise des diplômes — Promotion 2025',
-        date: '15/07/2026',
-        excerpt: 'Ils sont passés par CAB. Aujourd\'hui, ils travaillent.',
-        image_url: '/assets/images/img4.jpeg',
-        tag: 'Diplômes',
-    },
-];
+const HERO_SLIDE_DURATION = 6500;
 
 const avantages = [
     { icon: AcademicCapIcon, title: '100% Pratique', desc: 'On vous met devant le vrai matériel, dès la première semaine.' },
@@ -133,11 +111,14 @@ const campus = [
     }
 ];
 
-export default function Home() {
+export default function Home({ activites }: HomeProps) {
     const { ref: statsRef, isRevealed: statsVisible } = useScrollReveal<HTMLDivElement>(0.4);
     const annees = useCountUp(22, statsVisible);
     const diplomes = useCountUp(5000, statsVisible);
     const tauxReussite = useCountUp(85, statsVisible);
+
+    // ✅ Utiliser les activités dynamiques
+    const staticActivities = activites || [];
 
     // ============================================
     // Hero Carousel
@@ -182,7 +163,7 @@ export default function Home() {
     }, [currentSlide, heroPaused, reducedMotion, progressKey, nextSlide]);
 
     // ============================================
-    // Activités Carousel — toujours 3 slots visibles (gauche/centre/droite), boucle infinie
+    // Activités Carousel
     // ============================================
     const activityTrackRef = useRef<HTMLDivElement>(null);
     const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
@@ -193,7 +174,7 @@ export default function Home() {
         const track = activityTrackRef.current;
         const slot = track?.querySelector<HTMLElement>('[data-activity-slot]');
         if (!track || !slot) return 0;
-        const gap = 16; // gap-4
+        const gap = 16;
         return slot.offsetWidth + gap;
     };
 
@@ -207,7 +188,6 @@ export default function Home() {
         track.scrollTo({ left: clamped * slotWidth, behavior: 'smooth' });
         setCurrentActivityIndex(clamped);
 
-        // Libère le flag une fois l'animation de scroll terminée
         setTimeout(() => {
             isScrollingProgrammatically.current = false;
         }, 500);
@@ -216,7 +196,6 @@ export default function Home() {
     const nextActivity = () => goToActivity(currentActivityIndex + 1);
     const prevActivity = () => goToActivity(currentActivityIndex - 1);
 
-    // Détecte l'index centré quand l'utilisateur scrolle/swipe à la main (mobile)
     const handleActivityScroll = () => {
         if (isScrollingProgrammatically.current) return;
         const track = activityTrackRef.current;
@@ -228,14 +207,15 @@ export default function Home() {
         setCurrentActivityIndex(clamped);
     };
 
-    // Défilement automatique (desktop uniquement, comme avant)
     useEffect(() => {
         if (window.innerWidth < 1024) return;
         const interval = setInterval(nextActivity, 5000);
         return () => clearInterval(interval);
     }, [currentActivityIndex]);
 
-    // ✅ JSON-LD pour le SEO
+    // ============================================
+    // JSON-LD SEO
+    // ============================================
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
@@ -343,13 +323,11 @@ export default function Home() {
         <>
             <Head>
                 <title>CAB Informatique — Formation Professionnelle en Présentiel et en Ligne au Cameroun</title>
-
                 <meta
                     name="description"
                     content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques à Douala, Yaoundé et Bafoussam. Formations en présentiel et en ligne, DQP reconnu. Inscriptions ouvertes."
                 />
                 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
-
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="CAB Informatique — Centre de Référence de la Formation Professionnelle au Cameroun" />
                 <meta property="og:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
@@ -359,14 +337,12 @@ export default function Home() {
                 <meta property="og:site_name" content="CAB Informatique" />
                 <meta property="og:locale" content="fr_CM" />
                 <meta property="og:url" content="https://cab-informatique.com" />
-
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@cabinfo" />
                 <meta name="twitter:creator" content="@cabinfo" />
                 <meta name="twitter:title" content="CAB Informatique — Formation Professionnelle au Cameroun" />
                 <meta name="twitter:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
                 <meta name="twitter:image" content="/assets/images/og-cab-informatique.jpg" />
-
                 <script type="application/ld+json">
                     {JSON.stringify(jsonLd)}
                 </script>
@@ -407,7 +383,6 @@ export default function Home() {
                         .hc-progress-paused { animation-play-state: paused; }
                     `}</style>
 
-                    {/* Background image + duotone */}
                     <div className="absolute inset-0 z-0">
                         {heroSlides.map((slide, i) => (
                             <img
@@ -440,7 +415,6 @@ export default function Home() {
                     <div className="relative z-10 h-full flex items-center">
                         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 w-full py-16">
                             <div className="grid lg:grid-cols-[1fr_auto] gap-16 items-end lg:items-center">
-                                {/* Copy block */}
                                 <div key={current.id} className="max-w-2xl">
                                     <div
                                         className="hc-anim hc-mono inline-flex items-center gap-2 px-3.5 py-1.5 text-[11px] tracking-[0.16em] uppercase text-white/90 rounded-full border border-white/25 bg-white/[0.06] mb-7"
@@ -486,7 +460,6 @@ export default function Home() {
                                     </div>
                                 </div>
 
-                                {/* Signature element: ledger de programme */}
                                 <div className="hidden lg:flex flex-col w-[19rem] shrink-0">
                                     <span className="hc-mono text-[11px] tracking-[0.16em] uppercase text-white/45 mb-3 pl-1">
                                         Programme — {String(currentSlide + 1).padStart(2, '0')} /{' '}
@@ -538,7 +511,6 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* Arrow controls */}
                     <button
                         onClick={prevSlide}
                         aria-label="Diapositive précédente"
@@ -554,7 +526,6 @@ export default function Home() {
                         <ChevronRight className="w-5 h-5" />
                     </button>
 
-                    {/* Dots mobile */}
                     <div className="lg:hidden absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                         {heroSlides.map((_, index) => (
                             <button
@@ -570,7 +541,6 @@ export default function Home() {
                         ))}
                     </div>
 
-                    {/* Trust bar */}
                     <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/10 bg-[#081428]/70 backdrop-blur-sm">
                         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-4">
                             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-10 gap-y-2 text-white/70 text-sm">
@@ -784,7 +754,7 @@ export default function Home() {
                 </RevealSection>
 
                 {/* ============================================ */}
-                {/* 6. ACTIVITÉS - CARROUSEL 3 SLOTS (focus centre) */}
+                {/* 6. ACTIVITÉS - CARROUSEL DYNAMIQUE */}
                 {/* ============================================ */}
                 <section id="activites" className="py-20 bg-white scroll-mt-24 overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -800,87 +770,95 @@ export default function Home() {
                         </RevealSection>
 
                         <div className="relative">
-                            <div
-                                ref={activityTrackRef}
-                                onScroll={handleActivityScroll}
-                                className="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar lg:overflow-x-hidden"
-                            >
-                                {staticActivities.map((activity, index) => {
-                                    const isCenter = index === currentActivityIndex;
+                            {staticActivities.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <p className="text-gray-500">Aucune activité à venir</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div
+                                        ref={activityTrackRef}
+                                        onScroll={handleActivityScroll}
+                                        className="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar lg:overflow-x-hidden"
+                                    >
+                                        {staticActivities.map((activity, index) => {
+                                            const isCenter = index === currentActivityIndex;
 
-                                    return (
-                                        <div
-                                            key={activity.id}
-                                            data-activity-slot
-                                            className="flex-shrink-0 w-[78%] sm:w-[55%] lg:w-[32%] snap-center transition-all duration-500 ease-in-out"
-                                            style={{
-                                                transform: isCenter ? 'scale(1)' : 'scale(0.82)',
-                                                opacity: isCenter ? 1 : 0.55,
-                                            }}
-                                        >
-                                            <div
-                                                className="bg-white rounded-2xl overflow-hidden border transition-all duration-500"
-                                                style={{
-                                                    borderColor: isCenter ? '#1a56db' : '#f3f4f6',
-                                                    boxShadow: isCenter
-                                                        ? '0 20px 25px -5px rgba(0,0,0,0.15)'
-                                                        : '0 1px 2px rgba(0,0,0,0.05)',
-                                                }}
-                                            >
-                                                <img
-                                                    src={activity.image_url}
-                                                    alt={activity.title}
-                                                    className="w-full h-48 object-cover"
-                                                    loading="lazy"
-                                                />
-                                                <div className={`p-5 transition-all duration-500 ${isCenter ? 'bg-white' : 'bg-gray-50'}`}>
-                                                    <span className="text-xs font-semibold text-[#1a56db] bg-blue-50 px-2 py-1 rounded-full">
-                                                        {activity.tag}
-                                                    </span>
-                                                    <h3 className={`font-bold text-base mt-2 transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-600'}`}>
-                                                        {activity.title}
-                                                    </h3>
-                                                    <p className="text-xs text-gray-500 mt-1">{activity.date}</p>
-                                                    <p className={`text-sm mt-2 line-clamp-2 transition-colors duration-500 ${isCenter ? 'text-gray-700' : 'text-gray-500'}`}>
-                                                        {activity.excerpt}
-                                                    </p>
+                                            return (
+                                                <div
+                                                    key={activity.id}
+                                                    data-activity-slot
+                                                    className="flex-shrink-0 w-[78%] sm:w-[55%] lg:w-[32%] snap-center transition-all duration-500 ease-in-out"
+                                                    style={{
+                                                        transform: isCenter ? 'scale(1)' : 'scale(0.82)',
+                                                        opacity: isCenter ? 1 : 0.55,
+                                                    }}
+                                                >
+                                                    <div
+                                                        className="bg-white rounded-2xl overflow-hidden border transition-all duration-500"
+                                                        style={{
+                                                            borderColor: isCenter ? '#1a56db' : '#f3f4f6',
+                                                            boxShadow: isCenter
+                                                                ? '0 20px 25px -5px rgba(0,0,0,0.15)'
+                                                                : '0 1px 2px rgba(0,0,0,0.05)',
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={activity.image_url}
+                                                            alt={activity.title}
+                                                            className="w-full h-48 object-cover"
+                                                            loading="lazy"
+                                                        />
+                                                        <div className={`p-5 transition-all duration-500 ${isCenter ? 'bg-white' : 'bg-gray-50'}`}>
+                                                            <span className="text-xs font-semibold text-[#1a56db] bg-blue-50 px-2 py-1 rounded-full">
+                                                                {activity.tag}
+                                                            </span>
+                                                            <h3 className={`font-bold text-base mt-2 transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-600'}`}>
+                                                                {activity.title}
+                                                            </h3>
+                                                            <p className="text-xs text-gray-500 mt-1">{activity.date}</p>
+                                                            <p className={`text-sm mt-2 line-clamp-2 transition-colors duration-500 ${isCenter ? 'text-gray-700' : 'text-gray-500'}`}>
+                                                                {activity.excerpt}
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                            );
+                                        })}
+                                    </div>
 
-                            <button
-                                onClick={prevActivity}
-                                className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                aria-label="Événement précédent"
-                            >
-                                <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
-                            </button>
-                            <button
-                                onClick={nextActivity}
-                                className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                aria-label="Événement suivant"
-                            >
-                                <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-                            </button>
-
-                            <div className="flex justify-center gap-2 mt-6">
-                                {staticActivities.map((_, index) => (
                                     <button
-                                        key={index}
-                                        onClick={() => goToActivity(index)}
-                                        className="rounded-full transition-all duration-300"
-                                        style={{
-                                            width: index === currentActivityIndex ? '2rem' : '0.625rem',
-                                            height: '0.625rem',
-                                            backgroundColor: index === currentActivityIndex ? '#1a56db' : '#d1d5db',
-                                        }}
-                                        aria-label={`Aller à l'événement ${index + 1}`}
-                                    />
-                                ))}
-                            </div>
+                                        onClick={prevActivity}
+                                        className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
+                                        aria-label="Événement précédent"
+                                    >
+                                        <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+                                    </button>
+                                    <button
+                                        onClick={nextActivity}
+                                        className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
+                                        aria-label="Événement suivant"
+                                    >
+                                        <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+                                    </button>
+
+                                    <div className="flex justify-center gap-2 mt-6">
+                                        {staticActivities.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => goToActivity(index)}
+                                                className="rounded-full transition-all duration-300"
+                                                style={{
+                                                    width: index === currentActivityIndex ? '2rem' : '0.625rem',
+                                                    height: '0.625rem',
+                                                    backgroundColor: index === currentActivityIndex ? '#1a56db' : '#d1d5db',
+                                                }}
+                                                aria-label={`Aller à l'événement ${index + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -896,7 +874,7 @@ export default function Home() {
                 `}</style>
 
                 {/* ============================================ */}
-                {/* 7. TEMOIGNAGES - NOMS CAMEROUNAIS */}
+                {/* 7. TEMOIGNAGES */}
                 {/* ============================================ */}
                 <section className="py-20 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

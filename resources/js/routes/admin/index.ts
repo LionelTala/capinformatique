@@ -4,11 +4,17 @@ import formations from './formations'
 import certifications from './certifications'
 import vagues from './vagues'
 import candidatures from './candidatures'
-import notifications from './notifications'
-import heroSlides from './hero-slides'
+import students from './students'
+import cours from './cours'
+import devoirs from './devoirs'
+import soumissions from './soumissions'
+import evaluations from './evaluations'
+import soumissionsEvaluations from './soumissions-evaluations'
+import galerie from './galerie'
+import activites from './activites'
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 export const dashboard = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -23,7 +29,7 @@ dashboard.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 dashboard.url = (options?: RouteQueryOptions) => {
@@ -32,7 +38,7 @@ dashboard.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -42,7 +48,7 @@ dashboard.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -52,7 +58,7 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -62,7 +68,7 @@ const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> 
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -72,7 +78,7 @@ dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> =>
 
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
-* @see app/Http/Controllers/Admin/DashboardController.php:11
+* @see app/Http/Controllers/Admin/DashboardController.php:18
 * @route '/admin/dashboard'
 */
 dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -94,8 +100,14 @@ const admin = {
     certifications: Object.assign(certifications, certifications),
     vagues: Object.assign(vagues, vagues),
     candidatures: Object.assign(candidatures, candidatures),
-    notifications: Object.assign(notifications, notifications),
-    heroSlides: Object.assign(heroSlides, heroSlides),
+    students: Object.assign(students, students),
+    cours: Object.assign(cours, cours),
+    devoirs: Object.assign(devoirs, devoirs),
+    soumissions: Object.assign(soumissions, soumissions),
+    evaluations: Object.assign(evaluations, evaluations),
+    soumissionsEvaluations: Object.assign(soumissionsEvaluations, soumissionsEvaluations),
+    galerie: Object.assign(galerie, galerie),
+    activites: Object.assign(activites, activites),
 }
 
 export default admin

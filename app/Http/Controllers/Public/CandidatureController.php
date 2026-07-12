@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Public;
 
 use App\Events\NewCandidatureEvent;
+use App\Events\NotificationCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Candidature;
 use App\Models\Formation;
 use App\Models\Certification;
 use App\Models\Notification;
+use App\Models\User;
 use App\Models\Vague;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -116,16 +118,22 @@ class CandidatureController extends Controller
                     'statut' => 'en_attente',
                 ]);
             });
-            $notification = Notification::create([
-                'user_id' => null, // notification globale, visible par tous les admins
-                'candidature_id' => $candidature->id,
-                'type' => 'nouvelle_candidature',
-                'title' => 'Nouvelle candidature',
-                'message' => "{$candidature->prenom} {$candidature->nom} a soumis une candidature.",
-                'link' => "/admin/candidatures/{$candidature->id}",
-            ]);
+            $admins = User::all()->filter(fn ($u) => $u->isAdmin());
 
-            broadcast(new NewCandidatureEvent($notification));
+            foreach ($admins as $admin) {
+                $notification = Notification::create([
+                    'user_id' => $admin->id,
+                    'user_creator_id' => null, // généré par le système, candidature publique sans utilisateur connecté
+                    'type' => 'candidature',
+                    'notifiable_id' => $candidature->id,
+                    'notifiable_type' => Candidature::class,
+                    'title' => 'Nouvelle candidature',
+                    'message' => "{$candidature->prenom} {$candidature->nom} a soumis une candidature.",
+                    'link' => "/admin/candidatures/{$candidature->id}",
+                ]);
+
+                broadcast(new NotificationCreated($notification));
+            }
 
             Log::info('Nouvelle candidature', [
                 'candidature_id' => $candidature->id,

@@ -216,3 +216,84 @@ logoutForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 })
 
 logout.form = logoutForm
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+export const profil = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: profil.url(options),
+    method: 'get',
+})
+
+profil.definition = {
+    methods: ["get","head"],
+    url: '/profil',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+profil.url = (options?: RouteQueryOptions) => {
+    return profil.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+profil.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: profil.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+profil.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: profil.url(options),
+    method: 'head',
+})
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+const profilForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: profil.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+profilForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: profil.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\ProfileController::profil
+* @see app/Http/Controllers/ProfileController.php:16
+* @route '/profil'
+*/
+profilForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+    action: profil.url({
+        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+            _method: 'HEAD',
+            ...(options?.query ?? options?.mergeQuery ?? {}),
+        }
+    }),
+    method: 'get',
+})
+
+profil.form = profilForm

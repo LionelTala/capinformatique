@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -16,23 +17,31 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $unreadCountsByType = [];
+        $unreadTotal = 0;
+
+        if ($user) {
+            $counts = Notification::where('user_id', $user->id)
+                ->whereNull('read_at')
+                ->selectRaw('type, count(*) as total')
+                ->groupBy('type')
+                ->pluck('total', 'type');
+
+            $unreadCountsByType = $counts->toArray();
+            $unreadTotal = $counts->sum();
+        }
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'role' => $request->user()->role,
-                ] : null,
+                'user' => $user,
             ],
+            'unreadNotificationsCount' => $unreadTotal,
+            'unreadCountsByType' => $unreadCountsByType,
             'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
-            // ✅ Notifications partagées
-            'unreadNotificationsCount' => fn () => $request->user() && $request->user()->isAdmin()
-            ? $request->user()->unreadNotificationsCount()
-            : 0,
         ]);
     }
 }

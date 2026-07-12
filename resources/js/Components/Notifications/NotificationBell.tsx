@@ -3,6 +3,8 @@ import { BellIcon } from '@heroicons/react/24/outline';
 import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import NotificationDropdown from './NotificationDropdown';
+import { showToast } from '@/lib/toast';
+
 
 interface NotificationItem {
     id: number;
@@ -12,41 +14,54 @@ interface NotificationItem {
     link: string | null;
     created_at: string;
     read_at: string | null;
+    data?: {
+        video_url?: string;
+        video_title?: string;
+        has_video?: boolean;
+        has_files?: boolean;
+        cours_type?: string;
+    };
+}
+
+interface PageProps {
+    unreadNotificationsCount: number;
+    auth?: { user?: { id: number } };
 }
 
 const NotificationBell = () => {
-    const { props } = usePage<{ unreadNotificationsCount: number }>();
+    const { props } = usePage<PageProps>();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Source unique de vérité : la prop partagée par Inertia (mise à jour par le serveur)
     const unreadCount = props.unreadNotificationsCount ?? 0;
+    const userId = props.auth?.user?.id;
 
-    // Écoute Pusher en temps réel — UN SEUL useEffect
     useEffect(() => {
-        const channel = window.Echo.private('admin-notifications');
+        if (!window.Echo || !userId) return;
 
-        channel.listen('.notification.new', (data: NotificationItem) => {
-            // Ajoute à la liste locale du dropdown (avec dédup)
-            setNotifications((prev) => {
-                if (prev.some((n) => n.id === data.id)) {
-                    return prev;
-                }
-                return [data, ...prev];
-            });
+        const channelName = `user.${userId}`;
+        const channel = window.Echo.private(channelName);
 
-            // Redemande uniquement le compteur au serveur (source de vérité unique)
-            // Met à jour AUSSI le badge sidebar dans AdminLayout, sans refresh complet
-            router.reload({ only: ['unreadNotificationsCount'] });
-        });
+       channel.listen('.notification.created', (data: NotificationItem) => {
+    setNotifications((prev) => {
+        if ((prev ?? []).some((n) => n.id === data.id)) return prev;
+        return [data, ...(prev ?? [])];
+    });
 
+    showToast(`📚 ${data.title} — ${data.message}`, 'success', 10000); // 10 secondes
+
+    router.reload({ only: ['unreadNotificationsCount'] });
+});
         return () => {
-            window.Echo.leave('admin-notifications');
+            try {
+                window.Echo.leave(channelName);
+            } catch (error) {
+                console.error('Erreur leave channel:', error);
+            }
         };
-    }, []);
+    }, [userId]);
 
-    // Ferme le dropdown au clic extérieur
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -58,12 +73,25 @@ const NotificationBell = () => {
     }, []);
 
     const fetchNotifications = async () => {
-        const res = await fetch('/admin/notifications', {
+    try {
+        const res = await fetch('/notifications', {
             headers: { Accept: 'application/json' },
         });
+
+        if (!res.ok) {
+            console.error('Erreur HTTP notifications:', res.status);
+            setNotifications([]);
+            return;
+        }
+
         const data = await res.json();
-        setNotifications(data.notifications);
-    };
+        // ⬇️ Le backend renvoie { notifications: [...], unread_count: N }, pas un tableau brut
+        setNotifications(Array.isArray(data?.notifications) ? data.notifications : []);
+    } catch (error) {
+        console.error('Erreur récupération notifications:', error);
+        setNotifications([]);
+    }
+};
 
     const toggleDropdown = () => {
         if (!isOpen) fetchNotifications();
@@ -89,13 +117,12 @@ const NotificationBell = () => {
                     notifications={notifications}
                     onMarkAsRead={(id) => {
                         setNotifications((prev) =>
-                            prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
+                            (prev ?? []).map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
                         );
-                        // Redemande le vrai compteur au serveur après marquage
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}
                     onMarkAllAsRead={() => {
-                        setNotifications((prev) => prev.map((n) => ({ ...n, read_at: new Date().toISOString() })));
+                        setNotifications((prev) => (prev ?? []).map((n) => ({ ...n, read_at: new Date().toISOString() })));
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}
                     onClose={() => setIsOpen(false)}

@@ -5,19 +5,15 @@ import {
     CheckCircleIcon,
     XCircleIcon,
     ClockIcon,
-    UserGroupIcon,
     MagnifyingGlassIcon,
     FunnelIcon,
     XMarkIcon
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
-
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
 import { useState } from 'react';
 
 import AdminLayout from '@/Components/Layouts/AdminLayout';
+import Pagination from '@/Components/UI/Pagination';
 
 interface Candidature {
     id: number;
@@ -29,19 +25,9 @@ interface Candidature {
     statut: string;
     statut_label: string;
     statut_color: string;
-    formation: {
-        id: number;
-        name: string;
-        abbreviation: string;
-    } | null;
-    certification: {
-        id: number;
-        titre: string;
-    } | null;
-    vague: {
-        id: number;
-        name: string;
-    } | null;
+    formation: { id: number; name: string; abbreviation: string } | null;
+    certification: { id: number; titre: string } | null;
+    vague: { id: number; name: string } | null;
     created_at: string;
     created_at_full: string;
 }
@@ -61,7 +47,13 @@ interface Filters {
 }
 
 interface Props {
-    candidatures: Candidature[];
+    candidatures: {
+        data: Candidature[];
+        links: { url: string | null; label: string; active: boolean }[];
+        from: number | null;
+        to: number | null;
+        total: number;
+    };
     stats: Stats;
     filters: Filters;
 }
@@ -227,7 +219,6 @@ export default function Index({ candidatures, stats, filters }: Props) {
                         )}
                     </div>
 
-                    {/* Filtres dépliés */}
                     {showFilters && (
                         <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-4">
                             <div>
@@ -262,7 +253,7 @@ export default function Index({ candidatures, stats, filters }: Props) {
 
                 {/* Liste des candidatures */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    {candidatures.length === 0 ? (
+                    {candidatures.data.length === 0 ? (
                         <div className="text-center py-12">
                             <ClipboardDocumentListIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 text-sm">Aucune candidature trouvée</p>
@@ -272,31 +263,17 @@ export default function Index({ candidatures, stats, filters }: Props) {
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Candidat
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Contact
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Type
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Formation
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Statut
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Candidat</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formation</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {candidatures.map((candidature) => (
+                                    {candidatures.data.map((candidature) => (
                                         <tr key={candidature.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
@@ -344,6 +321,13 @@ export default function Index({ candidatures, stats, filters }: Props) {
                         </div>
                     )}
                 </div>
+
+                <Pagination
+                    links={candidatures.links}
+                    from={candidatures.from}
+                    to={candidatures.to}
+                    total={candidatures.total}
+                />
             </AdminLayout>
         </>
     );

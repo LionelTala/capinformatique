@@ -15,45 +15,51 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     // Liste des utilisateurs
-    public function index()
-    {
-        try {
-            $users = User::with('student')
-                ->when(!auth()->user()->isSuperAdmin(), function ($query) {
-                    $query->where('role', '!=', 'super_admin');
-                })
-                ->latest()
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'role' => $user->role,
-                        'is_active' => $user->is_active,
-                        'last_login_at' => $user->last_login_at?->diffForHumans(),
-                        'student' => $user->student ? [
-                            'first_name' => $user->student->first_name,
-                            'last_name' => $user->student->last_name,
-                            'matricule' => $user->student->matricule,
-                        ] : null,
-                    ];
-                });
+public function index()
+{
+    try {
+        $actor = auth()->user();
 
-            return Inertia::render('Admin/Users/Index', [
-                'users' => $users,
-                'canCreate' => auth()->user()->isAdmin(),
-                'canCreateAdminCentre' => auth()->user()->isSuperAdmin(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors du chargement des utilisateurs', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+        $users = User::with('student')
+            ->when(!$actor->isSuperAdmin(), function ($query) {
+                $query->where('role', '!=', 'super_admin');
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString()
+            ->through(function ($user) use ($actor) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'is_active' => $user->is_active,
+                    'last_login_at' => $user->last_login_at?->diffForHumans(),
+                    'student' => $user->student ? [
+                        'first_name' => $user->student->first_name,
+                        'last_name' => $user->student->last_name,
+                        'matricule' => $user->student->matricule,
+                    ] : null,
+                    'can_edit' => $this->canManage($actor, $user),
+                    'can_toggle' => $this->canManage($actor, $user) && $user->id !== $actor->id,
+                    'can_delete' => $this->canManage($actor, $user) && $user->id !== $actor->id,
+                ];
+            });
 
-            return redirect()->back()->with('error', '❌ Une erreur est survenue lors du chargement des utilisateurs.');
-        }
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'canCreate' => $actor->isAdmin(),
+            'canCreateAdminCentre' => $actor->isSuperAdmin(),
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Erreur lors du chargement des utilisateurs', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()->with('error', '❌ Une erreur est survenue lors du chargement des utilisateurs.');
     }
+}
 
     // Formulaire de création
     public function create()
@@ -63,7 +69,7 @@ class UserController extends Controller
                 abort(403, '❌ Vous n\'avez pas les droits pour créer un utilisateur.');
             }
 
-            $roles = $this->getCreatableRoles();
+            $roles = $this->getCreatableRoles(auth()->user());
 
             return Inertia::render('Admin/Users/Create', [
                 'roles' => $roles,
@@ -79,18 +85,16 @@ class UserController extends Controller
         }
     }
 
-    // Créer un utilisateur (avec transaction)
+    // Créer un utilisateur
     public function store(Request $request)
     {
         try {
-            // Vérifier les permissions
             if (!auth()->user()->isAdmin()) {
                 abort(403, '❌ Vous n\'avez pas les droits pour créer un utilisateur.');
             }
 
-            $roles = $this->getCreatableRoles();
+            $roles = $this->getCreatableRoles(auth()->user());
 
-            // Validation
             $validated = $request->validate([
                 'name' => 'required|string|max:255|unique:users,name',
                 'email' => 'required|email|max:255|unique:users,email',
@@ -99,7 +103,6 @@ class UserController extends Controller
                 'is_active' => 'boolean',
             ]);
 
-            // Transaction pour la création
             $user = DB::transaction(function () use ($validated) {
                 return User::create([
                     'name' => $validated['name'],
@@ -110,7 +113,6 @@ class UserController extends Controller
                 ]);
             });
 
-            // Log de succès
             Log::info('Utilisateur créé avec succès', [
                 'user_id' => $user->id,
                 'name' => $user->name,
@@ -122,11 +124,9 @@ class UserController extends Controller
                 ->with('success', "✅ Utilisateur {$user->name} créé avec succès !");
 
         } catch (ValidationException $e) {
-            // Les erreurs de validation sont gérées automatiquement par Laravel
             throw $e;
 
         } catch (\Exception $e) {
-            // Log de l'erreur
             Log::error('Erreur lors de la création de l\'utilisateur', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -139,23 +139,115 @@ class UserController extends Controller
         }
     }
 
+    // ✅ Formulaire d'édition
+    public function edit(User $user)
+    {
+        try {
+            $actor = auth()->user();
+
+            if (!$this->canManage($actor, $user)) {
+                abort(403, '❌ Vous n\'avez pas les droits pour modifier cet utilisateur.');
+            }
+
+            $editableRoles = $this->getEditableRolesFor($actor, $user);
+
+            return Inertia::render('Admin/Users/Edit', [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'is_active' => $user->is_active,
+                ],
+                'roles' => $editableRoles,
+                'canChangeRole' => count($editableRoles) > 1 || !in_array($user->role, $editableRoles),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur chargement formulaire édition utilisateur', [
+                'user_id' => $user->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.users.index')
+                ->with('error', '❌ Une erreur est survenue.');
+        }
+    }
+
+    // ✅ Mettre à jour un utilisateur
+    public function update(Request $request, User $user)
+    {
+        try {
+            $actor = auth()->user();
+
+            if (!$this->canManage($actor, $user)) {
+                abort(403, '❌ Vous n\'avez pas les droits pour modifier cet utilisateur.');
+            }
+
+            $editableRoles = $this->getEditableRolesFor($actor, $user);
+
+            $rules = [
+                'name' => ['required', 'string', 'max:255', Rule::unique('users', 'name')->ignore($user->id)],
+                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+                'role' => ['required', Rule::in($editableRoles)],
+                'is_active' => 'boolean',
+                'password' => 'nullable|string|min:8|confirmed', // optionnel à l'édition
+            ];
+
+            $validated = $request->validate($rules);
+
+            DB::transaction(function () use ($user, $validated) {
+                $updateData = [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'role' => $validated['role'],
+                    'is_active' => $validated['is_active'] ?? $user->is_active,
+                ];
+
+                if (!empty($validated['password'])) {
+                    $updateData['password'] = Hash::make($validated['password']);
+                }
+
+                $user->update($updateData);
+            });
+
+            Log::info('Utilisateur mis à jour', [
+                'user_id' => $user->id,
+                'updated_by' => auth()->id(),
+            ]);
+
+            return redirect()->route('admin.users.index')
+                ->with('success', "✅ Utilisateur {$user->name} mis à jour avec succès !");
+
+        } catch (ValidationException $e) {
+            throw $e;
+
+        } catch (\Exception $e) {
+            Log::error('Erreur mise à jour utilisateur', [
+                'user_id' => $user->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', '❌ Une erreur est survenue lors de la mise à jour.');
+        }
+    }
+
     // Activer/Désactiver un utilisateur
     public function toggleActive(User $user)
     {
         try {
-            // Vérifier les permissions
-            if (!auth()->user()->isAdmin()) {
+            $actor = auth()->user();
+
+            if (!$this->canManage($actor, $user)) {
                 abort(403, '❌ Vous n\'avez pas les droits pour modifier cet utilisateur.');
             }
 
-            // Empêcher de désactiver son propre compte
-            if ($user->id === auth()->id()) {
+            if ($user->id === $actor->id) {
                 return redirect()->back()->with('error', '❌ Vous ne pouvez pas désactiver votre propre compte.');
-            }
-
-            // admin_centre ne peut pas modifier super_admin
-            if (!auth()->user()->isSuperAdmin() && $user->isSuperAdmin()) {
-                abort(403, '❌ Vous ne pouvez pas modifier un super administrateur.');
             }
 
             $newStatus = !$user->is_active;
@@ -167,7 +259,7 @@ class UserController extends Controller
                 'user_id' => $user->id,
                 'user_name' => $user->name,
                 'new_status' => $newStatus,
-                'modified_by' => auth()->id(),
+                'modified_by' => $actor->id,
             ]);
 
             return redirect()->back()->with('success', "✅ Utilisateur {$user->name} {$statusText} avec succès !");
@@ -183,41 +275,33 @@ class UserController extends Controller
         }
     }
 
-    // Supprimer un utilisateur (avec transaction)
+    // Supprimer un utilisateur
     public function destroy(User $user)
     {
         try {
-            // Vérifier les permissions
-            if (!auth()->user()->isAdmin()) {
+            $actor = auth()->user();
+
+            if (!$this->canManage($actor, $user)) {
                 abort(403, '❌ Vous n\'avez pas les droits pour supprimer cet utilisateur.');
             }
 
-            // Empêcher de supprimer son propre compte
-            if ($user->id === auth()->id()) {
+            if ($user->id === $actor->id) {
                 return redirect()->back()->with('error', '❌ Vous ne pouvez pas supprimer votre propre compte.');
-            }
-
-            // admin_centre ne peut pas supprimer super_admin
-            if (!auth()->user()->isSuperAdmin() && $user->isSuperAdmin()) {
-                abort(403, '❌ Vous ne pouvez pas supprimer un super administrateur.');
             }
 
             $name = $user->name;
 
-            // Transaction pour la suppression
             DB::transaction(function () use ($user) {
-                // Supprimer d'abord le student si existe
                 if ($user->student) {
                     $user->student->delete();
                 }
-                // Puis supprimer l'utilisateur
                 $user->delete();
             });
 
             Log::info('Utilisateur supprimé', [
                 'deleted_user_id' => $user->id,
                 'deleted_user_name' => $name,
-                'deleted_by' => auth()->id(),
+                'deleted_by' => $actor->id,
             ]);
 
             return redirect()->back()->with('success', "✅ Utilisateur {$name} supprimé avec succès !");
@@ -233,26 +317,48 @@ class UserController extends Controller
         }
     }
 
-    // Rôles créables selon l'utilisateur connecté
-    private function getCreatableRoles(): array
+    /**
+     * ✅ Règle centrale de permission : est-ce que $actor peut gérer (éditer/activer/supprimer) $target ?
+     */
+    private function canManage(User $actor, User $target): bool
     {
-        try {
-            $user = auth()->user();
+        return match ($actor->role) {
+            'super_admin' => true,
+            'admin_centre' => in_array($target->role, ['admin', 'student_online', 'student_certif']),
+            'admin' => in_array($target->role, ['student_online', 'student_certif']),
+            default => false,
+        };
+    }
 
-            if ($user->isSuperAdmin()) {
-                return ['super_admin', 'admin_centre', 'admin'];
-            }
+    /**
+     * Rôles que $actor peut attribuer lors de la CRÉATION d'un nouvel utilisateur.
+     */
+    private function getCreatableRoles(User $actor): array
+    {
+        return match ($actor->role) {
+            'super_admin' => ['super_admin', 'admin_centre', 'admin'],
+            'admin_centre' => ['admin'],
+            default => [],
+        };
+    }
 
-            if ($user->isAdminCentre()) {
-                return ['admin'];
-            }
+    /**
+     * Rôles que $actor peut attribuer en ÉDITANT $target — inclut toujours
+     * le rôle actuel de $target pour que le select ne soit jamais vide.
+     */
+    private function getEditableRolesFor(User $actor, User $target): array
+    {
+        $assignable = match ($actor->role) {
+            'super_admin' => ['super_admin', 'admin_centre', 'admin', 'student_online', 'student_certif'],
+            'admin_centre' => ['admin', 'student_online', 'student_certif'],
+            'admin' => ['student_online', 'student_certif'],
+            default => [],
+        };
 
-            return [];
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la récupération des rôles', [
-                'message' => $e->getMessage(),
-            ]);
-            return [];
+        if (!in_array($target->role, $assignable)) {
+            $assignable[] = $target->role;
         }
+
+        return $assignable;
     }
 }

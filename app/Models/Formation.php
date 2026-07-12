@@ -52,6 +52,11 @@ class Formation extends Model
         return $this->hasMany(Certification::class);
     }
 
+    public function vagues()  // ✅ AJOUTER CETTE RELATION
+    {
+        return $this->hasMany(Vague::class);
+    }
+
     // ===================== ACCESSORS =====================
 
     public function getFormattedFraisAttribute(): string

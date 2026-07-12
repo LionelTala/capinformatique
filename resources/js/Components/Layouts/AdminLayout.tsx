@@ -10,32 +10,42 @@ import {
     Bars3Icon,
     XMarkIcon,
     ChevronDownIcon,
+    ChartBarIcon,
     PhotoIcon,
+    UserIcon,
 } from '@heroicons/react/24/outline';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import NotificationBell from '@/Components/Notifications/NotificationBell';
-
-// Importer les types
-import type { User } from '@/types';
+import ToastContainer from '@/Components/UI/ToastContainer';
+import type { SharedPageProps } from '@/types';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
     title?: string;
 }
 
+
 const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-    // Utiliser usePage avec les types Inertia
-    const { props, url } = usePage<Inertia.PageProps & { unreadNotificationsCount: number }>();
-    const user = props.auth.user as User | null;
+    const { props, url } = usePage<SharedPageProps>();
+    const user = props.auth?.user ?? null;
     const unreadCount = props.unreadNotificationsCount ?? 0;
+    const devoirCount = props.unreadCountsByType?.['devoir'] ?? 0;
+    const candidatureCount = props.unreadCountsByType?.['candidature'] ?? 0;
+    const evaluationCount = props.unreadCountsByType?.['evaluation'] ?? 0;
+
 
     const canManageUsers = user?.role === 'super_admin' || user?.role === 'admin_centre';
 
-    const menuItems = [
+    const menuItems: {
+        label: string;
+        href: string;
+        icon: React.ReactNode;
+        badge?: number;
+    }[] = [
         { label: 'Tableau de bord', href: '/admin/dashboard', icon: <HomeIcon className="w-5 h-5" /> },
     ];
 
@@ -48,33 +58,42 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
     }
 
     menuItems.push(
-        { label: 'Hero Slides', href: '/admin/hero-slides', icon: <PhotoIcon className="w-5 h-5" /> },
-
+        { label: 'Galerie', href: '/admin/galerie', icon: <PhotoIcon className="w-5 h-5" /> },
+        { label: 'Activités', href: '/admin/activites', icon: <CalendarIcon className="w-5 h-5" /> },
         { label: 'Formations', href: '/admin/formations', icon: <AcademicCapIcon className="w-5 h-5" /> },
         { label: 'Vagues', href: '/admin/vagues', icon: <CalendarIcon className="w-5 h-5" /> },
         { label: 'Certifications', href: '/admin/certifications', icon: <AcademicCapIcon className="w-5 h-5" /> },
+        { label: 'Candidatures', href: '/admin/candidatures', icon: <ClipboardDocumentListIcon className="w-5 h-5" />, badge: candidatureCount },
+
+        { label: 'Étudiants', href: '/admin/students', icon: <UserGroupIcon className="w-5 h-5" /> },
         { label: 'Cours', href: '/admin/cours', icon: <BookOpenIcon className="w-5 h-5" /> },
-        { label: 'Candidatures', href: '/admin/candidatures', icon: <ClipboardDocumentListIcon className="w-5 h-5" /> },
+        { label: 'Devoirs', href: '/admin/devoirs', icon: <ClipboardDocumentListIcon className="w-5 h-5" />, badge: devoirCount },
+        { label: 'Évaluations', href: '/admin/evaluations', icon: <ChartBarIcon className="w-5 h-5" />, badge: evaluationCount },
+        { label: 'Mon Profil', href: '/profil', icon: <UserIcon className="w-5 h-5" />},
+
+
     );
 
-    const getUserInitials = (user: User | null) => {
+    const getUserInitials = (user: typeof props.auth.user) => {
         if (!user) return '?';
         return user.name.charAt(0).toUpperCase();
     };
 
-    const getRoleLabel = (role: User['role']) => {
-        const labels: Record<User['role'], string> = {
+    const getRoleLabel = (role?: string) => {
+        const labels: Record<string, string> = {
             super_admin: 'Super Administrateur',
             admin_centre: 'Admin Centre',
             admin: 'Administrateur',
             student_online: 'Étudiant en ligne',
             student_certif: 'Étudiant certification',
         };
-        return labels[role] || role;
+        return role ? labels[role] || role : '';
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <ToastContainer />
+
             {/* Navbar Admin */}
             <nav className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
                 <div className="flex items-center justify-between px-4 py-3">
@@ -148,14 +167,13 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
             <aside
                 className={`
                     fixed top-16 left-0 bottom-0 z-30 w-64 bg-white border-r border-gray-200
-                    transition-transform duration-300 ease-in-out
+                    transition-transform duration-300 ease-in-out overflow-hidden
                     ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     lg:translate-x-0
                 `}
             >
-                <nav className="p-4 space-y-1">
+                <nav className="h-full overflow-y-auto p-4 space-y-1 pb-24">
                     {menuItems.map((item) => {
-                        const isCandidatures = item.href === '/admin/candidatures';
                         const isActive = url === item.href || url.startsWith(item.href + '/');
 
                         return (
@@ -173,15 +191,13 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
                             >
                                 {item.icon}
                                 <span className="flex-1">{item.label}</span>
-                                {isCandidatures && unreadCount > 0 && (
+                                {!!item.badge && item.badge > 0 && (
                                     <span
                                         className={`text-xs font-bold rounded-full px-2 py-0.5 ${
-                                            isActive
-                                                ? 'bg-white text-cab-blue'
-                                                : 'bg-cab-red text-white'
+                                            isActive ? 'bg-white text-cab-blue' : 'bg-cab-red text-white'
                                         }`}
                                     >
-                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                        {item.badge > 9 ? '9+' : item.badge}
                                     </span>
                                 )}
                             </Link>

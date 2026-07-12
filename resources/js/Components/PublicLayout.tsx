@@ -9,6 +9,7 @@ import {
     AcademicCapIcon,
     CalendarIcon,
     EnvelopeIcon,
+    PhotoIcon,
     HomeIcon
 } from '@heroicons/react/24/outline';
 
@@ -23,6 +24,7 @@ const navLinks = [
     { label: 'Accueil', href: '/', icon: <HomeIcon className="w-5 h-5" /> },
     { label: 'Formations', href: '/formations', icon: <AcademicCapIcon className="w-5 h-5" /> },
     { label: 'Certification', href: '/certification', icon: <SparklesIcon className="w-5 h-5" /> },
+    {label: 'Galerie', href: '/galerie', icon: <PhotoIcon className="w-5 h-5" /> },
  ];
 
 const PublicLayout = ({ children }: Props) => {
