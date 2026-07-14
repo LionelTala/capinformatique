@@ -9,7 +9,6 @@ import {
     Bars3Icon,
     XMarkIcon,
     ChevronDownIcon,
-    ChatBubbleLeftIcon,
 } from '@heroicons/react/24/outline';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -18,33 +17,21 @@ import NotificationBell from '@/Components/Notifications/NotificationBell';
 import ToastContainer from '@/Components/UI/ToastContainer';
 import type { SharedPageProps } from '@/types';
 
-
 interface StudentLayoutProps {
     children: React.ReactNode;
     title?: string;
 }
 
-
-
 const StudentLayout = ({ children, title = 'Tableau de bord' }: StudentLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [isChatMenuOpen, setIsChatMenuOpen] = useState(false);
 
     const { props, url } = usePage<SharedPageProps>();
     const user = props.auth?.user ?? null;
 
-
     const coursCount = props.unreadCountsByType?.['cours'] ?? 0;
     const devoirCount = props.unreadCountsByType?.['devoir'] ?? 0;
     const evaluationCount = props.unreadCountsByType?.['evaluation'] ?? 0;
-
-
-    const discussions = [
-        { id: 1, name: 'Vague Janvier 2026', lastMessage: 'Bonjour, quand aura lieu le prochain cours ?', unread: 2 },
-        { id: 2, name: 'Vague Mars 2026', lastMessage: 'Merci pour les cours !', unread: 0 },
-        { id: 3, name: 'Certification Infographie', lastMessage: 'J\'ai terminé le module 3', unread: 1 },
-    ];
 
     const menuItems: {
         label: string;
@@ -63,12 +50,6 @@ const StudentLayout = ({ children, title = 'Tableau de bord' }: StudentLayoutPro
         if (!user) return '?';
         return user.name?.charAt(0)?.toUpperCase() || '?';
     };
-
-    const getUnreadTotal = () => {
-        return discussions.reduce((acc, d) => acc + (d.unread || 0), 0);
-    };
-
-    const totalUnread = getUnreadTotal();
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -103,8 +84,6 @@ const StudentLayout = ({ children, title = 'Tableau de bord' }: StudentLayoutPro
 
                     <div className="flex items-center gap-2">
                         <NotificationBell />
-
-                         
 
                         {/* User Menu */}
                         <div className="relative">
@@ -191,27 +170,6 @@ const StudentLayout = ({ children, title = 'Tableau de bord' }: StudentLayoutPro
                             </Link>
                         );
                     })}
-
-                    {/* Chat dans la sidebar */}
-                    <Link
-                        href="/student/chat"
-                        className={`
-                            flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium
-                            transition-colors duration-200
-                            ${url.startsWith('/student/chat')
-                                ? 'bg-cab-blue text-white'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-cab-blue'
-                            }
-                        `}
-                    >
-                        <ChatBubbleLeftIcon className="w-5 h-5" />
-                        <span className="flex-1">Chat</span>
-                        {totalUnread > 0 && (
-                            <span className="text-xs font-bold bg-red-500 text-white rounded-full px-2 py-0.5">
-                                {totalUnread > 9 ? '9+' : totalUnread}
-                            </span>
-                        )}
-                    </Link>
 
                     <div className="pt-4 mt-4 border-t border-gray-200">
                         <Link

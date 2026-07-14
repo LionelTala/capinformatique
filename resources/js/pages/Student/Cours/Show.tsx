@@ -128,14 +128,7 @@ export default function Show({ cours }: Props) {
                                     </div>
                                 )}
                             </div>
-                            <a
-                                href={cours.video_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-block mt-3 text-sm text-cab-blue hover:underline"
-                            >
-                                Ouvrir dans un nouvel onglet
-                            </a>
+                             
                         </div>
                     )}
 
