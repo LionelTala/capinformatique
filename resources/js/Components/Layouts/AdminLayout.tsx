@@ -60,6 +60,7 @@ const AdminLayout = ({ children, title = 'Tableau de bord' }: AdminLayoutProps) 
 
     menuItems.push(
         { label: 'Statistiques visites', href: '/admin/stats-visites', icon: <EyeIcon className="w-5 h-5" /> },
+        { label: 'Pré-inscriptions', href: '/admin/pre-inscriptions', icon: <ClipboardDocumentListIcon className="w-5 h-5" /> },
         { label: 'Galerie', href: '/admin/galerie', icon: <PhotoIcon className="w-5 h-5" /> },
         { label: 'Activités', href: '/admin/activites', icon: <CalendarIcon className="w-5 h-5" /> },
         { label: 'Formations', href: '/admin/formations', icon: <AcademicCapIcon className="w-5 h-5" /> },

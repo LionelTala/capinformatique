@@ -5,6 +5,7 @@ import CandidatureController from './CandidatureController'
 import GalerieController from './GalerieController'
 import ActiviteController from './ActiviteController'
 import BibliothequeController from './BibliothequeController'
+import PreInscriptionController from './PreInscriptionController'
 
 const Public = {
     HomeController: Object.assign(HomeController, HomeController),
@@ -14,6 +15,7 @@ const Public = {
     GalerieController: Object.assign(GalerieController, GalerieController),
     ActiviteController: Object.assign(ActiviteController, ActiviteController),
     BibliothequeController: Object.assign(BibliothequeController, BibliothequeController),
+    PreInscriptionController: Object.assign(PreInscriptionController, PreInscriptionController),
 }
 
 export default Public

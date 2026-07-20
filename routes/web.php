@@ -26,6 +26,7 @@ use App\Http\Controllers\Public\GalerieController as PublicGalerieController;
 use App\Http\Controllers\Admin\ActiviteController;
 use App\Http\Controllers\Admin\LivreController;
 use App\Http\Controllers\Admin\PaiementController;
+use App\Http\Controllers\Admin\PreInscriptionController;
 use App\Http\Controllers\Admin\TrancheController;
 use App\Http\Controllers\Admin\VisitStatsController;
 use App\Http\Controllers\Public\ActiviteController as PublicActiviteController;
@@ -41,6 +42,8 @@ Route::get('/candidature/success', [CandidatureController::class, 'success'])->n
 Route::get('/galerie', [PublicGalerieController::class, 'index'])->name('galerie.public');
 Route::get('/activites', [PublicActiviteController::class, 'index'])->name('activites.public');
 Route::get('/bibliotheque', [BibliothequeController::class, 'index'])->name('public.bibliotheque');
+Route::post('/pre-inscription', [App\Http\Controllers\Public\PreInscriptionController::class, 'store'])->name('pre-inscription.store');
+
 
 
      Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -226,6 +229,13 @@ Route::post('/galerie/{galerie}/toggle-active', [GalerieController::class, 'togg
     Route::put('paiements/{paiement}', [PaiementController::class, 'update'])->name('paiements.update'); // ✅ Ajout
     Route::post('paiements/{student}/{tranche}/confirmer', [PaiementController::class, 'confirmer'])->name('paiements.confirmer');
     Route::delete('paiements/{student}/{tranche}/annuler', [PaiementController::class, 'annuler'])->name('paiements.annuler');
+
+
+
+    // Pre inscription
+    Route::get('/pre-inscriptions', [PreInscriptionController::class, 'index'])->name('pre-inscriptions.index');
+Route::put('/pre-inscriptions/{preInscription}', [PreInscriptionController::class, 'update'])->name('pre-inscriptions.update');
+Route::delete('/pre-inscriptions/{preInscription}', [PreInscriptionController::class, 'destroy'])->name('pre-inscriptions.destroy');
 
 });
 

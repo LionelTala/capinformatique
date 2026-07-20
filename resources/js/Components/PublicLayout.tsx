@@ -262,6 +262,8 @@ const PublicLayout = ({ children }: Props) => {
                             <h4 className="text-white font-semibold mb-3">Nos campus</h4>
                             <ul className="space-y-2 text-sm text-gray-400">
                                 <li className="flex items-center gap-2"><MapPinIcon className="w-4 h-4 text-[#1a56db]" /> Douala — Yassa</li>
+                                <li className="flex items-center gap-2"><MapPinIcon className="w-4 h-4 text-[#1a56db]" /> Douala — ELF Village</li>
+
                                 <li className="flex items-center gap-2"><MapPinIcon className="w-4 h-4 text-[#1a56db]" /> Yaoundé — Nlongkak</li>
                                 <li className="flex items-center gap-2"><MapPinIcon className="w-4 h-4 text-[#1a56db]" /> Bafoussam — Casablanca</li>
                             </ul>

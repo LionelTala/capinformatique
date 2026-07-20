@@ -711,47 +711,99 @@ export default function Home({ activites }: HomeProps) {
                 {/* ============================================ */}
                 {/* 5. CERTIFICATIONS */}
                 {/* ============================================ */}
-                <RevealSection as="section" className="py-20 relative overflow-hidden">
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d2a63, #1a56db)' }} />
-                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
-                                    CERTIFICATION EN LIGNE
-                                </span>
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-                                    Faites certifier vos compétences, où que vous soyez
-                                </h2>
-                                <p className="text-white/80 mt-4 leading-relaxed">
-                                    Vous maîtrisez déjà un métier mais n'avez pas de diplôme reconnu ?
-                                    Nos certifications en ligne vous permettent de valider vos compétences
-                                    à distance, à votre rythme.
-                                </p>
-                                <Link
-                                    href="/certification"
-                                    className="inline-flex items-center gap-2 mt-6 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
-                                >
-                                    En savoir plus
-                                    <ArrowRightIcon className="w-4 h-4" />
-                                </Link>
-                            </div>
-                            <div className="flex justify-center">
-                                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
-                                    <div className="text-center">
-                                        <div className="w-32 h-32 mx-auto rounded-full bg-white/20 flex items-center justify-center">
-                                            <CheckBadgeIcon className="w-16 h-16 text-white" />
-                                        </div>
-                                        <p className="text-white/70 text-sm mt-4">
-                                            Certifications reconnues
-                                            <br />
-                                            <span className="font-bold text-white">DQP</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </RevealSection>
+             {/* SECTION 1 - FORMATION EN LIGNE */}
+{/* SECTION 1 - FORMATION EN LIGNE */}
+<RevealSection as="section" className="py-20 relative overflow-hidden">
+    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d2a63, #1a56db)' }} />
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
+                    FORMATION EN LIGNE
+                </span>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight">
+                    Développez vos compétences grâce à nos formations <span className="text-white/90">100 % en ligne</span>
+                </h2>
+                <p className="text-white/80 mt-4 leading-relaxed">
+                    Conçues pour allier théorie et pratique. Apprenez à votre rythme, où que vous soyez,
+                    avec l'accompagnement de formateurs expérimentés et des supports pédagogiques de qualité.
+                </p>
+                <ul className="mt-6 space-y-3">
+                    {[
+                        '✅ Cours accessibles 24h/24 et 7j/7',
+                        '✅ Exercices pratiques et études de cas',
+                        '✅ Formateurs qualifiés',
+                        '✅ Attestation de formation à la fin du parcours',
+                        '✅ Accompagnement personnalisé'
+                    ].map((item, index) => (
+                        <li key={index} className="text-white/80 text-sm flex items-center gap-2">
+                            <span className="text-white font-bold">•</span>
+                            {item}
+                        </li>
+                    ))}
+                </ul>
+                <Link
+                    href="/formations"
+                    className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+                >
+                    Découvrir nos formations
+                    <ArrowRightIcon className="w-4 h-4" />
+                </Link>
+            </div>
+
+            <div className="flex justify-center">
+                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
+                    <img
+                        src="/assets/images/formation_en_ligne.webp"
+                        alt="Formation en ligne CAB Informatique"
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</RevealSection>
+
+{/* ✅ ESPACE BLANC ENTRE LES DEUX SECTIONS */}
+<div className="h-12 bg-white" />
+
+{/* SECTION 2 - CERTIFICATION EN LIGNE */}
+<RevealSection as="section" className="py-20 relative overflow-hidden">
+    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a56db, #0d2a63)' }} />
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
+                    CERTIFICATION EN LIGNE
+                </span>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                    Faites certifier vos compétences, où que vous soyez
+                </h2>
+                <p className="text-white/80 mt-4 leading-relaxed">
+                    Vous maîtrisez déjà un métier mais n'avez pas de diplôme reconnu ?
+                    Nos certifications en ligne vous permettent de valider vos compétences
+                    à distance, à votre rythme.
+                </p>
+                <Link
+                    href="/certification"
+                    className="inline-flex items-center gap-2 mt-6 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+                >
+                    En savoir plus
+                    <ArrowRightIcon className="w-4 h-4" />
+                </Link>
+            </div>
+            <div className="flex justify-center">
+                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
+                    <img
+                        src="/assets/images/certif.webp"
+                        alt="Certification CAB Informatique"
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</RevealSection>
 
                 {/* ============================================ */}
                 {/* 6. ACTIVITÉS - CARROUSEL DYNAMIQUE */}

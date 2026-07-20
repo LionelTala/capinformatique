@@ -16,6 +16,7 @@ import activites from './activites'
 import bibliotheque from './bibliotheque'
 import tranches from './tranches'
 import paiements from './paiements'
+import preInscriptions from './pre-inscriptions'
 /**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
 * @see app/Http/Controllers/Admin/DashboardController.php:18
@@ -116,6 +117,7 @@ const admin = {
     bibliotheque: Object.assign(bibliotheque, bibliotheque),
     tranches: Object.assign(tranches, tranches),
     paiements: Object.assign(paiements, paiements),
+    preInscriptions: Object.assign(preInscriptions, preInscriptions),
 }
 
 export default admin
