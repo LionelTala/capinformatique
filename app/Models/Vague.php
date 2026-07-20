@@ -81,4 +81,8 @@ class Vague extends Model
             return 'En cours';
         }
     }
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }

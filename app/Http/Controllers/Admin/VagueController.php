@@ -232,29 +232,46 @@ class VagueController extends Controller
     }
 
     public function toggleActive(Vague $vague)
-    {
-        try {
-            $vague->update(['is_active' => !$vague->is_active]);
+{
+    try {
+        DB::transaction(function () use ($vague) {
+            // 1. Inverser le statut de la vague
+            $newStatus = !$vague->is_active;
+            $vague->update(['is_active' => $newStatus]);
 
-            $status = $vague->is_active ? 'activée' : 'désactivée';
+            // 2. Désactiver ou Activer les comptes utilisateurs liés à cette vague
+            // Récupère les user_id de tous les étudiants de la vague
+            $userIds = $vague->students()
+                ->whereNotNull('user_id')
+                ->pluck('user_id');
 
-            Log::info('Vague ' . $status, [
-                'vague_id' => $vague->id,
-                'name' => $vague->name,
-                'updated_by' => auth()->id(),
-            ]);
+            if ($userIds->isNotEmpty()) {
+                \App\Models\User::whereIn('id', $userIds)->update([
+                    'is_active' => $newStatus,
+                ]);
+            }
+        });
 
-            return redirect()->back()
-                ->with('success', "✅ Vague {$vague->name} {$status} avec succès !");
+        $status = $vague->is_active ? 'activée (étudiants activés)' : 'désactivée (étudiants désactivés)';
 
-        } catch (\Exception $e) {
-            Log::error('Erreur changement statut vague', [
-                'vague_id' => $vague->id,
-                'message' => $e->getMessage(),
-            ]);
+        Log::info('Vague ' . $status, [
+            'vague_id' => $vague->id,
+            'name' => $vague->name,
+            'updated_by' => auth()->id(),
+        ]);
 
-            return redirect()->back()
-                ->with('error', '❌ Une erreur est survenue.');
-        }
+        return redirect()->back()
+            ->with('success', "✅ Vague {$vague->name} {$status} avec succès !");
+
+    } catch (\Exception $e) {
+        Log::error('Erreur changement statut vague', [
+            'vague_id' => $vague->id,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()
+            ->with('error', '❌ Une erreur est survenue lors du changement de statut.');
     }
+}
 }
