@@ -21,13 +21,15 @@ use Inertia\Inertia;
 
 class DevoirController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
+            // ✅ Pagination avec 20 éléments par page
             $devoirs = Devoir::with(['formation', 'vague', 'certification', 'trancheRequise', 'student'])
                 ->orderBy('created_at', 'desc')
-                ->get()
-                ->map(function ($d) {
+                ->paginate(10) // ✅ Pagination 20 éléments
+                ->withQueryString() // ✅ Garder les paramètres de recherche
+                ->through(function ($d) {
                     // ✅ Calcul dynamique des destinataires
                     $destinataires = $this->getDestinataires($d);
 

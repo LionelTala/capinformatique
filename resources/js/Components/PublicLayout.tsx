@@ -227,12 +227,35 @@ const PublicLayout = ({ children }: Props) => {
                         </div>
 
                         <div>
-                            <h4 className="text-white font-semibold mb-3">Liens rapides</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li><Link href="/formations" className="hover:text-white transition-colors">Nos formations</Link></li>
-                                <li><Link href="/certification" className="hover:text-white transition-colors">Certification en ligne</Link></li>
-                            </ul>
-                        </div>
+    <h4 className="text-white font-semibold mb-3">Liens rapides</h4>
+    <ul className="space-y-2 text-sm">
+        <li>
+            <Link href="/formations" className="hover:text-white transition-colors">
+                Nos formations
+            </Link>
+        </li>
+        <li>
+            <Link href="/certification" className="hover:text-white transition-colors">
+                Certifications en ligne
+            </Link>
+        </li>
+        <li>
+            <Link href="/galerie" className="hover:text-white transition-colors">
+                Galerie médias
+            </Link>
+        </li>
+        <li>
+            <Link href="/bibliotheque" className="hover:text-white transition-colors">
+                Bibliothèque
+            </Link>
+        </li>
+        <li>
+            <Link href="/preinscription" className="hover:text-white transition-colors">
+                Pré-inscription
+            </Link>
+        </li>
+    </ul>
+</div>
 
                         <div>
                             <h4 className="text-white font-semibold mb-3">Contact</h4>
@@ -271,7 +294,7 @@ const PublicLayout = ({ children }: Props) => {
                             <div className="mt-4">
                                 <h4 className="text-white font-semibold mb-2 text-sm">Suivez-nous</h4>
                                 <div className="flex gap-3">
-                                    <a href="https://facebook.com/cabinfo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <a href="https://web.facebook.com/Cabinformatiques" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                                         </svg>
@@ -281,7 +304,7 @@ const PublicLayout = ({ children }: Props) => {
                                             <path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.94 8.94 0 0 0-7.63 13.49L3 21l3.65-1.36a8.9 8.9 0 0 0 4.34 1.13h.01c4.94 0 9.09-4.15 9.09-9.09 0-2.42-1.06-4.7-2.49-5.36zM12.05 19.1a7.5 7.5 0 0 1-3.83-1.06l-.27-.16-2.66 1 .95-2.6-.18-.28a7.4 7.4 0 0 1-1.14-3.97 7.5 7.5 0 1 1 7.13 7.07z"/>
                                         </svg>
                                     </a>
-                                    <a href="https://tiktok.com/@cabinfo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <a href="https://www.tiktok.com/@cab_informatique" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.3-.67.29-1.05.04-1.16.01-2.32.01-3.48.01-3.74.01-7.48.02-11.22z"/>
                                         </svg>
@@ -293,11 +316,7 @@ const PublicLayout = ({ children }: Props) => {
 
                     <div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs text-gray-600">
                         <p>&copy; {new Date().getFullYear()} <strong>CAB Informatique</strong>. Tous droits réservés.</p>
-                        <p className="mt-1">
-                            <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link>
-                            {' · '}
-                            <Link href="/politique-confidentialite" className="hover:text-white transition-colors">Politique de confidentialité</Link>
-                        </p>
+
                         <p className="mt-4 text-gray-500 text-[10px]">
                             Développé par{' '}
                             <a href="https://wa.me/237659666110" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">

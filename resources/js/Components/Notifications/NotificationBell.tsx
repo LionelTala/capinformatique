@@ -1,4 +1,3 @@
-// resources/js/Components/Notifications/NotificationBell.tsx
 import { BellIcon } from '@heroicons/react/24/outline';
 import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
@@ -43,7 +42,7 @@ const NotificationBell = () => {
         const channel = window.Echo.private(channelName);
 
         channel.listen('.notification.created', (data: NotificationItem) => {
-            // ✅ une nouvelle notification arrive forcément non lue, on l'ajoute en tête
+            // ✅ Une nouvelle notification arrive forcément non lue, on l'ajoute en tête
             setNotifications((prev) => {
                 if ((prev ?? []).some((n) => n.id === data.id)) return prev;
                 return [data, ...(prev ?? [])];
@@ -57,8 +56,8 @@ const NotificationBell = () => {
         return () => {
             try {
                 window.Echo.leave(channelName);
-            } catch (error) {
-                console.error('Erreur leave channel:', error);
+            } catch {
+                // Gestion silencieuse
             }
         };
     }, [userId]);
@@ -80,16 +79,14 @@ const NotificationBell = () => {
             });
 
             if (!res.ok) {
-                console.error('Erreur HTTP notifications:', res.status);
                 setNotifications([]);
                 return;
             }
 
             const data = await res.json();
-            // Le backend renvoie maintenant directement un tableau (déjà filtré non-lues)
+            // Le backend renvoie directement un tableau
             setNotifications(Array.isArray(data) ? data : (Array.isArray(data?.notifications) ? data.notifications : []));
-        } catch (error) {
-            console.error('Erreur récupération notifications:', error);
+        } catch {
             setNotifications([]);
         }
     };
@@ -117,12 +114,12 @@ const NotificationBell = () => {
                 <NotificationDropdown
                     notifications={notifications}
                     onMarkAsRead={(id) => {
-                        // ✅ retire l'item de la liste au lieu de juste marquer read_at
+                        // ✅ Retire l'item de la liste au lieu de juste marquer read_at
                         setNotifications((prev) => (prev ?? []).filter((n) => n.id !== id));
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}
                     onMarkAllAsRead={() => {
-                        // ✅ vide complètement la liste
+                        // ✅ Vide complètement la liste
                         setNotifications([]);
                         router.reload({ only: ['unreadNotificationsCount'] });
                     }}

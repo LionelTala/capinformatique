@@ -55,7 +55,13 @@ interface Devoir {
 }
 
 interface Props {
-    devoirs: Devoir[];
+    devoirs: {
+        data: Devoir[];
+        links: { url: string | null; label: string; active: boolean }[];
+        from: number | null;
+        to: number | null;
+        total: number;
+    };
 }
 
 export default function Index({ devoirs }: Props) {
@@ -108,7 +114,7 @@ export default function Index({ devoirs }: Props) {
             <AdminLayout title="Gestion des devoirs">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <p className="text-sm text-gray-500">
-                        {devoirs?.length ?? 0} devoir{devoirs?.length !== 1 ? 's' : ''} au total
+                        {devoirs.total} devoir{devoirs.total !== 1 ? 's' : ''} au total
                     </p>
                     <Link
                         href="/admin/devoirs/create"
@@ -120,7 +126,7 @@ export default function Index({ devoirs }: Props) {
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    {!devoirs || devoirs.length === 0 ? (
+                    {devoirs.data.length === 0 ? (
                         <div className="text-center py-12">
                             <ClipboardDocumentListIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 text-sm">Aucun devoir trouvé</p>
@@ -169,7 +175,7 @@ export default function Index({ devoirs }: Props) {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {devoirs.map((d) => (
+                                    {devoirs.data.map((d) => (
                                         <tr key={d.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
@@ -305,6 +311,16 @@ export default function Index({ devoirs }: Props) {
                             </table>
                         </div>
                     )}
+                </div>
+
+                {/* ✅ Pagination */}
+                <div className="mt-4">
+                    <Pagination
+                        links={devoirs.links}
+                        from={devoirs.from}
+                        to={devoirs.to}
+                        total={devoirs.total}
+                    />
                 </div>
             </AdminLayout>
         </>

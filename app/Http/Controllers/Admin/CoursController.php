@@ -27,7 +27,7 @@ class CoursController extends Controller
         try {
             $cours = Cours::with(['formation', 'vague', 'certification', 'trancheRequise', 'student'])
                 ->orderBy('created_at', 'desc')
-                ->paginate(15)
+                ->paginate(10)
                 ->withQueryString()
                 ->through(function ($c) {
                     // ✅ Calcul dynamique des destinataires

@@ -9,6 +9,7 @@ import ErrorBoundary from '@/Components/UI/ErrorBoundary';
 import ToastContainer from '@/Components/UI/ToastContainer';
 
 import type { Auth, Flash } from './types';
+import PageLoader from './Components/UI/PageLoader';
 
 const appName = import.meta.env.VITE_APP_NAME || 'CAB Informatique';
 
@@ -40,10 +41,12 @@ createInertiaApp({
         root.render(
             <ErrorBoundary>
                 <App {...props} />
+                <PageLoader></PageLoader>
             </ErrorBoundary>
         );
     },
     progress: {
         color: '#1A56DB',
-    },
+     },
 });
+

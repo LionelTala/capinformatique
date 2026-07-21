@@ -1,16 +1,9 @@
-// resources/js/pages/public/Home.tsx
 import {
     AcademicCapIcon,
     ClockIcon,
     ComputerDesktopIcon,
-    BriefcaseIcon,
     ShieldCheckIcon,
     ArrowRightIcon,
-    MapPinIcon,
-    PhoneIcon,
-    EnvelopeIcon,
-    SparklesIcon,
-    UserGroupIcon,
     CheckBadgeIcon,
     StarIcon,
     ChevronLeftIcon,
@@ -55,36 +48,39 @@ const heroSlides = [
     {
         id: 1,
         image: '/assets/images/img1.jpeg',
+        alt: 'Centre de formation professionnelle CAB Informatique Douala Yaoundé Bafoussam',
         badge: 'Rentrée académique 2026-2027',
         title: 'CAB Informatique',
         subtitle: 'Centre de Référence de la Formation Professionnelle au Cameroun',
-        description: 'Depuis 22 ans, CAB Informatique forme des professionnels compétents, opérationnels, prêts pour le monde du travail — à Douala, Yaoundé, Bafoussam et en ligne.'
+        description: 'Depuis 22 ans, CAB Informatique forme des professionnels qualifiés en informatique, secrétariat, comptabilité, infographie et maintenance à Douala, Yaoundé, Bafoussam et en ligne.'
     },
     {
         id: 2,
         image: '/assets/images/certif.jpg',
+        alt: 'Certification professionnelle en ligne au Cameroun - CAB Informatique',
         badge: 'Certifications en ligne',
         title: 'Faites certifier vos compétences',
-        subtitle: 'Où que vous soyez, à votre rythme',
-        description: 'Nos certifications en ligne vous permettent de valider vos compétences à distance.'
+        subtitle: 'Où que vous soyez au Cameroun, à votre rythme',
+        description: 'Nos certifications professionnelles en ligne vous permettent de valider vos acquis et d\'obtenir un diplôme reconnu à distance.'
     },
     {
         id: 3,
         image: '/assets/images/img3.jpeg',
-        badge: 'Formations pratiques',
-        title: '100% pratique',
-        subtitle: 'Dès la première semaine',
-        description: 'On vous met devant le vrai matériel — pas seulement des slides. C\'est ça, la différence CAB.'
+        alt: 'Formation pratique en informatique bureautique et maintenance Douala',
+        badge: 'Formations 100% pratiques',
+        title: 'Formations Pratiques & Opérationnelles',
+        subtitle: 'Matériel réel dès la première semaine',
+        description: 'Mise en pratique directe sur équipements informatiques, réseaux et logiciels professionnels. C\'est l\'exigence CAB Informatique.'
     }
 ];
 
 const HERO_SLIDE_DURATION = 6500;
 
 const avantages = [
-    { icon: AcademicCapIcon, title: '100% Pratique', desc: 'On vous met devant le vrai matériel, dès la première semaine.' },
-    { icon: ShieldCheckIcon, title: 'Formateurs qui exercent', desc: 'Pas des théoriciens : des professionnels qui forment sur ce qu\'ils pratiquent.' },
-    { icon: ComputerDesktopIcon, title: 'Salles équipées', desc: 'Ordinateurs, logiciels sous licence, matériel réseau et vidéosurveillance réels.' },
-    { icon: ClockIcon, title: 'Cours du jour ou du soir', desc: 'Étudiant, salarié ou en reconversion : un créneau existe pour vous.' },
+    { icon: AcademicCapIcon, title: '100% Pratique', desc: 'Apprentissage direct sur matériel réel, ordinateurs et réseaux dès la première semaine.' },
+    { icon: ShieldCheckIcon, title: 'Formateurs Experts', desc: 'Des professionnels du terrain qui enseignent la réalité des métiers en entreprise.' },
+    { icon: ComputerDesktopIcon, title: 'Salles Équipées', desc: 'Ordinateurs récents, logiciels métiers sous licence et laboratoires pratiques.' },
+    { icon: ClockIcon, title: 'Cours du Jour & Soir', desc: 'Des horaires adaptés pour étudiants, travailleurs et personnes en reconversion.' },
 ];
 
 const campus = [
@@ -117,12 +113,9 @@ export default function Home({ activites }: HomeProps) {
     const diplomes = useCountUp(5000, statsVisible);
     const tauxReussite = useCountUp(85, statsVisible);
 
-    // ✅ Utiliser les activités dynamiques
     const staticActivities = activites || [];
 
-    // ============================================
-    // Hero Carousel
-    // ============================================
+    // Carousel Hero State
     const [currentSlide, setCurrentSlide] = useState(0);
     const [heroPaused, setHeroPaused] = useState(false);
     const [progressKey, setProgressKey] = useState(0);
@@ -162,9 +155,7 @@ export default function Home({ activites }: HomeProps) {
         };
     }, [currentSlide, heroPaused, reducedMotion, progressKey, nextSlide]);
 
-    // ============================================
     // Activités Carousel
-    // ============================================
     const activityTrackRef = useRef<HTMLDivElement>(null);
     const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
     const totalActivities = staticActivities.length;
@@ -174,8 +165,7 @@ export default function Home({ activites }: HomeProps) {
         const track = activityTrackRef.current;
         const slot = track?.querySelector<HTMLElement>('[data-activity-slot]');
         if (!track || !slot) return 0;
-        const gap = 16;
-        return slot.offsetWidth + gap;
+        return slot.offsetWidth + 16;
     };
 
     const goToActivity = (index: number) => {
@@ -214,14 +204,14 @@ export default function Home({ activites }: HomeProps) {
     }, [currentActivityIndex]);
 
     // ============================================
-    // JSON-LD SEO
+    // JSON-LD SEO ENRICHI (Schema.org)
     // ============================================
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
         "name": "CAB Informatique",
-        "alternateName": "CAB Informatique - Centre de Formation Professionnelle",
-        "description": "Centre de formation professionnelle en informatique, gestion, secrétariat et sécurité. Présent à Douala, Yaoundé et Bafoussam depuis 22 ans.",
+        "alternateName": ["CAB Informatique Cameroun", "Centre d'Apprentissage Bureautique et Informatique"],
+        "description": "Centre de référence de la formation professionnelle agréé au Cameroun : Informatique, Secrétariat, Comptabilité, Infographie, Maintenance, Vidéosurveillance à Douala, Yaoundé, Bafoussam et en ligne.",
         "url": "https://cab-informatique.com",
         "logo": "https://cab-informatique.com/assets/images/logo.jpeg",
         "image": "https://cab-informatique.com/assets/images/og-cab-informatique.jpg",
@@ -235,7 +225,7 @@ export default function Home({ activites }: HomeProps) {
         ],
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "ELF, à 100 m de l'Échangeur",
+            "streetAddress": "ELF Yassa, à 100m de l'échangeur",
             "addressLocality": "Douala",
             "addressRegion": "Littoral",
             "addressCountry": "CM"
@@ -243,7 +233,7 @@ export default function Home({ activites }: HomeProps) {
         "department": [
             {
                 "@type": "EducationalOrganization",
-                "name": "CAB Informatique Douala",
+                "name": "CAB Informatique Douala - Campus Yassa",
                 "address": {
                     "@type": "PostalAddress",
                     "streetAddress": "ELF, à 100 m de l'Échangeur",
@@ -254,7 +244,7 @@ export default function Home({ activites }: HomeProps) {
             },
             {
                 "@type": "EducationalOrganization",
-                "name": "CAB Informatique Yaoundé",
+                "name": "CAB Informatique Yaoundé - Campus Nlongkak",
                 "address": {
                     "@type": "PostalAddress",
                     "streetAddress": "À 100 m du rond-point Nlongkak",
@@ -265,10 +255,10 @@ export default function Home({ activites }: HomeProps) {
             },
             {
                 "@type": "EducationalOrganization",
-                "name": "CAB Informatique Bafoussam",
+                "name": "CAB Informatique Bafoussam - Campus Casablanca",
                 "address": {
                     "@type": "PostalAddress",
-                    "streetAddress": "Marché Casablanca",
+                    "streetAddress": "Marché Casablanca, Immeuble Pharmacie de l'Espérance",
                     "addressLocality": "Bafoussam",
                     "addressCountry": "CM"
                 },
@@ -277,42 +267,36 @@ export default function Home({ activites }: HomeProps) {
         ],
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
-            "name": "Formations CAB Informatique",
+            "name": "Formations Professionnelles CAB Informatique",
             "itemListElement": [
                 {
                     "@type": "Course",
-                    "name": "Secrétariat Bureautique",
-                    "description": "Formation aux métiers du secrétariat et de l'assistanat",
+                    "name": "Formation Secrétariat Bureautique Douala Yaoundé Bafoussam",
+                    "description": "Formation pratique aux outils bureautiques et secrétariat de direction.",
                     "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
-                    "name": "Secrétariat Comptable",
-                    "description": "Formation en comptabilité et secrétariat",
+                    "name": "Formation Secrétariat Comptable & Gestion",
+                    "description": "Formation qualifiante en tenue de caisse, comptabilité et logiciels de gestion.",
                     "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
-                    "name": "Logistique et Transit",
-                    "description": "Formation en logistique et transport international",
+                    "name": "Formation Infographie 2D & Design Graphique",
+                    "description": "Formation sur la suite Adobe (Photoshop, Illustrator, InDesign) à Douala, Yaoundé et en ligne.",
                     "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
-                    "name": "Infographie 2D & Multimédia",
-                    "description": "Formation en graphisme et multimédia",
+                    "name": "Formation Maintenance Informatique & Réseaux",
+                    "description": "Dépannage matériel, câblage réseau et administration système au Cameroun.",
                     "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 },
                 {
                     "@type": "Course",
-                    "name": "Réseaux & Maintenance Informatique",
-                    "description": "Formation en administration réseaux et maintenance",
-                    "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
-                },
-                {
-                    "@type": "Course",
-                    "name": "Vidéosurveillance",
-                    "description": "Formation en installation et maintenance de systèmes de vidéosurveillance",
+                    "name": "Formation Installation Vidéosurveillance",
+                    "description": "Installation et configuration de caméras de surveillance IP et analogiques.",
                     "provider": { "@type": "EducationalOrganization", "name": "CAB Informatique" }
                 }
             ]
@@ -322,27 +306,39 @@ export default function Home({ activites }: HomeProps) {
     return (
         <>
             <Head>
-                <title>CAB Informatique — Formation Professionnelle en Présentiel et en Ligne au Cameroun</title>
+                {/* Title optimisé mot-clé principal + marque + villes */}
+                <title>CAB Informatique — Centre de Formation Professionnelle à Douala, Yaoundé, Bafoussam & En Ligne</title>
+
+                {/* Meta Description riche avec mots-clés métiers */}
                 <meta
                     name="description"
-                    content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques à Douala, Yaoundé et Bafoussam. Formations en présentiel et en ligne, DQP reconnu. Inscriptions ouvertes."
+                    content="CAB Informatique : Centre de formation professionnelle agréé au Cameroun. Formations 100% pratiques en Infographie, Secrétariat Bureautique, Comptabilité, Maintenance, Réseaux & Vidéosurveillance à Douala, Yaoundé, Bafoussam et en ligne."
                 />
-                <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+                <meta name="keywords" content="CAB Informatique, centre de formation professionnelle Douala, formation informatique Yaoundé, centre de formation Bafoussam, formation infographie Douala, formation secrétariat bureautique, formation en ligne Cameroun, certification en ligne" />
+                <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+                {/* URL Canonical explicite */}
+                <link rel="canonical" href="https://cab-informatique.com" />
+
+                {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="CAB Informatique — Centre de Référence de la Formation Professionnelle au Cameroun" />
-                <meta property="og:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
-                <meta property="og:image" content="/assets/images/og-cab-informatique.jpg" />
+                <meta property="og:title" content="CAB Informatique — Formation Professionnelle Pratique au Cameroun" />
+                <meta property="og:description" content="Formez-vous aux métiers de l'informatique, de la gestion et du numérique à Douala, Yaoundé, Bafoussam et en ligne. DQP reconnu et certifications." />
+                <meta property="og:image" content="https://cab-informatique.com/assets/images/og-cab-informatique.jpg" />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta property="og:site_name" content="CAB Informatique" />
                 <meta property="og:locale" content="fr_CM" />
                 <meta property="og:url" content="https://cab-informatique.com" />
+
+                {/* Twitter Cards */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@cabinfo" />
-                <meta name="twitter:creator" content="@cabinfo" />
-                <meta name="twitter:title" content="CAB Informatique — Formation Professionnelle au Cameroun" />
-                <meta name="twitter:description" content="Depuis 22 ans, CAB Informatique forme aux métiers de l'informatique, de la gestion et des métiers techniques. Formations en présentiel et en ligne. DQP reconnu." />
-                <meta name="twitter:image" content="/assets/images/og-cab-informatique.jpg" />
+                <meta name="twitter:title" content="CAB Informatique — Centre de Formation Professionnelle au Cameroun" />
+                <meta name="twitter:description" content="Formations pratiques en présentiel (Douala, Yaoundé, Bafoussam) et en ligne. Préparez votre avenir professionnel avec CAB Informatique." />
+                <meta name="twitter:image" content="https://cab-informatique.com/assets/images/og-cab-informatique.jpg" />
+
+                {/* Données structurées JSON-LD */}
                 <script type="application/ld+json">
                     {JSON.stringify(jsonLd)}
                 </script>
@@ -388,7 +384,7 @@ export default function Home({ activites }: HomeProps) {
                             <img
                                 key={slide.id}
                                 src={slide.image}
-                                alt=""
+                                alt={slide.alt}
                                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1100ms] ease-out ${
                                     i === currentSlide ? 'opacity-100' : 'opacity-0'
                                 }`}
@@ -424,6 +420,7 @@ export default function Home({ activites }: HomeProps) {
                                         {current.badge}
                                     </div>
 
+                                    {/* H1 Principal enrichi pour le SEO */}
                                     <h1
                                         className="hc-anim hc-display text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-[4.2rem] font-medium tracking-tight"
                                         style={{ animationDelay: '80ms' }}
@@ -448,14 +445,14 @@ export default function Home({ activites }: HomeProps) {
                                             href="/formations"
                                             className="group inline-flex items-center gap-2 px-7 py-4 bg-[#f2b705] text-[#0f2b63] rounded-full font-semibold hover:bg-white transition-colors duration-300"
                                         >
-                                            Découvrir nos formations
+                                            Découvrir nos nos formations
                                             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                                         </Link>
                                         <a
                                             href="#activites"
                                             className="inline-flex items-center gap-2 px-7 py-4 text-white/90 font-medium hover:text-white transition-colors duration-300 border-b border-white/30 hover:border-white"
                                         >
-                                            Voir nos activités
+                                            Voir nos événements
                                         </a>
                                     </div>
                                 </div>
@@ -546,15 +543,15 @@ export default function Home({ activites }: HomeProps) {
                             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-10 gap-y-2 text-white/70 text-sm">
                                 <span className="flex items-center gap-2">
                                     <BadgeCheck className="w-4 h-4 text-[#f2b705]" />
-                                    22 ans d'expérience
+                                    22 ans d'expérience au Cameroun
                                 </span>
                                 <span className="flex items-center gap-2">
                                     <Users className="w-4 h-4 text-[#f2b705]" />
-                                    Milliers de diplômés
+                                    Plus de 5000 diplômés formés
                                 </span>
                                 <span className="flex items-center gap-2">
                                     <GraduationCap className="w-4 h-4 text-[#f2b705]" />
-                                    DQP reconnu
+                                    DQP & Certifications Reconnues
                                 </span>
                             </div>
                         </div>
@@ -568,29 +565,29 @@ export default function Home({ activites }: HomeProps) {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <RevealSection className="text-center max-w-2xl mx-auto mb-14">
                             <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                POURQUOI NOUS CHOISIR
+                                POURQUOI CHOISIR CAB INFORMATIQUE
                             </span>
                             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                Des chiffres qui parlent d'eux-mêmes
+                                Le centre de référence pour votre formation professionnelle
                             </h2>
                         </RevealSection>
 
                         <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-100">
                                 <div className="text-4xl font-extrabold text-[#1a56db]">{annees}+</div>
-                                <div className="text-sm font-medium text-gray-700 mt-1">Ans d'expérience</div>
+                                <div className="text-sm font-medium text-gray-700 mt-1">Ans d'expérience au Cameroun</div>
                             </div>
                             <div className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-100">
                                 <div className="text-4xl font-extrabold text-[#1a56db]">{diplomes}+</div>
-                                <div className="text-sm font-medium text-gray-700 mt-1">Apprenants formés</div>
+                                <div className="text-sm font-medium text-gray-700 mt-1">Apprenants diplômés</div>
                             </div>
                             <div className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-100">
                                 <div className="text-4xl font-extrabold text-[#1a56db]">100%</div>
-                                <div className="text-sm font-medium text-gray-700 mt-1">Pratique</div>
+                                <div className="text-sm font-medium text-gray-700 mt-1">Ateliers Pratiques</div>
                             </div>
                             <div className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-100">
                                 <div className="text-4xl font-extrabold text-[#1a56db]">{tauxReussite}%</div>
-                                <div className="text-sm font-medium text-gray-700 mt-1">Taux de réussite</div>
+                                <div className="text-sm font-medium text-gray-700 mt-1">Insertion & Réussite</div>
                             </div>
                         </div>
                     </div>
@@ -603,10 +600,10 @@ export default function Home({ activites }: HomeProps) {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <RevealSection className="text-center max-w-2xl mx-auto mb-14">
                             <span className="inline-block px-4 py-1.5 bg-red-50 text-[#d21f2f] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                CE QUI FAIT LA DIFFÉRENCE
+                                L'EXCELLENCE PÉDAGOGIQUE
                             </span>
                             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                Pourquoi CAB Informatique ?
+                                Pourquoi vous former chez CAB Informatique ?
                             </h2>
                         </RevealSection>
 
@@ -636,36 +633,41 @@ export default function Home({ activites }: HomeProps) {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center max-w-2xl mx-auto mb-12">
                             <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                NOS FORMATIONS
+                                NOS MODALITÉS DE FORMATION
                             </span>
                             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                Deux façons de vous former, un seul objectif : <span className="text-[#1a56db]">votre réussite</span>
+                                Formations Présentielles à Douala, Yaoundé, Bafoussam ou <span className="text-[#1a56db]">100% En Ligne</span>
                             </h2>
                             <p className="text-gray-500 mt-3 leading-relaxed">
-                                Choisissez le format qui vous correspond : en présentiel dans nos centres ou en ligne à votre rythme.
+                                Choisissez la formule qui convient à votre emploi du temps : cours en centre de formation ou apprentissage flexible à distance.
                             </p>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
                                 <div className="relative h-48 overflow-hidden">
-                                    <img src="/assets/images/img3.jpeg" alt="Présentiel" className="w-full h-full object-cover" loading="lazy" />
+                                    <img
+                                        src="/assets/images/img3.jpeg"
+                                        alt="Formation professionnelle en présentiel à Douala Yaoundé Bafoussam - CAB Informatique"
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-[#1a56db] text-white rounded-full text-xs font-semibold">Présentiel</div>
                                 </div>
                                 <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900">Cours du jour ou du soir</h3>
+                                    <h3 className="text-xl font-bold text-gray-900">Cours en centre (Jour & Soir)</h3>
                                     <ul className="mt-4 space-y-2">
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#1a56db] mt-0.5 shrink-0" />
-                                            Enseignement dans nos 3 centres
+                                            Centres équipés à Douala (Yassa), Yaoundé (Nlongkak) et Bafoussam
                                         </li>
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#1a56db] mt-0.5 shrink-0" />
-                                            Pédagogie 100% pratique
+                                            Pédagogie active 100% pratique sur matériel réel
                                         </li>
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#1a56db] mt-0.5 shrink-0" />
-                                            Encadrement direct par des professionnels
+                                            Préparation aux diplômes nationaux (DQP) et attestations
                                         </li>
                                     </ul>
                                 </div>
@@ -673,23 +675,28 @@ export default function Home({ activites }: HomeProps) {
 
                             <div className="bg-gray-50 rounded-3xl overflow-hidden border border-gray-100">
                                 <div className="relative h-48 overflow-hidden">
-                                    <img src="/assets/images/online.webp" alt="En ligne" className="w-full h-full object-cover" loading="lazy" />
+                                    <img
+                                        src="/assets/images/online.webp"
+                                        alt="Formation en ligne professionnelle au Cameroun - CAB Informatique"
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-[#d21f2f] text-white rounded-full text-xs font-semibold">En ligne</div>
                                 </div>
                                 <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900">À votre rythme, où que vous soyez</h3>
+                                    <h3 className="text-xl font-bold text-gray-900">Formations & Certifications En Ligne</h3>
                                     <ul className="mt-4 space-y-2">
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#d21f2f] mt-0.5 shrink-0" />
-                                            Formation entièrement à distance
+                                            Plateforme e-learning accessible 24h/24 au Cameroun et à l'international
                                         </li>
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#d21f2f] mt-0.5 shrink-0" />
-                                            Apprenez à votre rythme
+                                            Apprenez à votre rythme avec accompagnement personnalisé
                                         </li>
                                         <li className="flex items-start gap-2 text-sm text-gray-600">
                                             <CheckBadgeIcon className="w-4 h-4 text-[#d21f2f] mt-0.5 shrink-0" />
-                                            Même encadrement de qualité
+                                            Validation des acquis et certification officielle à distance
                                         </li>
                                     </ul>
                                 </div>
@@ -701,7 +708,7 @@ export default function Home({ activites }: HomeProps) {
                                 href="/formations"
                                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#1a56db] text-white rounded-full font-semibold hover:bg-[#0d2a63] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
                             >
-                                Voir toutes nos formations
+                                Découvrir le catalogue des formations
                                 <ArrowRightIcon className="w-4 h-4" />
                             </Link>
                         </div>
@@ -709,101 +716,94 @@ export default function Home({ activites }: HomeProps) {
                 </RevealSection>
 
                 {/* ============================================ */}
-                {/* 5. CERTIFICATIONS */}
+                {/* 5. FORMATION & CERTIFICATION EN LIGNE */}
                 {/* ============================================ */}
-             {/* SECTION 1 - FORMATION EN LIGNE */}
-{/* SECTION 1 - FORMATION EN LIGNE */}
-<RevealSection as="section" className="py-20 relative overflow-hidden">
-    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d2a63, #1a56db)' }} />
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
-                    FORMATION EN LIGNE
-                </span>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight">
-                    Développez vos compétences grâce à nos formations <span className="text-white/90">100 % en ligne</span>
-                </h2>
-                <p className="text-white/80 mt-4 leading-relaxed">
-                    Conçues pour allier théorie et pratique. Apprenez à votre rythme, où que vous soyez,
-                    avec l'accompagnement de formateurs expérimentés et des supports pédagogiques de qualité.
-                </p>
-                <ul className="mt-6 space-y-3">
-                    {[
-                        '✅ Cours accessibles 24h/24 et 7j/7',
-                        '✅ Exercices pratiques et études de cas',
-                        '✅ Formateurs qualifiés',
-                        '✅ Attestation de formation à la fin du parcours',
-                        '✅ Accompagnement personnalisé'
-                    ].map((item, index) => (
-                        <li key={index} className="text-white/80 text-sm flex items-center gap-2">
-                            <span className="text-white font-bold">•</span>
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-                <Link
-                    href="/formations"
-                    className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
-                >
-                    Découvrir nos formations
-                    <ArrowRightIcon className="w-4 h-4" />
-                </Link>
-            </div>
+                <RevealSection as="section" className="py-20 relative overflow-hidden">
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d2a63, #1a56db)' }} />
+                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
+                                    FORMATION EN LIGNE À DOUALA & CAMEROUN
+                                </span>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight">
+                                    Développez vos compétences avec nos formations <span className="text-white/90">100 % à distance</span>
+                                </h2>
+                                <p className="text-white/80 mt-4 leading-relaxed">
+                                    Que vous soyez à Douala, Yaoundé, Garoua ou à l'étranger, accédez aux cours pratiques CAB Informatique sur notre plateforme e-learning.
+                                </p>
+                                <ul className="mt-6 space-y-3">
+                                    {[
+                                        '✅ Cours interactifs accessibles 24h/24 et 7j/7',
+                                        '✅ Projets pratiques, études de cas et travaux guidés',
+                                        '✅ Suivi individuel par des instructeurs qualifiés',
+                                        '✅ Attestation et certification de fin de parcours'
+                                    ].map((item, index) => (
+                                        <li key={index} className="text-white/80 text-sm flex items-center gap-2">
+                                            <span className="text-white font-bold">•</span>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <Link
+                                    href="/formations"
+                                    className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+                                >
+                                    Explorer les formations en ligne
+                                    <ArrowRightIcon className="w-4 h-4" />
+                                </Link>
+                            </div>
 
-            <div className="flex justify-center">
-                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
-                    <img
-                        src="/assets/images/formation_en_ligne.webp"
-                        alt="Formation en ligne CAB Informatique"
-                        className="w-full h-full object-contain"
-                    />
-                </div>
-            </div>
-        </div>
-    </div>
-</RevealSection>
+                            <div className="flex justify-center">
+                                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
+                                    <img
+                                        src="/assets/images/formation_en_ligne.webp"
+                                        alt="Plateforme de formation en ligne CAB Informatique Cameroun"
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </RevealSection>
 
-{/* ✅ ESPACE BLANC ENTRE LES DEUX SECTIONS */}
-<div className="h-12 bg-white" />
+                <div className="h-12 bg-white" />
 
-{/* SECTION 2 - CERTIFICATION EN LIGNE */}
-<RevealSection as="section" className="py-20 relative overflow-hidden">
-    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a56db, #0d2a63)' }} />
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
-                    CERTIFICATION EN LIGNE
-                </span>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-                    Faites certifier vos compétences, où que vous soyez
-                </h2>
-                <p className="text-white/80 mt-4 leading-relaxed">
-                    Vous maîtrisez déjà un métier mais n'avez pas de diplôme reconnu ?
-                    Nos certifications en ligne vous permettent de valider vos compétences
-                    à distance, à votre rythme.
-                </p>
-                <Link
-                    href="/certification"
-                    className="inline-flex items-center gap-2 mt-6 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
-                >
-                    En savoir plus
-                    <ArrowRightIcon className="w-4 h-4" />
-                </Link>
-            </div>
-            <div className="flex justify-center">
-                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
-                    <img
-                        src="/assets/images/certif.webp"
-                        alt="Certification CAB Informatique"
-                        className="w-full h-full object-contain"
-                    />
-                </div>
-            </div>
-        </div>
-    </div>
-</RevealSection>
+                <RevealSection as="section" className="py-20 relative overflow-hidden">
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a56db, #0d2a63)' }} />
+                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-xs font-semibold tracking-wider mb-4">
+                                    CERTIFICATION PROFESSIONNELLE EN LIGNE
+                                </span>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                                    Faites certifier votre expérience professionnelle
+                                </h2>
+                                <p className="text-white/80 mt-4 leading-relaxed">
+                                    Vous exercez déjà en infographie, secrétariat, comptabilité ou maintenance sans diplôme officiel ?
+                                    Valorisez vos compétences sur le marché du travail grâce à nos certifications en ligne reconnues.
+                                </p>
+                                <Link
+                                    href="/certification"
+                                    className="inline-flex items-center gap-2 mt-6 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+                                >
+                                    Obtenir ma certification
+                                    <ArrowRightIcon className="w-4 h-4" />
+                                </Link>
+                            </div>
+                            <div className="flex justify-center">
+                                <div className="w-full max-w-sm aspect-square rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-8">
+                                    <img
+                                        src="/assets/images/certif.webp"
+                                        alt="Certification professionnelle en ligne CAB Informatique"
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </RevealSection>
 
                 {/* ============================================ */}
                 {/* 6. ACTIVITÉS - CARROUSEL DYNAMIQUE */}
@@ -813,10 +813,10 @@ export default function Home({ activites }: HomeProps) {
                         <RevealSection className="flex items-end justify-between mb-10 flex-wrap gap-4">
                             <div>
                                 <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                    CE QUI BOUGE CHEZ CAB
+                                    VIE DU CENTRE & ÉVÉNEMENTS
                                 </span>
                                 <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                    Nos prochains événements
+                                    Actualités & Séminaires CAB Informatique
                                 </h2>
                             </div>
                         </RevealSection>
@@ -824,7 +824,7 @@ export default function Home({ activites }: HomeProps) {
                         <div className="relative">
                             {staticActivities.length === 0 ? (
                                 <div className="text-center py-12">
-                                    <p className="text-gray-500">Aucune activité à venir</p>
+                                    <p className="text-gray-500">Aucune activité programmée pour le moment.</p>
                                 </div>
                             ) : (
                                 <>
@@ -857,7 +857,7 @@ export default function Home({ activites }: HomeProps) {
                                                     >
                                                         <img
                                                             src={activity.image_url}
-                                                            alt={activity.title}
+                                                            alt={`${activity.title} - CAB Informatique`}
                                                             className="w-full h-48 object-cover"
                                                             loading="lazy"
                                                         />
@@ -916,13 +916,8 @@ export default function Home({ activites }: HomeProps) {
                 </section>
 
                 <style>{`
-                    .hide-scrollbar::-webkit-scrollbar {
-                        display: none;
-                    }
-                    .hide-scrollbar {
-                        -ms-overflow-style: none;
-                        scrollbar-width: none;
-                    }
+                    .hide-scrollbar::-webkit-scrollbar { display: none; }
+                    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 `}</style>
 
                 {/* ============================================ */}
@@ -932,10 +927,10 @@ export default function Home({ activites }: HomeProps) {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <RevealSection className="text-center max-w-2xl mx-auto mb-14">
                             <span className="inline-block px-4 py-1.5 bg-red-50 text-[#d21f2f] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                ILS PARLENT DE CAB
+                                AVIS & TÉMOIGNAGES
                             </span>
                             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                Ce que disent nos apprenants
+                                Ce que disent nos anciens étudiants
                             </h2>
                         </RevealSection>
 
@@ -948,12 +943,11 @@ export default function Home({ activites }: HomeProps) {
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-900">Marie Ngo</p>
-                                            <p className="text-xs text-gray-500">Secrétariat Comptable (2025)</p>
+                                            <p className="text-xs text-gray-500">Secrétariat Comptable — Douala (2025)</p>
                                         </div>
                                     </div>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        "J'ai découvert CAB grâce à une ancienne collègue qui y avait fait sa formation.
-                                        Aujourd'hui, je suis assistante comptable dans une PME."
+                                        "Excellente formation pratique chez CAB Informatique Yassa. Grâce à la maîtrise des logiciels de comptabilité, j'ai décroché mon poste d'assistante."
                                     </p>
                                     <div className="flex gap-0.5 mt-3">
                                         {[...Array(5)].map((_, i) => (
@@ -971,12 +965,11 @@ export default function Home({ activites }: HomeProps) {
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-900">Kevin Ebogo</p>
-                                            <p className="text-xs text-gray-500">Réseaux & Maintenance (2024)</p>
+                                            <p className="text-xs text-gray-500">Réseaux & Maintenance — Yaoundé (2024)</p>
                                         </div>
                                     </div>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        "Un ami m'a parlé de CAB. J'ai été convaincu par le côté pratique.
-                                        Après 8 mois, j'ai ouvert mon propre atelier de maintenance."
+                                        "La formation à Nlongkak est 100% axée sur le matériel informatique. Après 8 mois de formation chez CAB, j'ai ouvert mon propre atelier à Yaoundé."
                                     </p>
                                     <div className="flex gap-0.5 mt-3">
                                         {[...Array(5)].map((_, i) => (
@@ -994,12 +987,11 @@ export default function Home({ activites }: HomeProps) {
                                         </div>
                                         <div>
                                             <p className="font-semibold text-gray-900">Aïcha Moumouni</p>
-                                            <p className="text-xs text-gray-500">Infographie 2D (2025)</p>
+                                            <p className="text-xs text-gray-500">Infographie 2D — En Ligne (2025)</p>
                                         </div>
                                     </div>
                                     <p className="text-sm text-gray-600 leading-relaxed">
-                                        "J'ai vu la formation en ligne sur le site et j'ai postulé.
-                                        L'encadrement était top. Aujourd'hui je suis graphiste à Douala."
+                                        "J'ai suivi la formation en ligne depuis Bafoussam. Les formateurs sont disponibles et la pratique sur Photoshop/Illustrator m'a permis de devenir freelance."
                                     </p>
                                     <div className="flex gap-0.5 mt-3">
                                         {[...Array(5)].map((_, i) => (
@@ -1013,19 +1005,19 @@ export default function Home({ activites }: HomeProps) {
                 </section>
 
                 {/* ============================================ */}
-                {/* 8. CAMPUS */}
+                {/* 8. CAMPUS GEOLOCALISÉS */}
                 {/* ============================================ */}
                 <section className="py-20 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <RevealSection className="text-center max-w-2xl mx-auto mb-12">
                             <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                NOS CAMPUS
+                                NOS CENTRES DE FORMATION AU CAMEROUN
                             </span>
                             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                Trois villes, une même exigence
+                                Campus CAB Informatique à Douala, Yaoundé & Bafoussam
                             </h2>
                             <p className="text-gray-500 mt-3">
-                                Des centres équipés, accessibles, avec une équipe pédagogique présente sur place.
+                                Des locaux modernes, des salles informatiques climatisées et une équipe pédagogique à votre écoute.
                             </p>
                         </RevealSection>
 
@@ -1052,7 +1044,7 @@ export default function Home({ activites }: HomeProps) {
                                             rel="noopener noreferrer"
                                             className="inline-block mt-3 text-xs font-medium text-[#1a56db] hover:underline"
                                         >
-                                            🗺️ Voir sur Google Maps
+                                            🗺️ Localiser le campus sur Google Maps
                                         </a>
                                     </div>
                                 </RevealSection>
@@ -1068,16 +1060,16 @@ export default function Home({ activites }: HomeProps) {
                     <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #d21f2f, #b01a26)' }} />
                     <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-                            Votre avenir commence ici
+                            Inscrivez-vous dès aujourd'hui chez CAB Informatique
                         </h2>
                         <p className="text-white/80 mt-3 max-w-xl mx-auto">
-                            Rejoignez des milliers de professionnels formés par CAB Informatique.
+                            Rejoignez le réseau des diplômés du centre de référence au Cameroun.
                         </p>
                         <Link
                             href="/formations"
                             className="inline-flex items-center gap-2 mt-8 px-10 py-4 bg-white text-[#d21f2f] rounded-full font-bold text-lg hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-2xl transition-all duration-300"
                         >
-                            Découvrir nos formations
+                            Consulter les formations disponibles
                             <ArrowRightIcon className="w-5 h-5" />
                         </Link>
                     </div>

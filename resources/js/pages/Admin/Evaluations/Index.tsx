@@ -16,6 +16,7 @@ import {
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
+import Pagination from '@/Components/UI/Pagination';
 
 interface Evaluation {
     id: number;
@@ -55,7 +56,13 @@ interface Evaluation {
 }
 
 interface Props {
-    evaluations: Evaluation[];
+    evaluations: {
+        data: Evaluation[];
+        links: { url: string | null; label: string; active: boolean }[];
+        from: number | null;
+        to: number | null;
+        total: number;
+    };
 }
 
 export default function Index({ evaluations }: Props) {
@@ -108,7 +115,7 @@ export default function Index({ evaluations }: Props) {
             <AdminLayout title="Gestion des évaluations">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <p className="text-sm text-gray-500">
-                        {evaluations?.length ?? 0} évaluation{evaluations?.length !== 1 ? 's' : ''} au total
+                        {evaluations.total} évaluation{evaluations.total !== 1 ? 's' : ''} au total
                     </p>
                     <Link
                         href="/admin/evaluations/create"
@@ -120,7 +127,7 @@ export default function Index({ evaluations }: Props) {
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    {!evaluations || evaluations.length === 0 ? (
+                    {evaluations.data.length === 0 ? (
                         <div className="text-center py-12">
                             <ChartBarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 text-sm">Aucune évaluation trouvée</p>
@@ -172,7 +179,7 @@ export default function Index({ evaluations }: Props) {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {evaluations.map((e) => (
+                                    {evaluations.data.map((e) => (
                                         <tr key={e.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
@@ -311,6 +318,16 @@ export default function Index({ evaluations }: Props) {
                             </table>
                         </div>
                     )}
+                </div>
+
+                {/* ✅ Pagination */}
+                <div className="mt-4">
+                    <Pagination
+                        links={evaluations.links}
+                        from={evaluations.from}
+                        to={evaluations.to}
+                        total={evaluations.total}
+                    />
                 </div>
             </AdminLayout>
         </>

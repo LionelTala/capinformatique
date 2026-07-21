@@ -45,7 +45,7 @@ class CandidatureController extends Controller
 
         // Pagination faite APRÈS tous les filtres
         $candidatures = $query
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString()
             ->through(function ($candidature) {
                 return [

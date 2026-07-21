@@ -25,7 +25,7 @@ public function index()
                 $query->where('role', '!=', 'super_admin');
             })
             ->latest()
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString()
             ->through(function ($user) use ($actor) {
                 return [

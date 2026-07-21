@@ -23,8 +23,6 @@ const ToastContainer = () => {
 
 
     useEffect(() => {
-            console.log('🔍 Flash reçu:', flash);
-
         if (flash?.success) {
             showToast(flash.success, 'success');
         } else if (flash?.error) {

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::corriger
-* @see app/Http/Controllers/Admin/EvaluationController.php:686
+* @see app/Http/Controllers/Admin/EvaluationController.php:688
 * @route '/admin/soumissions-evaluations/{soumission}/corriger'
 */
 export const corriger = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ corriger.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::corriger
-* @see app/Http/Controllers/Admin/EvaluationController.php:686
+* @see app/Http/Controllers/Admin/EvaluationController.php:688
 * @route '/admin/soumissions-evaluations/{soumission}/corriger'
 */
 corriger.url = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ corriger.url = (args: { soumission: number | { id: number } } | [soumission: num
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::corriger
-* @see app/Http/Controllers/Admin/EvaluationController.php:686
+* @see app/Http/Controllers/Admin/EvaluationController.php:688
 * @route '/admin/soumissions-evaluations/{soumission}/corriger'
 */
 corriger.post = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ corriger.post = (args: { soumission: number | { id: number } } | [soumission: nu
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::corriger
-* @see app/Http/Controllers/Admin/EvaluationController.php:686
+* @see app/Http/Controllers/Admin/EvaluationController.php:688
 * @route '/admin/soumissions-evaluations/{soumission}/corriger'
 */
 const corrigerForm = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -69,7 +69,7 @@ const corrigerForm = (args: { soumission: number | { id: number } } | [soumissio
 
 /**
 * @see \App\Http\Controllers\Admin\EvaluationController::corriger
-* @see app/Http/Controllers/Admin/EvaluationController.php:686
+* @see app/Http/Controllers/Admin/EvaluationController.php:688
 * @route '/admin/soumissions-evaluations/{soumission}/corriger'
 */
 corrigerForm.post = (args: { soumission: number | { id: number } } | [soumission: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

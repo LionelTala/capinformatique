@@ -14,7 +14,8 @@ class TrackVisit
         'formations' => 'formations',
         'certification' => 'certification',
         'galerie' => 'galerie',
-        // 'bibliotheque' => 'bibliotheque',
+        'bibliotheque' => 'bibliotheque',
+        'login' => 'login'
     ];
 
     public function handle($request, Closure $next)

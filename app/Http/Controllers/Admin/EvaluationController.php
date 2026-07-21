@@ -21,13 +21,15 @@ use Inertia\Inertia;
 
 class EvaluationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
+            // ✅ Pagination avec 20 éléments par page
             $evaluations = Evaluation::with(['formation', 'vague', 'certification', 'trancheRequise', 'student'])
                 ->orderBy('created_at', 'desc')
-                ->get()
-                ->map(function ($e) {
+                ->paginate(10) // ✅ Pagination 20 éléments
+                ->withQueryString() // ✅ Garder les paramètres de recherche
+                ->through(function ($e) {
                     // ✅ Calcul dynamique des destinataires
                     $destinataires = $this->getDestinataires($e);
 
@@ -724,3 +726,4 @@ class EvaluationController extends Controller
         }
     }
 }
+
