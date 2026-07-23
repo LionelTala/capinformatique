@@ -14,6 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'telephone',
         'role',
         'is_active',
         'last_login_at',
@@ -34,6 +35,10 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return in_array($this->role, ['super_admin', 'admin_centre', 'admin']);
+    }
+     public function getLoginAttribute()
+    {
+        return $this->email ?? $this->telephone;
     }
 
     // Vérifier si l'utilisateur est super admin

@@ -12,7 +12,7 @@ class PreInscriptionController extends Controller
     {
         $validated = $request->validate([
             'nom_complet' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'telephone' => 'required|string|max:50',
             'ville' => 'nullable|string|max:255',
             'formation' => 'required|string|max:255',

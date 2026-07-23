@@ -18,6 +18,7 @@ export default function Create() {
         heure: '',
         is_active: true,
         ordre: 0,
+        lien: '',
     });
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,6 +185,7 @@ export default function Create() {
                                     </div>
                                     {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
                                 </div>
+
                                 <div>
                                     <label htmlFor="lieu" className="block text-sm font-medium text-gray-700 mb-1">
                                         Lieu
@@ -222,6 +224,22 @@ export default function Create() {
                                     {errors.heure && <p className="mt-1 text-sm text-red-600">{errors.heure}</p>}
                                 </div>
                             </div>
+                             <div>
+                                    <label htmlFor="lien" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Lien (optionnel)
+                                    </label>
+                                    <input
+                                        id="lien"
+                                        type="url"
+                                        value={data.lien}
+                                        onChange={(e) => setData('lien', e.target.value)}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
+                                        placeholder="https://exemple.com/evenement"
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        Lien vers la page de l'événement ou vers une page externe
+                                    </p>
+                                </div>
 
                             {/* Statut et ordre */}
                             <div className="grid grid-cols-2 gap-4">

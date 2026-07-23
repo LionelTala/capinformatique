@@ -5,14 +5,13 @@ import {
     TrashIcon,
     EyeIcon,
     EyeSlashIcon,
-    AcademicCapIcon ,
-    ArrowUpIcon,
-    ArrowDownIcon
+    AcademicCapIcon,
+    BookOpenIcon,
+    ClockIcon,
+    CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
-
 import { useState } from 'react';
-
 import AdminLayout from '@/Components/Layouts/AdminLayout';
 
 interface Formation {
@@ -21,7 +20,7 @@ interface Formation {
     abbreviation: string;
     slug: string;
     description: string;
-    debouches: string;
+    debouches: string | string[] | null;
     duration: string;
     diplome: string;
     frais: number;
@@ -32,28 +31,47 @@ interface Formation {
     lien_label: string | null;
     is_active: boolean;
     order: number;
+    type: 'enligne' | 'presentiel';
+    // Champs spécifiques présentiel
+    icon?: string;
+    tags?: string[];
+    programme?: string[];
+    couleur?: 'blue' | 'red';
 }
 
 interface Props {
     formations: Formation[];
+    currentType: 'enligne' | 'presentiel';
 }
 
-export default function Index({ formations }: Props) {
-    const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
-
-    // Vérifier si formations existe
-    console.log('Formations data:', formations);
+export default function Index({ formations, currentType }: Props) {
+    const [type, setType] = useState<'enligne' | 'presentiel'>(currentType || 'enligne');
 
     const handleToggleActive = (formation: Formation) => {
-        if (confirm(`Confirmer la ${formation.is_active ? 'désactivation' : 'activation'} de ${formation.name} ?`)) {
-            router.post(`/admin/formations/${formation.id}/toggle-active`);
+        if (confirm(`Confirmer la ${formation.is_active ? 'désactivation' : 'activation'} de la formation "${formation.name}" ?`)) {
+            router.post(`/admin/formations/${formation.id}/toggle-active?type=${type}`);
         }
     };
 
     const handleDelete = (formation: Formation) => {
-        if (confirm(`Confirmer la suppression de ${formation.name} ? Cette action est irréversible.`)) {
-            router.delete(`/admin/formations/${formation.id}`);
+        if (confirm(`Confirmer la suppression de la formation "${formation.name}" ? Cette action est irréversible.`)) {
+            router.delete(`/admin/formations/${formation.id}?type=${type}`);
         }
+    };
+
+    const handleTypeChange = (newType: 'enligne' | 'presentiel') => {
+        setType(newType);
+        router.get('/admin/formations', { type: newType }, { preserveState: true });
+    };
+
+    const getCreateRoute = () => {
+        return type === 'enligne' ? '/admin/formations/create?type=enligne' : '/admin/formations/create-presentiel?type=presentiel';
+    };
+
+    const getEditRoute = (formation: Formation) => {
+        return type === 'enligne'
+            ? `/admin/formations/${formation.id}/edit?type=enligne`
+            : `/admin/formations/${formation.id}/edit-presentiel?type=presentiel`;
     };
 
     return (
@@ -61,35 +79,61 @@ export default function Index({ formations }: Props) {
             <Head title="Gestion des formations - Admin" />
 
             <AdminLayout title="Gestion des formations">
-                {/* Header */}
+                {/* ✅ Boutons de bascule et Ajouter */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <p className="text-sm text-gray-500">
-                        {formations?.length ?? 0} formation{formations?.length !== 1 ? 's' : ''} au total
-                    </p>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => handleTypeChange('enligne')}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                                type === 'enligne'
+                                    ? 'bg-cab-blue text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            💻 En ligne
+                        </button>
+                        <button
+                            onClick={() => handleTypeChange('presentiel')}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                                type === 'presentiel'
+                                    ? 'bg-cab-blue text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            📍 Présentiel
+                        </button>
+                    </div>
+
                     <Link
-                        href="/admin/formations/create"
+                        href={getCreateRoute()}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
                     >
                         <PlusIcon className="w-5 h-5" />
-                        Nouvelle formation
+                        {type === 'enligne' ? 'Nouvelle formation en ligne' : 'Nouvelle formation présentiel'}
                     </Link>
                 </div>
 
-                {/* Liste */}
+                {/* Liste des formations */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    {!formations || formations.length === 0 ? (
+                    {formations.length === 0 ? (
                         <div className="text-center py-12">
                             <AcademicCapIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500 text-sm">Aucune formation trouvée</p>
+                            <p className="text-gray-500 text-sm">
+                                {type === 'enligne'
+                                    ? 'Aucune formation en ligne trouvée'
+                                    : 'Aucune formation présentiel trouvée'}
+                            </p>
                             <Link
-                                href="/admin/formations/create"
+                                href={getCreateRoute()}
                                 className="inline-block mt-4 text-cab-blue hover:text-cab-dark text-sm font-medium"
                             >
-                                Créer votre première formation →
+                                {type === 'enligne'
+                                    ? 'Créer votre première formation en ligne →'
+                                    : 'Créer votre première formation présentiel →'}
                             </Link>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto" key={formations.map(f => f.id).join('-')}>
+                        <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
@@ -97,14 +141,19 @@ export default function Index({ formations }: Props) {
                                             Formation
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Abréviation
+                                            Abrév.
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Durée
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Frais
+                                            Prix
                                         </th>
+                                        {type === 'presentiel' && (
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Icône
+                                            </th>
+                                        )}
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Statut
                                         </th>
@@ -117,32 +166,42 @@ export default function Index({ formations }: Props) {
                                     {formations.map((formation) => (
                                         <tr key={formation.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <img
-                                                        src={formation.image_url || '/assets/images/placeholder.jpg'}
-                                                        alt={formation.name || 'Formation'}
-                                                        className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = '/assets/images/placeholder.jpg';
-                                                        }}
-                                                    />
+                                                <div className="flex items-center gap-2">
+                                                    {formation.image_url ? (
+                                                        <img
+                                                            src={formation.image_url}
+                                                            alt={formation.name}
+                                                            className="w-10 h-10 rounded-lg object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                            <AcademicCapIcon className="w-5 h-5 text-gray-400" />
+                                                        </div>
+                                                    )}
                                                     <div>
-                                                        <p className="font-medium text-gray-900">{formation.name || 'Sans nom'}</p>
-                                                        <p className="text-xs text-gray-500">{formation.diplome || 'Non défini'}</p>
+                                                        <p className="font-medium text-gray-900 line-clamp-1">
+                                                            {formation.name}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500 line-clamp-1">
+                                                            {formation.description?.substring(0, 60) || 'Aucune description'}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-mono">
-                                                    {formation.abbreviation || '-'}
-                                                </span>
+                                            <td className="px-4 py-3 text-gray-600 text-xs font-mono">
+                                                {formation.abbreviation}
                                             </td>
-                                            <td className="px-4 py-3 text-gray-600 text-sm">
-                                                {formation.duration || '-'}
+                                            <td className="px-4 py-3 text-gray-600 text-xs">
+                                                {formation.duration}
                                             </td>
-                                            <td className="px-4 py-3 font-semibold text-gray-900">
+                                            <td className="px-4 py-3 text-gray-900 font-medium text-xs">
                                                 {formation.frais_formatted || '0 FCFA'}
                                             </td>
+                                            {type === 'presentiel' && (
+                                                <td className="px-4 py-3 text-2xl">
+                                                    {formation.icon || '📚'}
+                                                </td>
+                                            )}
                                             <td className="px-4 py-3">
                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                                                     formation.is_active
@@ -154,18 +213,6 @@ export default function Index({ formations }: Props) {
                                             </td>
                                             <td className="px-4 py-3 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    {formation.lien_externe && formation.lien_label && (
-                                                        <a
-                                                            href={formation.lien_externe}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="p-1.5 rounded-lg text-cab-blue hover:bg-blue-50 transition-colors"
-                                                            title={formation.lien_label}
-                                                        >
-                                                            <EyeIcon className="w-5 h-5" />
-                                                        </a>
-                                                    )}
-
                                                     <button
                                                         onClick={() => handleToggleActive(formation)}
                                                         className={`p-1.5 rounded-lg transition-colors ${
@@ -183,7 +230,7 @@ export default function Index({ formations }: Props) {
                                                     </button>
 
                                                     <Link
-                                                        href={`/admin/formations/${formation.id}/edit`}
+                                                        href={getEditRoute(formation)}
                                                         className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
                                                         title="Modifier"
                                                     >

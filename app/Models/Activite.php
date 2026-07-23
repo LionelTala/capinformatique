@@ -22,6 +22,7 @@ class Activite extends Model
         'heure',
         'is_active',
         'ordre',
+        'lien',
     ];
 
     protected $casts = [
@@ -42,6 +43,16 @@ class Activite extends Model
             $activite->slug = Str::slug($activite->title);
         });
     }
+    public function getLienUrlAttribute()
+{
+    return $this->lien ?? null;
+}
+
+// ✅ Vérifier si un lien existe
+public function getHasLienAttribute()
+{
+    return !empty($this->lien);
+}
 
     // Accesseurs
     public function getImageUrlAttribute(): string

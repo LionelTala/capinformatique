@@ -1,3 +1,4 @@
+// resources/js/pages/Admin/Activites/Edit.tsx
 import { useState } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Components/Layouts/AdminLayout';
@@ -16,6 +17,7 @@ interface Activite {
     heure: string | null;
     is_active: boolean;
     ordre: number;
+    lien: string | null;
 }
 
 interface Props {
@@ -34,6 +36,7 @@ export default function Edit({ activite }: Props) {
         date: activite.date || '',
         lieu: activite.lieu || '',
         heure: activite.heure || '',
+        lien: activite.lien || '',
         is_active: !!activite.is_active,
         ordre: activite.ordre ?? 0,
     });
@@ -53,7 +56,6 @@ export default function Edit({ activite }: Props) {
     const removeImage = () => {
         setData('image', null);
         setPreview(null);
-        // Optionnel : Réinitialiser l'élément HTML input pour permettre de re-sélectionner le même fichier
         const fileInput = document.getElementById('image-input') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
     };
@@ -61,29 +63,24 @@ export default function Edit({ activite }: Props) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 1. Initialiser le conteneur FormData multipart
         const formData = new FormData();
-
-        // 🚀 CRITIQUE : Spoofing requis par Laravel pour intercepter l'update
         formData.append('_method', 'PUT');
 
-        // 2. Transférer tous les champs du state local vers le FormData
         formData.append('title', data.title);
-        formData.append('excerpt', data.excerpt);
-        formData.append('description', data.description);
-        formData.append('tag', data.tag);
+        formData.append('excerpt', data.excerpt || '');
+        formData.append('description', data.description || '');
+        formData.append('tag', data.tag || '');
         formData.append('date', data.date);
-        formData.append('lieu', data.lieu);
-        formData.append('heure', data.heure);
+        formData.append('lieu', data.lieu || '');
+        formData.append('heure', data.heure || '');
+        formData.append('lien', data.lien || ''); // ✅ AJOUTÉ
         formData.append('is_active', data.is_active ? '1' : '0');
         formData.append('ordre', String(data.ordre));
 
-        // N'ajouter l'image au payload que si une nouvelle a été sélectionnée
         if (data.image) {
             formData.append('image', data.image);
         }
 
-        // 3. Envoyer via le routeur global d'Inertia en POST
         router.post(`/admin/activites/${activite.id}`, formData, {
             forceFormData: true,
             headers: {
@@ -208,8 +205,8 @@ export default function Edit({ activite }: Props) {
                                 {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
                             </div>
 
-                            {/* Date, Lieu, Heure */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Date, Lien, Lieu, Heure */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
                                         Date <span className="text-red-500">*</span>
@@ -229,6 +226,27 @@ export default function Edit({ activite }: Props) {
                                     </div>
                                     {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
                                 </div>
+
+                                <div>
+                                    <label htmlFor="lien" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Lien (optionnel)
+                                    </label>
+                                    <input
+                                        id="lien"
+                                        type="url"
+                                        value={data.lien}
+                                        onChange={(e) => setData('lien', e.target.value)}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
+                                        placeholder="https://exemple.com/evenement"
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        Lien vers la page de l'événement ou vers une page externe
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Lieu et Heure */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="lieu" className="block text-sm font-medium text-gray-700 mb-1">
                                         Lieu
@@ -247,6 +265,7 @@ export default function Edit({ activite }: Props) {
                                     </div>
                                     {errors.lieu && <p className="mt-1 text-sm text-red-600">{errors.lieu}</p>}
                                 </div>
+
                                 <div>
                                     <label htmlFor="heure" className="block text-sm font-medium text-gray-700 mb-1">
                                         Heure

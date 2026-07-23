@@ -37,6 +37,7 @@ interface Activite {
     excerpt: string | null;
     image_url: string;
     tag: string | null;
+    lien : string;
 }
 
 interface HomeProps {
@@ -746,7 +747,7 @@ export default function Home({ activites }: HomeProps) {
                                     ))}
                                 </ul>
                                 <Link
-                                    href="/formations"
+                                    href="/formations#enligne"
                                     className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-[#1a56db] rounded-full font-semibold hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
                                 >
                                     Explorer les formations en ligne
@@ -805,115 +806,130 @@ export default function Home({ activites }: HomeProps) {
                     </div>
                 </RevealSection>
 
-                {/* ============================================ */}
-                {/* 6. ACTIVITÉS - CARROUSEL DYNAMIQUE */}
-                {/* ============================================ */}
-                <section id="activites" className="py-20 bg-white scroll-mt-24 overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <RevealSection className="flex items-end justify-between mb-10 flex-wrap gap-4">
-                            <div>
-                                <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
-                                    VIE DU CENTRE & ÉVÉNEMENTS
-                                </span>
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                                    Actualités & Séminaires CAB Informatique
-                                </h2>
-                            </div>
-                        </RevealSection>
+               {/* ============================================ */}
+{/* 6. ACTIVITÉS - CARROUSEL DYNAMIQUE AVEC LIEN */}
+{/* ============================================ */}
+<section id="activites" className="py-20 bg-white scroll-mt-24 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealSection className="flex items-end justify-between mb-10 flex-wrap gap-4">
+            <div>
+                <span className="inline-block px-4 py-1.5 bg-blue-50 text-[#1a56db] rounded-full text-xs font-semibold tracking-wider mb-4">
+                    VIE DU CENTRE & ÉVÉNEMENTS
+                </span>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
+                    Actualités & Séminaires CAB Informatique
+                </h2>
+            </div>
+        </RevealSection>
 
-                        <div className="relative">
-                            {staticActivities.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <p className="text-gray-500">Aucune activité programmée pour le moment.</p>
-                                </div>
-                            ) : (
-                                <>
+        <div className="relative">
+            {staticActivities.length === 0 ? (
+                <div className="text-center py-12">
+                    <p className="text-gray-500">Aucune activité programmée pour le moment.</p>
+                </div>
+            ) : (
+                <>
+                    <div
+                        ref={activityTrackRef}
+                        onScroll={handleActivityScroll}
+                        className="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar lg:overflow-x-hidden"
+                    >
+                        {staticActivities.map((activity, index) => {
+                            const isCenter = index === currentActivityIndex;
+                            const hasLien = activity.lien && activity.lien.trim() !== '';
+
+                            return (
+                                <div
+                                    key={activity.id}
+                                    data-activity-slot
+                                    className="flex-shrink-0 w-[78%] sm:w-[55%] lg:w-[32%] snap-center transition-all duration-500 ease-in-out"
+                                    style={{
+                                        transform: isCenter ? 'scale(1)' : 'scale(0.82)',
+                                        opacity: isCenter ? 1 : 0.55,
+                                    }}
+                                >
                                     <div
-                                        ref={activityTrackRef}
-                                        onScroll={handleActivityScroll}
-                                        className="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar lg:overflow-x-hidden"
+                                        className="bg-white rounded-2xl overflow-hidden border transition-all duration-500"
+                                        style={{
+                                            borderColor: isCenter ? '#1a56db' : '#f3f4f6',
+                                            boxShadow: isCenter
+                                                ? '0 20px 25px -5px rgba(0,0,0,0.15)'
+                                                : '0 1px 2px rgba(0,0,0,0.05)',
+                                        }}
                                     >
-                                        {staticActivities.map((activity, index) => {
-                                            const isCenter = index === currentActivityIndex;
-
-                                            return (
-                                                <div
-                                                    key={activity.id}
-                                                    data-activity-slot
-                                                    className="flex-shrink-0 w-[78%] sm:w-[55%] lg:w-[32%] snap-center transition-all duration-500 ease-in-out"
-                                                    style={{
-                                                        transform: isCenter ? 'scale(1)' : 'scale(0.82)',
-                                                        opacity: isCenter ? 1 : 0.55,
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="bg-white rounded-2xl overflow-hidden border transition-all duration-500"
-                                                        style={{
-                                                            borderColor: isCenter ? '#1a56db' : '#f3f4f6',
-                                                            boxShadow: isCenter
-                                                                ? '0 20px 25px -5px rgba(0,0,0,0.15)'
-                                                                : '0 1px 2px rgba(0,0,0,0.05)',
-                                                        }}
+                                        <img
+                                            src={activity.image_url}
+                                            alt={`${activity.title} - CAB Informatique`}
+                                            className="w-full h-48 object-cover"
+                                            loading="lazy"
+                                        />
+                                        <div className={`p-5 transition-all duration-500 ${isCenter ? 'bg-white' : 'bg-gray-50'}`}>
+                                            <span className="text-xs font-semibold text-[#1a56db] bg-blue-50 px-2 py-1 rounded-full">
+                                                {activity.tag}
+                                            </span>
+                                            <h3 className={`font-bold text-base mt-2 transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-600'}`}>
+                                                {activity.title}
+                                            </h3>
+                                            <p className="text-xs text-gray-500 mt-1">{activity.date}</p>
+                                            <p className={`text-sm mt-2 line-clamp-2 transition-colors duration-500 ${isCenter ? 'text-gray-700' : 'text-gray-500'}`}>
+                                                {activity.excerpt}
+                                            </p>
+                                            {/* ✅ Bouton Voir si lien existe */}
+                                            {hasLien && (
+                                                <div className="mt-3">
+                                                    <a
+                                                        href={activity.lien}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 px-4 py-1.5 bg-[#1a56db] text-white rounded-lg text-xs font-medium hover:bg-[#0d2a63] transition-colors"
                                                     >
-                                                        <img
-                                                            src={activity.image_url}
-                                                            alt={`${activity.title} - CAB Informatique`}
-                                                            className="w-full h-48 object-cover"
-                                                            loading="lazy"
-                                                        />
-                                                        <div className={`p-5 transition-all duration-500 ${isCenter ? 'bg-white' : 'bg-gray-50'}`}>
-                                                            <span className="text-xs font-semibold text-[#1a56db] bg-blue-50 px-2 py-1 rounded-full">
-                                                                {activity.tag}
-                                                            </span>
-                                                            <h3 className={`font-bold text-base mt-2 transition-colors duration-500 ${isCenter ? 'text-gray-900' : 'text-gray-600'}`}>
-                                                                {activity.title}
-                                                            </h3>
-                                                            <p className="text-xs text-gray-500 mt-1">{activity.date}</p>
-                                                            <p className={`text-sm mt-2 line-clamp-2 transition-colors duration-500 ${isCenter ? 'text-gray-700' : 'text-gray-500'}`}>
-                                                                {activity.excerpt}
-                                                            </p>
-                                                        </div>
-                                                    </div>
+                                                        Voir
+                                                        <ArrowRightIcon className="w-3 h-3" />
+                                                    </a>
                                                 </div>
-                                            );
-                                        })}
+                                            )}
+                                        </div>
                                     </div>
-
-                                    <button
-                                        onClick={prevActivity}
-                                        className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                        aria-label="Événement précédent"
-                                    >
-                                        <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
-                                    </button>
-                                    <button
-                                        onClick={nextActivity}
-                                        className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
-                                        aria-label="Événement suivant"
-                                    >
-                                        <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-                                    </button>
-
-                                    <div className="flex justify-center gap-2 mt-6">
-                                        {staticActivities.map((_, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => goToActivity(index)}
-                                                className="rounded-full transition-all duration-300"
-                                                style={{
-                                                    width: index === currentActivityIndex ? '2rem' : '0.625rem',
-                                                    height: '0.625rem',
-                                                    backgroundColor: index === currentActivityIndex ? '#1a56db' : '#d1d5db',
-                                                }}
-                                                aria-label={`Aller à l'événement ${index + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            );
+                        })}
                     </div>
-                </section>
+
+                    <button
+                        onClick={prevActivity}
+                        className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
+                        aria-label="Événement précédent"
+                    >
+                        <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <button
+                        onClick={nextActivity}
+                        className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-3 bg-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-[#1a56db]"
+                        aria-label="Événement suivant"
+                    >
+                        <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+                    </button>
+
+                    <div className="flex justify-center gap-2 mt-6">
+                        {staticActivities.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToActivity(index)}
+                                className="rounded-full transition-all duration-300"
+                                style={{
+                                    width: index === currentActivityIndex ? '2rem' : '0.625rem',
+                                    height: '0.625rem',
+                                    backgroundColor: index === currentActivityIndex ? '#1a56db' : '#d1d5db',
+                                }}
+                                aria-label={`Aller à l'événement ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    </div>
+</section>
 
                 <style>{`
                     .hide-scrollbar::-webkit-scrollbar { display: none; }

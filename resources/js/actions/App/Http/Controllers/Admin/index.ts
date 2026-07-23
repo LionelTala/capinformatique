@@ -15,6 +15,7 @@ import LivreController from './LivreController'
 import TrancheController from './TrancheController'
 import PaiementController from './PaiementController'
 import PreInscriptionController from './PreInscriptionController'
+import LessonController from './LessonController'
 
 const Admin = {
     VisitStatsController: Object.assign(VisitStatsController, VisitStatsController),
@@ -34,6 +35,7 @@ const Admin = {
     TrancheController: Object.assign(TrancheController, TrancheController),
     PaiementController: Object.assign(PaiementController, PaiementController),
     PreInscriptionController: Object.assign(PreInscriptionController, PreInscriptionController),
+    LessonController: Object.assign(LessonController, LessonController),
 }
 
 export default Admin

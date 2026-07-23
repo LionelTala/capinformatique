@@ -10,7 +10,6 @@ use App\Models\Formation;
 use App\Models\Certification;
 use App\Models\Notification;
 use App\Models\User;
-use App\Models\Vague;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +17,7 @@ use Inertia\Inertia;
 
 class CandidatureController extends Controller
 {
-    // ✅ Page de pré-inscription (unique)
+    // ✅ Page de pré-inscription
     public function create(Request $request)
     {
         $formationId = $request->query('formation');
@@ -27,29 +26,13 @@ class CandidatureController extends Controller
 
         $formation = null;
         $certification = null;
-        $vagues = [];
 
         // Si formation
         if ($formationId) {
             $formation = Formation::find($formationId);
-            if ($formation) {
-                $vagues = Vague::where('formation_id', $formationId)
-                    ->where('is_active', true)
-                    ->where('date_debut', '>=', now())
-                    ->orderBy('date_debut')
-                    ->get()
-                    ->map(function ($vague) {
-                        return [
-                            'id' => $vague->id,
-                            'name' => $vague->name,
-                            'date_debut' => $vague->date_debut->format('d/m/Y'),
-                            'places' => $vague->capacite ? $vague->places_restantes : 'Illimité',
-                        ];
-                    });
-            }
         }
 
-        // Si certification (pas de vagues)
+        // Si certification
         if ($certificationId) {
             $certification = Certification::with('formation')->find($certificationId);
         }
@@ -72,9 +55,6 @@ class CandidatureController extends Controller
                 'titre' => $certification->titre,
                 'formation' => $certification->formation?->name,
             ] : null,
-            'vagues' => $vagues,
-            // ✅ Indicateur pour savoir si on doit afficher les vagues
-            'showVagues' => $type === 'formation' && $vagues->count() > 0,
         ]);
     }
 
@@ -86,10 +66,9 @@ class CandidatureController extends Controller
                 'type' => 'required|in:formation,certification',
                 'formation_id' => 'nullable|exists:formations,id',
                 'certification_id' => 'nullable|exists:certifications,id',
-                'vague_id' => 'nullable|exists:vagues,id',
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
+                'email' => 'nullable|email|max:255', // ✅ Email désormais optionnel
                 'telephone' => 'required|string|max:20',
                 'niveau_scolaire' => 'nullable|string|max:255',
                 'message' => 'nullable|string',
@@ -108,16 +87,16 @@ class CandidatureController extends Controller
                     'type' => $validated['type'],
                     'formation_id' => $validated['formation_id'] ?? null,
                     'certification_id' => $validated['certification_id'] ?? null,
-                    'vague_id' => $validated['vague_id'] ?? null,
                     'nom' => $validated['nom'],
                     'prenom' => $validated['prenom'],
-                    'email' => $validated['email'],
+                    'email' => $validated['email'] ?? null,
                     'telephone' => $validated['telephone'],
                     'niveau_scolaire' => $validated['niveau_scolaire'] ?? null,
                     'message' => $validated['message'] ?? null,
                     'statut' => 'en_attente',
                 ]);
             });
+
             $admins = User::all()->filter(fn ($u) => $u->isAdmin());
 
             foreach ($admins as $admin) {
@@ -140,8 +119,6 @@ class CandidatureController extends Controller
                 'nom' => $candidature->nom_complet,
                 'type' => $candidature->type,
             ]);
-
-            // 🔔 Événement broadcast (à implémenter)
 
             return redirect()->route('candidature.success')
                 ->with('success', '✅ Votre candidature a été envoyée avec succès ! Nous vous contacterons sous 48h.');

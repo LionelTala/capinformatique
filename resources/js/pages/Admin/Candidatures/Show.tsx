@@ -1,3 +1,4 @@
+// resources/js/pages/Admin/Candidatures/Show.tsx
 import {
     ArrowLeftIcon,
     UserIcon,
@@ -28,7 +29,7 @@ interface Candidature {
     nom: string;
     prenom: string;
     nom_complet: string;
-    email: string;
+    email: string | null;
     telephone: string;
     niveau_scolaire: string | null;
     message: string | null;
@@ -57,14 +58,15 @@ interface Candidature {
     user: {
         id: number;
         username: string;
-        email: string;
+        email: string | null;
+        telephone: string | null;
     } | null;
     student: {
         id: number;
         matricule: string;
         nom_complet: string;
-        vague_id: number | null;          // ✅ Ajouté
-        certification_id: number | null;  // ✅ Ajouté
+        vague_id: number | null;
+        certification_id: number | null;
     } | null;
 }
 
@@ -144,8 +146,38 @@ export default function Show({ candidature, vagues = [] }: Props) {
         });
     };
 
+    // ✅ Récupérer l'identifiant de connexion (priorité email puis téléphone)
+    const getLoginIdentifiant = () => {
+        if (candidature.user?.email) {
+            return candidature.user.email;
+        }
+        if (candidature.user?.telephone) {
+            return candidature.user.telephone;
+        }
+        if (candidature.telephone) {
+            return candidature.telephone;
+        }
+        return 'Non disponible';
+    };
+
+    // ✅ Récupérer le label de l'identifiant
+    const getIdentifiantLabel = () => {
+        if (candidature.user?.email) return '📧 Email';
+        if (candidature.user?.telephone) return '📱 Téléphone';
+        if (candidature.telephone) return '📱 Téléphone';
+        return '📧 Identifiant';
+    };
+
+    // ✅ Construire le message pour le candidat
+    const buildMessage = () => {
+        const identifiant = getLoginIdentifiant();
+        const label = getIdentifiantLabel();
+        return `👋 Bonjour ${candidature.nom_complet},\n\nVotre compte CAB Informatique a été créé avec succès !\n\n🔑 Identifiants de connexion :\n${label} : ${identifiant}\n🔐 Mot de passe : ${candidature.student?.matricule}\n🎓 Matricule : ${candidature.student?.matricule}\n\n➡️ Connectez-vous sur : ${window.location.origin}/login\n\nBonne formation ! 🚀`;
+    };
+
+    // ✅ Copier les identifiants
     const copyIdentifiants = () => {
-        const message = `👋 Bonjour ${candidature.nom_complet},\n\nVotre compte CAB Informatique a été créé avec succès !\n\n🔑 Identifiants de connexion :\n📧 Email : ${candidature.user?.email}\n🔐 Mot de passe : ${candidature.student?.matricule}\n🎓 Matricule : ${candidature.student?.matricule}\n\n➡️ Connectez-vous sur : ${window.location.origin}/login\n\nBonne formation ! 🚀`;
+        const message = buildMessage();
 
         navigator.clipboard.writeText(message).then(() => {
             setCopied(true);
@@ -153,11 +185,20 @@ export default function Show({ candidature, vagues = [] }: Props) {
         });
     };
 
+    // ✅ Lien WhatsApp
     const getWhatsAppLink = () => {
-        const message = `👋 Bonjour ${candidature.nom_complet},\n\nVotre compte CAB Informatique a été créé avec succès !\n\n🔑 Identifiants de connexion :\n📧 Email : ${candidature.user?.email}\n🔐 Mot de passe : ${candidature.student?.matricule}\n🎓 Matricule : ${candidature.student?.matricule}\n\n➡️ Connectez-vous sur : ${window.location.origin}/login\n\nBonne formation ! 🚀`;
-
+        const message = buildMessage();
         const phone = candidature.telephone.replace(/[^0-9]/g, '');
         return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    };
+
+    // ✅ Lien email (seulement si email existe)
+    const getEmailLink = () => {
+        if (!candidature.user?.email) return null;
+
+        const message = buildMessage();
+        const subject = 'Compte CAB Informatique';
+        return `mailto:${candidature.user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
     };
 
     // ✅ Déterminer si l'étudiant a une vague ou une certification
@@ -297,10 +338,17 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                     <p className="text-xs text-green-600 font-medium">👤 Nom d'utilisateur</p>
                                     <p className="font-mono font-bold text-green-900 mt-1">{candidature.user.username}</p>
                                 </div>
+
+                                {/* ✅ Identifiant de connexion (email ou téléphone) */}
                                 <div className="bg-white/70 rounded-xl p-4 border border-green-100">
-                                    <p className="text-xs text-green-600 font-medium">📧 Email</p>
-                                    <p className="text-green-900 text-sm mt-1 truncate">{candidature.user.email}</p>
+                                    <p className="text-xs text-green-600 font-medium">
+                                        {getIdentifiantLabel()}
+                                    </p>
+                                    <p className="text-green-900 text-sm mt-1 truncate font-medium">
+                                        {getLoginIdentifiant()}
+                                    </p>
                                 </div>
+
                                 <div className="bg-white/70 rounded-xl p-4 border border-green-100">
                                     <p className="text-xs text-green-600 font-medium">🔐 Mot de passe</p>
                                     <div className="flex items-center gap-2 mt-1">
@@ -312,7 +360,7 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                 </div>
                             </div>
 
-                            {/* ✅ Ajout des informations Vague / Certification */}
+                            {/* ✅ Informations Vague / Certification */}
                             <div className="mt-4 pt-4 border-t border-green-200">
                                 <p className="text-xs text-green-600 font-medium mb-2">📋 Affectation</p>
                                 {studentType === 'vague' ? (
@@ -333,7 +381,7 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                 )}
                             </div>
 
-                            {/* Actions de transmission */}
+                            {/* ✅ Actions de transmission */}
                             <div className="mt-4 pt-4 border-t border-green-200 flex flex-wrap gap-3">
                                 <button
                                     onClick={copyIdentifiants}
@@ -364,14 +412,14 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                     💬 Envoyer sur WhatsApp
                                 </a>
 
-                                <a
-                                    href={`mailto:${candidature.user.email}?subject=Compte CAB Informatique&body=${encodeURIComponent(
-                                        `Bonjour ${candidature.nom_complet},\n\nVotre compte CAB Informatique a été créé avec succès !\n\n🔑 Identifiants de connexion :\n📧 Email : ${candidature.user.email}\n🔐 Mot de passe : ${candidature.student.matricule}\n🎓 Matricule : ${candidature.student.matricule}\n\n➡️ Connectez-vous sur : ${window.location.origin}/login\n\nBonne formation ! 🚀`
-                                    )}`}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-xl text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2"
-                                >
-                                    ✉️ Envoyer par email
-                                </a>
+                                {getEmailLink() && (
+                                    <a
+                                        href={getEmailLink()}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-xl text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2"
+                                    >
+                                        ✉️ Envoyer par email
+                                    </a>
+                                )}
                             </div>
                         </div>
                     )}
@@ -392,15 +440,21 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                         <p className="font-medium text-gray-900">{candidature.nom_complet}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-3">
-                                    <EnvelopeIcon className="w-4 h-4 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <p className="text-xs text-gray-500">Email</p>
-                                        <a href={`mailto:${candidature.email}`} className="text-cab-blue hover:underline">
-                                            {candidature.email}
-                                        </a>
+
+                                {/* ✅ Email - affiché uniquement si présent */}
+                                {candidature.email && (
+                                    <div className="flex items-start gap-3">
+                                        <EnvelopeIcon className="w-4 h-4 text-gray-400 mt-0.5" />
+                                        <div>
+                                            <p className="text-xs text-gray-500">Email</p>
+                                            <a href={`mailto:${candidature.email}`} className="text-cab-blue hover:underline">
+                                                {candidature.email}
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+
+                                {/* ✅ Téléphone - toujours affiché */}
                                 <div className="flex items-start gap-3">
                                     <PhoneIcon className="w-4 h-4 text-gray-400 mt-0.5" />
                                     <div>
@@ -410,6 +464,7 @@ export default function Show({ candidature, vagues = [] }: Props) {
                                         </a>
                                     </div>
                                 </div>
+
                                 <div className="flex items-start gap-3">
                                     <AcademicCapIcon className="w-4 h-4 text-gray-400 mt-0.5" />
                                     <div>

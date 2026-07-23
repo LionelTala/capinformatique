@@ -1,9 +1,7 @@
 // resources/js/pages/public/Preinscription.tsx
 import { ArrowLeftIcon, UserIcon, EnvelopeIcon, PhoneIcon, AcademicCapIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
-
 import { Head, Link, useForm } from '@inertiajs/react';
-
-import { useState,useEffect } from 'react';
+import { useEffect } from 'react';
 import PublicLayout from '@/Components/PublicLayout';
 
 interface Formation {
@@ -18,27 +16,17 @@ interface Certification {
     formation: string;
 }
 
-interface Vague {
-    id: number;
-    name: string;
-    date_debut: string;
-    places: string;
-}
-
 interface Props {
     type: 'formation' | 'certification';
     formation: Formation | null;
     certification: Certification | null;
-    vagues: Vague[];
-    showVagues: boolean;
 }
 
-export default function Preinscription({ type, formation, certification, vagues, showVagues }: Props) {
+export default function Preinscription({ type, formation, certification }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         type: type,
         formation_id: formation?.id || '',
         certification_id: certification?.id || '',
-        vague_id: '',
         nom: '',
         prenom: '',
         email: '',
@@ -51,6 +39,7 @@ export default function Preinscription({ type, formation, certification, vagues,
         e.preventDefault();
         post('/candidatures');
     };
+
     useEffect(() => {
         // Réinitialiser le scroll
         document.body.style.overflow = '';
@@ -130,40 +119,6 @@ export default function Preinscription({ type, formation, certification, vagues,
                                     )}
                                 </div>
 
-                                {/* Vague - UNIQUEMENT pour les formations */}
-                                {type === 'formation' && showVagues && vagues.length > 0 && (
-                                    <div>
-                                        <label htmlFor="vague_id" className="block text-sm font-medium text-gray-700 mb-1">
-                                            Vague souhaitée <span className="text-red-500">*</span>
-                                        </label>
-                                        <select
-                                            id="vague_id"
-                                            value={data.vague_id}
-                                            onChange={(e) => setData('vague_id', e.target.value)}
-                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
-                                            required
-                                        >
-                                            <option value="">-- Sélectionnez une vague --</option>
-                                            {vagues.map((vague) => (
-                                                <option key={vague.id} value={vague.id}>
-                                                    {vague.name} ({vague.date_debut}) - Places: {vague.places}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.vague_id && <p className="mt-1 text-sm text-red-600">{errors.vague_id}</p>}
-                                    </div>
-                                )}
-
-                                {/* Message pour les certifications (pas de vagues) */}
-                                {type === 'certification' && (
-                                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                                        <p className="text-sm text-green-700 flex items-start gap-2">
-                                            <span>ℹ️</span>
-                                            Cette certification est disponible en continu. Vous pouvez débuter à tout moment.
-                                        </p>
-                                    </div>
-                                )}
-
                                 {/* Nom + Prénom */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -198,10 +153,10 @@ export default function Preinscription({ type, formation, certification, vagues,
                                     </div>
                                 </div>
 
-                                {/* Email */}
+                                {/* Email (Optionnel) */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Email <span className="text-red-500">*</span>
+                                        Email <span className="text-gray-400 text-xs">(optionnel)</span>
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -214,7 +169,6 @@ export default function Preinscription({ type, formation, certification, vagues,
                                             onChange={(e) => setData('email', e.target.value)}
                                             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
                                             placeholder="exemple@email.com"
-                                            required
                                         />
                                     </div>
                                     {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}

@@ -1,7 +1,8 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import lesson from './lesson'
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +17,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +26,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +36,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +46,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +56,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +66,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::index
-* @see app/Http/Controllers/Student/CoursController.php:19
+* @see app/Http/Controllers/Student/CoursController.php:21
 * @route '/student/cours'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -187,7 +188,7 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::view
-* @see app/Http/Controllers/Student/CoursController.php:232
+* @see app/Http/Controllers/Student/CoursController.php:399
 * @route '/student/cours/{cours}/view'
 */
 export const view = (args: { cours: number | { id: number } } | [cours: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -202,7 +203,7 @@ view.definition = {
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::view
-* @see app/Http/Controllers/Student/CoursController.php:232
+* @see app/Http/Controllers/Student/CoursController.php:399
 * @route '/student/cours/{cours}/view'
 */
 view.url = (args: { cours: number | { id: number } } | [cours: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -235,7 +236,7 @@ view.url = (args: { cours: number | { id: number } } | [cours: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::view
-* @see app/Http/Controllers/Student/CoursController.php:232
+* @see app/Http/Controllers/Student/CoursController.php:399
 * @route '/student/cours/{cours}/view'
 */
 view.post = (args: { cours: number | { id: number } } | [cours: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -245,7 +246,7 @@ view.post = (args: { cours: number | { id: number } } | [cours: number | { id: n
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::view
-* @see app/Http/Controllers/Student/CoursController.php:232
+* @see app/Http/Controllers/Student/CoursController.php:399
 * @route '/student/cours/{cours}/view'
 */
 const viewForm = (args: { cours: number | { id: number } } | [cours: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -255,7 +256,7 @@ const viewForm = (args: { cours: number | { id: number } } | [cours: number | { 
 
 /**
 * @see \App\Http\Controllers\Student\CoursController::view
-* @see app/Http/Controllers/Student/CoursController.php:232
+* @see app/Http/Controllers/Student/CoursController.php:399
 * @route '/student/cours/{cours}/view'
 */
 viewForm.post = (args: { cours: number | { id: number } } | [cours: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -268,6 +269,7 @@ view.form = viewForm
 const cours = {
     index: Object.assign(index, index),
     show: Object.assign(show, show),
+    lesson: Object.assign(lesson, lesson),
     view: Object.assign(view, view),
 }
 

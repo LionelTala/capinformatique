@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 export const publicMethod = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ publicMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 publicMethod.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ publicMethod.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 publicMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ publicMethod.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 publicMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ publicMethod.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 const publicMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const publicMethodForm = (options?: RouteQueryOptions): RouteFormDefinition<'get
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 publicMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ publicMethodForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'>
 
 /**
 * @see \App\Http\Controllers\Public\FormationController::publicMethod
-* @see app/Http/Controllers/Public/FormationController.php:11
+* @see app/Http/Controllers/Public/FormationController.php:12
 * @route '/formations'
 */
 publicMethodForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

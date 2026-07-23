@@ -32,6 +32,8 @@ class ActiviteController extends Controller
                         'formatted_date' => $activite->formatted_date,
                         'lieu' => $activite->lieu,
                         'heure' => $activite->heure,
+                        'lien' => $activite->lien, // ✅ Ajouté
+                        'has_lien' => $activite->has_lien, // ✅ Ajouté
                         'is_active' => $activite->is_active,
                         'status' => $activite->status,
                         'status_color' => $activite->status_color,
@@ -78,6 +80,7 @@ class ActiviteController extends Controller
                 'date' => 'required|date',
                 'lieu' => 'nullable|string|max:255',
                 'heure' => 'nullable|string|max:255',
+                'lien' => 'nullable|url|max:500', // ✅ Ajouté
                 'is_active' => 'boolean',
                 'ordre' => 'integer|min:0',
             ]);
@@ -97,6 +100,7 @@ class ActiviteController extends Controller
                 'date' => $validated['date'],
                 'lieu' => $validated['lieu'] ?? null,
                 'heure' => $validated['heure'] ?? null,
+                'lien' => $validated['lien'] ?? null, // ✅ Ajouté
                 'is_active' => $validated['is_active'] ?? true,
                 'ordre' => $validated['ordre'] ?? 0,
             ]);
@@ -136,6 +140,8 @@ class ActiviteController extends Controller
                 'date' => $activite->date->format('Y-m-d'),
                 'lieu' => $activite->lieu,
                 'heure' => $activite->heure,
+                'lien' => $activite->lien, // ✅ Ajouté
+                'has_lien' => $activite->has_lien, // ✅ Ajouté
                 'is_active' => $activite->is_active,
                 'ordre' => $activite->ordre,
             ],
@@ -154,6 +160,7 @@ class ActiviteController extends Controller
                 'date' => 'required|date',
                 'lieu' => 'nullable|string|max:255',
                 'heure' => 'nullable|string|max:255',
+                'lien' => 'nullable|url|max:500', // ✅ Ajouté
                 'is_active' => 'boolean',
                 'ordre' => 'integer|min:0',
             ]);
@@ -174,6 +181,7 @@ class ActiviteController extends Controller
                 'date' => $validated['date'],
                 'lieu' => $validated['lieu'] ?? null,
                 'heure' => $validated['heure'] ?? null,
+                'lien' => $validated['lien'] ?? null, // ✅ Ajouté
                 'is_active' => $validated['is_active'] ?? true,
                 'ordre' => $validated['ordre'] ?? 0,
             ]);

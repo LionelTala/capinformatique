@@ -24,6 +24,7 @@ use App\Http\Controllers\Student\EvaluationController as StudentEvaluationContro
 use App\Http\Controllers\Admin\GalerieController;
 use App\Http\Controllers\Public\GalerieController as PublicGalerieController;
 use App\Http\Controllers\Admin\ActiviteController;
+use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\LivreController;
 use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\PreInscriptionController;
@@ -66,8 +67,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-     Route::resource('/formations', FormationController::class);
-    Route::post('/formations/{formation}/toggle-active', [FormationController::class, 'toggleActive'])->name('formations.toggle-active');
+Route::get('/formations', [FormationController::class, 'index'])->name('formations.index');
+Route::get('/formations/create', [FormationController::class, 'create'])->name('formations.create');
+Route::get('/formations/create-presentiel', [FormationController::class, 'createPresentiel'])->name('formations.create-presentiel');
+Route::post('/formations', [FormationController::class, 'store'])->name('formations.store');
+Route::get('/formations/{id}/edit', [FormationController::class, 'edit'])->name('formations.edit');
+Route::get('/formations/{id}/edit-presentiel', [FormationController::class, 'editPresentiel'])->name('formations.edit-presentiel');
+Route::match(['post', 'put'], '/formations/{id}', [FormationController::class, 'update'])->name('formations.update');
+Route::delete('/formations/{id}', [FormationController::class, 'destroy'])->name('formations.destroy');
+Route::post('/formations/{id}/toggle-active', [FormationController::class, 'toggleActive'])->name('formations.toggle-active');
     // routes/web.php - Ajouter dans le groupe admin
     Route::resource('/certifications', CertificationController::class);
     Route::post('/certifications/{certification}/toggle-active', [CertificationController::class, 'toggleActive'])->name('certifications.toggle-active');
@@ -237,6 +245,26 @@ Route::post('/galerie/{galerie}/toggle-active', [GalerieController::class, 'togg
 Route::put('/pre-inscriptions/{preInscription}', [PreInscriptionController::class, 'update'])->name('pre-inscriptions.update');
 Route::delete('/pre-inscriptions/{preInscription}', [PreInscriptionController::class, 'destroy'])->name('pre-inscriptions.destroy');
 
+
+ // lecon
+
+Route::post('/cours/{cours}/lessons', [LessonController::class, 'store'])->name('lessons.store');
+
+// Détails d'une leçon
+Route::get('/cours/lesson/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
+
+// Édition d'une leçon
+Route::get('/cours/lesson/{lesson}/edit', [LessonController::class, 'edit'])->name('lessons.edit');
+
+// Mise à jour d'une leçon (POST pour multipart/form-data)
+Route::match(['post', 'put'], '/cours/lesson/{lesson}', [LessonController::class, 'update'])->name('lessons.update');
+
+// Suppression d'une leçon
+Route::delete('/cours/lesson/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
+
+// Activer/Désactiver une leçon
+Route::post('/cours/lesson/{lesson}/toggle-active', [LessonController::class, 'toggleActive'])->name('lessons.toggle-active');
+
 });
 
 
@@ -246,6 +274,9 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
        Route::get('/cours', [StudentCoursController::class, 'index'])->name('cours.index');
        Route::get('/cours/{cours}', [StudentCoursController::class, 'show'])->name('cours.show');
+
+       Route::get('/cours/lesson/{lesson}', [StudentCoursController::class, 'showLesson'])->name('cours.lesson.show');
+    Route::post('/cours/lesson/{lesson}/view', [StudentCoursController::class, 'markLessonAsViewed'])->name('cours.lesson.view');
 
     // Marquer un cours comme vu
     Route::post('/cours/{cours}/view', [StudentCoursController::class, 'markAsViewed'])->name('cours.view');

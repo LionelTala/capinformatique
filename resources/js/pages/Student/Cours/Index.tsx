@@ -9,6 +9,7 @@ import {
     LockClosedIcon,
     LockOpenIcon,
     ExclamationTriangleIcon,
+    AcademicCapIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link } from '@inertiajs/react';
 import StudentLayout from '@/Components/Layouts/StudentLayout';
@@ -30,9 +31,10 @@ interface Cours {
     tranche_requise: {
         numero: number;
         montant: number;
-        lien : string;
+        lien: string;
     } | null;
     est_verrouille: boolean;
+    lessons_count: number; // ✅ Maintenant requis
 }
 
 interface Props {
@@ -100,6 +102,13 @@ export default function Index({ cours, stats }: Props) {
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs">
                                                         Verrouillé
                                                     </span>
+                                                    {/* ✅ Nombre de leçons */}
+                                                    {c.lessons_count > 0 && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-xs">
+                                                            <AcademicCapIcon className="w-3 h-3" />
+                                                            {c.lessons_count} leçon{c.lessons_count > 1 ? 's' : ''}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">{c.formation?.name}</p>
                                                 {c.description && (
@@ -132,24 +141,24 @@ export default function Index({ cours, stats }: Props) {
                                                     )}
                                                 </div>
                                             </div>
-                                            {
-                                                c.tranche_requise?.lien ?(
-                                                    <div className="shrink-0 mt-1">
-                                                        <Link
-                                                            href={c.tranche_requise.lien}
-                                                            className="inline-flex items-center gap-1 px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-medium hover:bg-cab-dark transition-colors"
-                                                        >
-                                                            <LockOpenIcon className="w-4 h-4" />
-                                                            Débloquer
-                                                        </Link>
-                                                    </div>
-                                               ) : (
+                                            {c.tranche_requise?.lien ? (
+                                                <div className="shrink-0 mt-1">
+                                                    <a
+                                                        href={c.tranche_requise.lien}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-medium hover:bg-cab-dark transition-colors"
+                                                    >
+                                                        <LockOpenIcon className="w-4 h-4" />
+                                                        Débloquer
+                                                    </a>
+                                                </div>
+                                            ) : (
                                                 <span className="inline-flex items-center gap-1 px-4 py-2 bg-gray-200 text-gray-500 rounded-xl text-sm font-medium shrink-0 mt-1 cursor-not-allowed">
                                                     <LockOpenIcon className="w-4 h-4" />
                                                     Lien indisponible
                                                 </span>
                                             )}
-
                                         </div>
                                     </div>
                                 );
@@ -175,6 +184,13 @@ export default function Index({ cours, stats }: Props) {
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs">
                                                         <ClockIcon className="w-3 h-3" />
                                                         Non vu
+                                                    </span>
+                                                )}
+                                                {/* ✅ Nombre de leçons */}
+                                                {c.lessons_count > 0 && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
+                                                        <AcademicCapIcon className="w-3 h-3" />
+                                                        {c.lessons_count} leçon{c.lessons_count > 1 ? 's' : ''}
                                                     </span>
                                                 )}
                                             </div>

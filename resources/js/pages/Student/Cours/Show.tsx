@@ -7,10 +7,29 @@ import {
     LockClosedIcon,
     LockOpenIcon,
     ExclamationTriangleIcon,
+    BookOpenIcon,
+    EyeIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import StudentLayout from '@/Components/Layouts/StudentLayout';
+
+interface Lesson {
+    id: number;
+    titre: string;
+    description: string | null;
+    contenu: string | null;
+    video_url: string | null;
+    video_title: string | null;
+    video_embed_url: string | null;
+    has_video: boolean;
+    has_files: boolean;
+    files: any[];
+    order: number;
+    vu: boolean;
+    viewed_at: string | null;
+    created_at: string;
+}
 
 interface Cours {
     id: number;
@@ -35,6 +54,7 @@ interface Cours {
         lien: string;
     } | null;
     est_verrouille: boolean;
+    lessons: Lesson[]; // ✅ Nouveau champ
 }
 
 interface Props {
@@ -135,6 +155,7 @@ export default function Show({ cours }: Props) {
                         Retour à mes cours
                     </Link>
 
+                    {/* En-tête du cours */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                         <div className="flex items-start justify-between">
                             <div>
@@ -170,7 +191,80 @@ export default function Show({ cours }: Props) {
                         </div>
                     )}
 
-                    {/* ✅ VIDÉO - Lecteur propre sans marque YouTube */}
+                    {/* ✅ LEÇONS DU COURS */}
+                    {cours.lessons && cours.lessons.length > 0 && (
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                            <div className="p-4 border-b border-gray-100 bg-gray-50">
+                                <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                    <BookOpenIcon className="w-5 h-5 text-cab-blue" />
+                                    Leçons du cours ({cours.lessons.length})
+                                </h2>
+                            </div>
+                            <div className="divide-y divide-gray-100">
+                                {cours.lessons.map((lesson, index) => (
+                                    <div key={lesson.id} className="p-4 hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-gray-400 w-6">
+                                                        {String(lesson.order || index + 1).padStart(2, '0')}.
+                                                    </span>
+                                                    <Link
+                                                        href={`/student/cours/lesson/${lesson.id}`}
+                                                        className="text-sm font-medium text-gray-900 hover:text-cab-blue transition-colors"
+                                                    >
+                                                        {lesson.titre}
+                                                    </Link>
+                                                    {lesson.vu ? (
+                                                        <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                                                            ✅ Vu
+                                                        </span>
+                                                    ) : (
+                                                        <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs">
+                                                            Non vu
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {lesson.description && (
+                                                    <p className="text-xs text-gray-500 ml-8 mt-0.5 line-clamp-1">
+                                                        {lesson.description}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center gap-3 ml-8 mt-1">
+                                                    {lesson.has_video && (
+                                                        <span className="flex items-center gap-1 text-xs text-red-500">
+                                                            <VideoCameraIcon className="w-3 h-3" />
+                                                            Vidéo
+                                                        </span>
+                                                    )}
+                                                    {lesson.has_files && (
+                                                        <span className="flex items-center gap-1 text-xs text-blue-500">
+                                                            <DocumentIcon className="w-3 h-3" />
+                                                            Fichiers
+                                                        </span>
+                                                    )}
+                                                    {lesson.viewed_at && (
+                                                        <span className="text-xs text-gray-400">
+                                                            Vu le {lesson.viewed_at}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <Link
+                                                href={`/student/cours/lesson/${lesson.id}`}
+                                                className="px-3 py-1.5 text-sm text-cab-blue hover:bg-blue-50 rounded-lg transition-colors font-medium flex items-center gap-1"
+                                            >
+                                                <EyeIcon className="w-4 h-4" />
+                                                Voir
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Vidéo du cours */}
                     {cours.video_url && cours.video_embed_url && (
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
                             <div className="p-4 border-b border-gray-100 bg-gray-50">
@@ -188,18 +282,13 @@ export default function Show({ cours }: Props) {
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
                                         title={cours.video_title || cours.titre}
-                                        // ✅ Paramètres YouTube pour un lecteur propre
-                                        // rel=0 : pas de vidéos suggérées
-                                        // modestbranding=1 : pas de logo YouTube
-                                        // showinfo=0 : pas d'infos
-                                        // controls=1 : contrôles visibles
                                     />
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* ⚠️ Si la vidéo n'a pas d'embed URL, afficher juste le lien (fallback) */}
+                    {/* ⚠️ Si la vidéo n'a pas d'embed URL */}
                     {cours.video_url && !cours.video_embed_url && (
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                             <div className="flex items-center gap-3 text-yellow-600 bg-yellow-50 rounded-xl p-4 border border-yellow-200">

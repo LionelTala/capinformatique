@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-         
+
 
         $activites = Activite::where('is_active', true)
             ->orderBy('date')
@@ -23,6 +23,7 @@ class HomeController extends Controller
                     'image_url' => $activite->image_url,
                     'tag' => $activite->tag,
                     'formatted_date' => $activite->formatted_date,
+                    'lien' => $activite->lien,
                 ];
             });
 

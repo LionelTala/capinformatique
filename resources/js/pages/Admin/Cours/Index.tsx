@@ -1,4 +1,3 @@
-// resources/js/pages/Admin/Cours/Index.tsx
 import {
     PlusIcon,
     PencilSquareIcon,
@@ -10,6 +9,10 @@ import {
     VideoCameraIcon,
     UserGroupIcon,
     UserIcon,
+    MagnifyingGlassIcon,
+    FunnelIcon,
+    XMarkIcon,
+    AcademicCapIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -26,12 +29,13 @@ interface Cours {
     has_video: boolean;
     has_files: boolean;
     total_students: number;
-    mode_envoi: 'groupe' | 'individuel'; // ✅ Ajouté
+    lessons_count: number;
+    mode_envoi: 'groupe' | 'individuel';
     tranche_requise: {
         id: number;
         numero: number;
         montant: number;
-    } | null; // ✅ Ajouté
+    } | null;
     formation: {
         id: number;
         name: string;
@@ -48,6 +52,20 @@ interface Cours {
     notification_sent: boolean;
 }
 
+interface Formation {
+    id: number;
+    name: string;
+    abbreviation: string;
+}
+
+interface Stats {
+    total: number;
+    actifs: number;
+    inactifs: number;
+    vague: number;
+    certification: number;
+}
+
 interface Props {
     cours: {
         data: Cours[];
@@ -56,10 +74,22 @@ interface Props {
         to: number | null;
         total: number;
     };
+    formations: Formation[];
+    stats: Stats;
+    filters: {
+        search: string | null;
+        formation_id: string | null;
+    };
+    sort: {
+        field: string;
+        direction: string;
+    };
 }
 
-export default function Index({ cours }: Props) {
-    const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
+export default function Index({ cours, formations, stats, filters, sort }: Props) {
+    const [showFilters, setShowFilters] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const [selectedFormation, setSelectedFormation] = useState(filters.formation_id || '');
 
     const handleToggleActive = (c: Cours) => {
         if (confirm(`Confirmer la ${c.is_active ? 'désactivation' : 'activation'} du cours "${c.titre}" ?`)) {
@@ -79,24 +109,141 @@ export default function Index({ cours }: Props) {
         }
     };
 
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        applyFilters();
+    };
+
+    const applyFilters = () => {
+        const params = new URLSearchParams();
+        if (searchTerm) params.set('search', searchTerm);
+        if (selectedFormation) params.set('formation_id', selectedFormation);
+        if (sort.field) params.set('sort', sort.field);
+        if (sort.direction) params.set('direction', sort.direction);
+
+        router.get('/admin/cours', params.toString() ? '?' + params.toString() : '');
+    };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        setSelectedFormation('');
+        router.get('/admin/cours');
+    };
+
+    const statsCards = [
+        { label: 'Total', value: stats.total, color: 'bg-blue-500' },
+        { label: 'Actifs', value: stats.actifs, color: 'bg-green-500' },
+        { label: 'Inactifs', value: stats.inactifs, color: 'bg-gray-500' },
+        { label: 'Vagues', value: stats.vague, color: 'bg-purple-500' },
+        { label: 'Certifications', value: stats.certification, color: 'bg-orange-500' },
+    ];
+
     return (
         <>
             <Head title="Gestion des cours - Admin" />
 
             <AdminLayout title="Gestion des cours">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                    <p className="text-sm text-gray-500">
-                        {cours.total} cours au total
-                    </p>
-                    <Link
-                        href="/admin/cours/create"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
-                    >
-                        <PlusIcon className="w-5 h-5" />
-                        Nouveau cours
-                    </Link>
+                {/* Statistiques */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                    {statsCards.map((stat) => (
+                        <div
+                            key={stat.label}
+                            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+                                    <p className="text-2xl font-bold text-gray-900 mt-0.5">{stat.value}</p>
+                                </div>
+                                <div className={`${stat.color} w-10 h-10 rounded-xl flex items-center justify-center text-white`}>
+                                    <BookOpenIcon className="w-5 h-5" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
+                {/* Barre de recherche et filtre par formation */}
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+                    <div className="flex flex-wrap gap-3 items-center">
+                        <form onSubmit={handleSearch} className="flex-1 min-w-[200px]">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Rechercher un cours..."
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors text-sm"
+                                />
+                            </div>
+                        </form>
+
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        >
+                            <FunnelIcon className="w-4 h-4" />
+                            Filtres
+                            {filters.formation_id && (
+                                <span className="w-2 h-2 bg-cab-blue rounded-full"></span>
+                            )}
+                        </button>
+
+                        {(filters.formation_id || filters.search) && (
+                            <button
+                                onClick={clearFilters}
+                                className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors flex items-center gap-1"
+                            >
+                                <XMarkIcon className="w-4 h-4" />
+                                Effacer
+                            </button>
+                        )}
+
+                        <Link
+                            href="/admin/cours/create"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
+                        >
+                            <PlusIcon className="w-5 h-5" />
+                            Nouveau cours
+                        </Link>
+                    </div>
+
+                    {showFilters && (
+                        <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Formation</label>
+                                <select
+                                    value={selectedFormation}
+                                    onChange={(e) => setSelectedFormation(e.target.value)}
+                                    className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors bg-white"
+                                >
+                                    <option value="">Toutes les formations</option>
+                                    {formations.map((f) => (
+                                        <option key={f.id} value={f.id}>
+                                            {f.name} ({f.abbreviation})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
+                    {showFilters && (
+                        <div className="mt-3 flex justify-end">
+                            <button
+                                onClick={applyFilters}
+                                className="px-4 py-2 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-colors"
+                            >
+                                Appliquer le filtre
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Tableau */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     {cours.data.length === 0 ? (
                         <div className="text-center py-12">
@@ -121,10 +268,13 @@ export default function Index({ cours }: Props) {
                                             Formation
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Type
+                                        </th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Envoi
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Tranche requise
+                                            Leçons
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Vues
@@ -163,6 +313,15 @@ export default function Index({ cours }: Props) {
                                                 {c.formation?.name || '-'}
                                             </td>
                                             <td className="px-4 py-3">
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                    c.type === 'vague'
+                                                        ? 'bg-blue-100 text-blue-700'
+                                                        : 'bg-purple-100 text-purple-700'
+                                                }`}>
+                                                    {c.type === 'vague' ? 'Vague' : 'Certification'}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
                                                     c.mode_envoi === 'individuel'
                                                         ? 'bg-purple-100 text-purple-700'
@@ -176,14 +335,11 @@ export default function Index({ cours }: Props) {
                                                     {c.mode_envoi === 'individuel' ? 'Individuel' : 'Groupe'}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                {c.tranche_requise ? (
-                                                    <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">
-                                                        T{c.tranche_requise.numero}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-xs text-gray-400">Tous</span>
-                                                )}
+                                            <td className="px-4 py-3 text-center">
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                                    <AcademicCapIcon className="w-3 h-3" />
+                                                    {c.lessons_count}
+                                                </span>
                                             </td>
                                             <td className="px-4 py-3 text-gray-600 text-sm">
                                                 {c.viewed_count} / {c.total_students}
@@ -274,12 +430,14 @@ export default function Index({ cours }: Props) {
                 </div>
 
                 {/* Pagination */}
-                <Pagination
-                    links={cours.links}
-                    from={cours.from}
-                    to={cours.to}
-                    total={cours.total}
-                />
+                <div className="mt-4">
+                    <Pagination
+                        links={cours.links}
+                        from={cours.from}
+                        to={cours.to}
+                        total={cours.total}
+                    />
+                </div>
             </AdminLayout>
         </>
     );

@@ -194,7 +194,7 @@ class CandidatureController extends Controller
     }
 
     // Accepter une candidature → Création du compte étudiant
-    public function accepter(Candidature $candidature)
+public function accepter(Candidature $candidature)
 {
     try {
         if ($candidature->statut !== 'en_attente' && $candidature->statut !== 'en_cours') {
@@ -226,12 +226,20 @@ class CandidatureController extends Controller
             }
         }
 
-        // ✅ Vérifier si un compte existe déjà
-        $existingUser = User::where('email', $candidature->email)->first();
+        // ✅ Vérifier si un compte existe déjà avec cet email OU ce téléphone
+        $existingUser = null;
+        if ($candidature->email) {
+            $existingUser = User::where('email', $candidature->email)->first();
+        }
+
+        if (!$existingUser && $candidature->telephone) {
+            $existingUser = User::where('telephone', $candidature->telephone)->first();
+        }
 
         if ($existingUser) {
+            $identifiant = $existingUser->email ?? $existingUser->telephone;
             return redirect()->back()
-                ->with('error', "❌ Un compte existe déjà avec l'email {$candidature->email}.");
+                ->with('error', "❌ Un compte existe déjà avec l'identifiant {$identifiant}.");
         }
 
         $result = DB::transaction(function () use ($candidature) {
@@ -253,14 +261,25 @@ class CandidatureController extends Controller
             // 2. Générer le username
             $username = $this->genererUsername($candidature->prenom, $candidature->nom);
 
-            // 3. Créer l'utilisateur
-            $user = User::create([
+            // ✅ 3. Créer l'utilisateur (avec email OU telephone)
+            $userData = [
                 'name' => $username,
-                'email' => $candidature->email,
                 'password' => Hash::make($matricule),
                 'role' => $role,
                 'is_active' => true,
-            ]);
+            ];
+
+            // ✅ Si email existe, l'ajouter
+            if ($candidature->email) {
+                $userData['email'] = $candidature->email;
+            }
+
+            // ✅ Si telephone existe, l'ajouter
+            if ($candidature->telephone) {
+                $userData['telephone'] = $candidature->telephone;
+            }
+
+            $user = User::create($userData);
 
             // ✅ 4. Créer l'étudiant AVEC vague_id ou certification_id
             $studentData = [
@@ -272,7 +291,7 @@ class CandidatureController extends Controller
                 'school_level' => $candidature->niveau_scolaire,
             ];
 
-            // ✅ AJOUT CRUCIAL : Assigner la vague ou la certification
+            // ✅ Assigner la vague ou la certification
             if ($candidature->type === 'formation' && $candidature->vague_id) {
                 $studentData['vague_id'] = $candidature->vague_id;
                 Log::info('Assignation vague', [
@@ -286,7 +305,6 @@ class CandidatureController extends Controller
                     'certification_id' => $candidature->certification_id,
                 ]);
             } else {
-                // 🔴 Si ni vague ni certification, on log l'erreur
                 Log::error('Étudiant créé sans affectation', [
                     'candidature_id' => $candidature->id,
                     'type' => $candidature->type,
@@ -323,6 +341,8 @@ class CandidatureController extends Controller
                 'type' => $candidature->type,
                 'student_id' => $student->id,
                 'matricule' => $matricule,
+                'email' => $candidature->email,
+                'telephone' => $candidature->telephone,
                 'vague_id' => $candidature->vague_id,
                 'certification_id' => $candidature->certification_id,
                 'admin_id' => auth()->id(),
@@ -336,8 +356,11 @@ class CandidatureController extends Controller
             ];
         });
 
+        $identifiant = $result['user']->email ?? $result['user']->telephone;
+        $message = "✅ Candidature de {$candidature->nom_complet} acceptée ! Compte créé avec matricule {$result['matricule']}.";
+
         return redirect()->route('admin.candidatures.index')
-            ->with('success', "✅ Candidature de {$candidature->nom_complet} acceptée ! Compte créé avec matricule {$result['matricule']}.");
+            ->with('success', $message);
 
     } catch (\Exception $e) {
         Log::error('Erreur acceptation candidature', [

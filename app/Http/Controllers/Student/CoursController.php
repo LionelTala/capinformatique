@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Cours;
 use App\Models\CoursVue;
 use App\Models\CoursNotification;
+use App\Models\Lesson;
+use App\Models\LessonVue;
 use App\Models\Student;
 use App\Models\Tranche;
 use App\Models\PaiementTranche;
@@ -33,7 +35,6 @@ class CoursController extends Controller
                 'certification_id' => $student->certification_id,
             ]);
 
-            // ✅ Récupérer tous les cours de la formation/certification
             $allCours = Cours::where('is_active', true)
                 ->where(function ($query) use ($student) {
                     if ($student->vague_id) {
@@ -56,16 +57,13 @@ class CoursController extends Controller
                 'total' => $allCours->count()
             ]);
 
-            // ✅ Transformer les cours avec statut d'accès
             $coursList = $allCours->map(function ($c) use ($student) {
                 $vue = CoursVue::where('cours_id', $c->id)
                     ->where('student_id', $student->id)
                     ->first();
 
-                // ✅ Vérifier si l'étudiant peut accéder au contenu
                 $peutAcceder = $student->peutAccederContenu($c->tranche_requise_id);
 
-                // ✅ Récupérer les infos de la tranche requise si elle existe
                 $trancheInfo = null;
                 if ($c->tranche_requise_id) {
                     $tranche = Tranche::find($c->tranche_requise_id);
@@ -78,6 +76,9 @@ class CoursController extends Controller
                         ];
                     }
                 }
+
+                // ✅ Compter les leçons
+                $lessonsCount = $c->lessons()->where('is_active', true)->count();
 
                 return [
                     'id' => $c->id,
@@ -92,14 +93,13 @@ class CoursController extends Controller
                         'id' => $c->formation_id,
                         'name' => $c->formation?->name,
                     ],
-                    // ✅ Nouveaux champs pour le blocage
                     'est_accessible' => $peutAcceder,
                     'tranche_requise' => $trancheInfo,
                     'est_verrouille' => !$peutAcceder && $trancheInfo !== null,
+                    'lessons_count' => $lessonsCount, // ✅ Nouveau champ
                 ];
             });
 
-            // ✅ Statistiques
             $stats = [
                 'total' => $coursList->count(),
                 'viewed' => $coursList->filter(fn($c) => $c['viewed'])->count(),
@@ -126,7 +126,7 @@ class CoursController extends Controller
         }
     }
 
-    // ✅ Détail d'un cours avec vérification d'accès
+    // ✅ Détail d'un cours avec ses leçons
     public function show(Cours $cours)
     {
         try {
@@ -143,7 +143,6 @@ class CoursController extends Controller
                 'cours_titre' => $cours->titre,
             ]);
 
-            // ✅ Vérifier que l'étudiant a accès à ce cours
             $hasAccess = false;
             if ($cours->type === 'vague' && $student->vague_id === $cours->vague_id) {
                 $hasAccess = true;
@@ -163,10 +162,8 @@ class CoursController extends Controller
                 abort(403, '❌ Vous n\'avez pas accès à ce cours.');
             }
 
-            // ✅ Vérifier l'accès par tranche
             $peutAcceder = $student->peutAccederContenu($cours->tranche_requise_id);
 
-            // ✅ Récupérer les infos de la tranche requise
             $trancheInfo = null;
             if ($cours->tranche_requise_id) {
                 $tranche = Tranche::find($cours->tranche_requise_id);
@@ -180,15 +177,43 @@ class CoursController extends Controller
                 }
             }
 
-            // ✅ Vérifier si déjà vu
             $vue = CoursVue::where('cours_id', $cours->id)
                 ->where('student_id', $student->id)
                 ->first();
+
+            // ✅ Charger les leçons actives du cours avec leur statut de visionnage
+            $lessons = $cours->lessons()
+                ->where('is_active', true)
+                ->orderBy('order')
+                ->get()
+                ->map(function ($lesson) use ($student) {
+                    $vue = LessonVue::where('lesson_id', $lesson->id)
+                        ->where('student_id', $student->id)
+                        ->first();
+
+                    return [
+                        'id' => $lesson->id,
+                        'titre' => $lesson->titre,
+                        'description' => $lesson->description,
+                        'contenu' => $lesson->contenu,
+                        'video_url' => $lesson->video_url,
+                        'video_title' => $lesson->video_title,
+                        'video_embed_url' => $lesson->video_embed_url,
+                        'has_video' => $lesson->has_video,
+                        'has_files' => $lesson->has_files,
+                        'files' => $lesson->files,
+                        'order' => $lesson->order,
+                        'vu' => $vue !== null,
+                        'viewed_at' => $vue ? $vue->viewed_at->format('d/m/Y H:i') : null,
+                        'created_at' => $lesson->created_at->format('d/m/Y'),
+                    ];
+                });
 
             Log::info('✅ [Student] Cours affiché', [
                 'cours_id' => $cours->id,
                 'est_accessible' => $peutAcceder,
                 'deja_vu' => $vue !== null,
+                'lessons_count' => $lessons->count(),
             ]);
 
             return Inertia::render('Student/Cours/Show', [
@@ -208,10 +233,10 @@ class CoursController extends Controller
                         'id' => $cours->formation_id,
                         'name' => $cours->formation?->name,
                     ],
-                    // ✅ Nouveaux champs
                     'est_accessible' => $peutAcceder,
                     'tranche_requise' => $trancheInfo,
                     'est_verrouille' => !$peutAcceder && $trancheInfo !== null,
+                    'lessons' => $lessons, // ✅ Ajout des leçons
                 ],
             ]);
 
@@ -225,6 +250,148 @@ class CoursController extends Controller
 
             return redirect()->route('student.cours')
                 ->with('error', '❌ Une erreur est survenue.');
+        }
+    }
+
+    // ✅ Afficher une leçon spécifique
+    public function showLesson(Lesson $lesson)
+    {
+        try {
+            $user = auth()->user();
+            $student = $user->student;
+
+            if (!$student) {
+                return redirect()->back()->with('error', '❌ Aucun profil étudiant trouvé.');
+            }
+
+            $cours = $lesson->cours;
+
+            // ✅ Vérifier que l'étudiant a accès au cours parent
+            $hasAccess = false;
+            if ($cours->type === 'vague' && $student->vague_id === $cours->vague_id) {
+                $hasAccess = true;
+            }
+            if ($cours->type === 'certification' && $student->certification_id === $cours->certification_id) {
+                $hasAccess = true;
+            }
+
+            if (!$hasAccess) {
+                abort(403, '❌ Vous n\'avez pas accès à ce contenu.');
+            }
+
+            // ✅ Vérifier l'accès par tranche (hérité du cours)
+            $peutAcceder = $student->peutAccederContenu($cours->tranche_requise_id);
+            if (!$peutAcceder) {
+                abort(403, '❌ Vous devez payer la tranche requise pour accéder à cette leçon.');
+            }
+
+            // ✅ Vérifier si la leçon est active
+            if (!$lesson->is_active) {
+                abort(404, '❌ Cette leçon n\'est pas disponible.');
+            }
+
+            // ✅ Vérifier si déjà vu
+            $vue = LessonVue::where('lesson_id', $lesson->id)
+                ->where('student_id', $student->id)
+                ->first();
+
+            Log::info('👁️ [Student] Affichage leçon', [
+                'student_id' => $student->id,
+                'lesson_id' => $lesson->id,
+                'lesson_titre' => $lesson->titre,
+                'deja_vu' => $vue !== null,
+            ]);
+
+            return Inertia::render('Student/Cours/ShowLesson', [
+                'lesson' => [
+                    'id' => $lesson->id,
+                    'titre' => $lesson->titre,
+                    'description' => $lesson->description,
+                    'contenu' => $lesson->contenu,
+                    'video_url' => $lesson->video_url,
+                    'video_title' => $lesson->video_title,
+                    'video_embed_url' => $lesson->video_embed_url,
+                    'has_video' => $lesson->has_video,
+                    'has_files' => $lesson->has_files,
+                    'files' => $lesson->files,
+                    'order' => $lesson->order,
+                    'vu' => $vue !== null,
+                    'viewed_at' => $vue ? $vue->viewed_at->format('d/m/Y H:i') : null,
+                    'created_at' => $lesson->created_at->format('d/m/Y'),
+                    'cours' => [
+                        'id' => $cours->id,
+                        'titre' => $cours->titre,
+                        'formation' => [
+                            'name' => $cours->formation?->name,
+                        ],
+                    ],
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ [Student] Erreur affichage leçon', [
+                'lesson_id' => $lesson->id,
+                'user_id' => auth()->id(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('student.cours')
+                ->with('error', '❌ Une erreur est survenue.');
+        }
+    }
+
+    // ✅ Marquer une leçon comme vue
+    public function markLessonAsViewed(Lesson $lesson)
+    {
+        try {
+            $student = auth()->user()->student;
+
+            if (!$student) {
+                return response()->json(['error' => 'Étudiant non trouvé'], 404);
+            }
+
+            $cours = $lesson->cours;
+
+            // ✅ Vérifier l'accès
+            $hasAccess = false;
+            if ($cours->type === 'vague' && $student->vague_id === $cours->vague_id) {
+                $hasAccess = true;
+            }
+            if ($cours->type === 'certification' && $student->certification_id === $cours->certification_id) {
+                $hasAccess = true;
+            }
+
+            if ($hasAccess) {
+                $hasAccess = $student->peutAccederContenu($cours->tranche_requise_id);
+            }
+
+            if (!$hasAccess) {
+                return response()->json(['error' => 'Accès non autorisé'], 403);
+            }
+
+            // ✅ Marquer comme vu
+            $vue = LessonVue::firstOrCreate([
+                'lesson_id' => $lesson->id,
+                'student_id' => $student->id,
+            ], [
+                'viewed_at' => now(),
+            ]);
+
+            Log::info('✅ [Student] Leçon marquée comme vue', [
+                'lesson_id' => $lesson->id,
+                'student_id' => $student->id,
+            ]);
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ [Student] Erreur marquage leçon vue', [
+                'lesson_id' => $lesson->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 

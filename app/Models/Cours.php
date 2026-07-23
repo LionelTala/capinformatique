@@ -110,6 +110,10 @@ public function getNotViewedStudentsAttribute()
     {
         return $this->notifications()->where('is_read', false)->get();
     }
+    public function lessons()
+    {
+        return $this->hasMany(Lesson::class)->orderBy('order');
+    }
 
     public function getIsVideoAttribute(): bool
     {

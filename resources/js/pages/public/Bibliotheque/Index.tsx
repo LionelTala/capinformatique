@@ -1,7 +1,7 @@
 // resources/js/pages/public/Bibliotheque/Index.tsx
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { BookOpenIcon, MagnifyingGlassIcon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, MagnifyingGlassIcon, XMarkIcon, ShoppingBagIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 import PublicLayout from '@/Components/PublicLayout';
 
@@ -24,12 +24,31 @@ interface Props {
 
 export default function Index({ livres, filters }: Props) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         const params = new URLSearchParams();
         if (searchTerm) params.set('search', searchTerm);
         router.get(`/bibliotheque${params.toString() ? '?' + params.toString() : ''}`);
+    };
+
+    const toggleDescription = (livreId: number) => {
+        setExpandedDescriptions((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(livreId)) {
+                newSet.delete(livreId);
+            } else {
+                newSet.add(livreId);
+            }
+            return newSet;
+        });
+    };
+
+    // Fonction pour tronquer le texte
+    const truncateText = (text: string, maxLength: number = 100) => {
+        if (text.length <= maxLength) return text;
+        return text.slice(0, maxLength) + '...';
     };
 
     return (
@@ -92,39 +111,75 @@ export default function Index({ livres, filters }: Props) {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {livres.data.map((livre) => (
-                                    <div key={livre.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-                                        <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
-                                            {livre.image_url ? (
-                                                <img src={livre.image_url} alt={livre.titre} className="w-full h-full object-cover" loading="lazy" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <BookOpenIcon className="w-16 h-16 text-gray-300" />
-                                                </div>
-                                            )}
-                                            {livre.prix && (
-                                                <div className="absolute top-3 right-3 bg-[#1a56db] text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                                    {Number(livre.prix).toLocaleString()} FCFA
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-5">
-                                            <h3 className="font-bold text-gray-900 mb-2">{livre.titre}</h3>
-                                            <p className="text-sm text-gray-600 line-clamp-3 mb-4">{livre.description}</p>
-                                            {livre.lien_achat && (
+                                {livres.data.map((livre) => {
+                                    const isExpanded = expandedDescriptions.has(livre.id);
+                                    const descriptionLength = livre.description?.length || 0;
+                                    const shouldTruncate = descriptionLength > 100;
 
-                                                <a    href={livre.lien_achat}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#1a56db] text-white rounded-xl text-sm font-semibold hover:bg-[#0d2a63] transition-colors"
-                                                >
-                                                    <ShoppingBagIcon className="w-4 h-4" />
-                                                    Acheter ce livre
-                                                </a>
-                                            )}
+                                    return (
+                                        <div key={livre.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
+                                            <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
+                                                {livre.image_url ? (
+                                                    <img src={livre.image_url} alt={livre.titre} className="w-full h-full object-cover" loading="lazy" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <BookOpenIcon className="w-16 h-16 text-gray-300" />
+                                                    </div>
+                                                )}
+                                                {livre.prix && (
+                                                    <div className="absolute top-3 right-3 bg-[#1a56db] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                                        {Number(livre.prix).toLocaleString()} FCFA
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-5 flex flex-col flex-1">
+                                                <h3 className="font-bold text-gray-900 mb-2">{livre.titre}</h3>
+
+                                                {/* ✅ Description avec déroulement */}
+                                                <div className="flex-1">
+                                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                                        {isExpanded || !shouldTruncate
+                                                            ? livre.description
+                                                            : truncateText(livre.description, 100)
+                                                        }
+                                                    </p>
+                                                    {shouldTruncate && (
+                                                        <button
+                                                            onClick={() => toggleDescription(livre.id)}
+                                                            className="mt-1 text-sm text-[#1a56db] hover:text-[#0d2a63] font-medium flex items-center gap-1 transition-colors"
+                                                        >
+                                                            {isExpanded ? (
+                                                                <>
+                                                                    Voir moins
+                                                                    <ChevronUpIcon className="w-4 h-4" />
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    Voir plus
+                                                                    <ChevronDownIcon className="w-4 h-4" />
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {livre.lien_achat && (
+                                                    <div className="mt-4 pt-4 border-t border-gray-100">
+                                                        <a
+                                                            href={livre.lien_achat}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#1a56db] text-white rounded-xl text-sm font-semibold hover:bg-[#0d2a63] transition-colors"
+                                                        >
+                                                            <ShoppingBagIcon className="w-4 h-4" />
+                                                            Acheter ce livre
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

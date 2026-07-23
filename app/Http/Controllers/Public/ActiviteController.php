@@ -25,6 +25,7 @@ class ActiviteController extends Controller
                     'formatted_date' => $activite->formatted_date,
                     'lieu' => $activite->lieu,
                     'heure' => $activite->heure,
+                    'lien' => $activite->lien,
                 ];
             });
 

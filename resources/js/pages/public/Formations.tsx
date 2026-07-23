@@ -11,11 +11,10 @@ import {
     UserIcon,
     MapPinIcon,
 } from '@heroicons/react/24/outline';
-import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
 import PublicLayout from '@/Components/PublicLayout';
-import { formationsPresentiel } from '@/data/formationsPresentiel';
 
 interface FormationEnLigne {
     id: number;
@@ -32,12 +31,41 @@ interface FormationEnLigne {
     lien_label: string | null;
 }
 
-interface Props {
-    formationsEnLigne: FormationEnLigne[];
+interface FormationPresentiel {
+    id: number;
+    title: string;
+    abbreviation: string;
+    description: string;
+    duration: string;
+    diplome: string;
+    price: string;
+    image: string;
+    icon: string;
+    tags: string[];
+    debouches: string[];
+    programme: string[];
+    couleur: 'blue' | 'red';
 }
 
-export default function Formations({ formationsEnLigne }: Props) {
-    const [activeTab, setActiveTab] = useState<'presentiel' | 'enligne'>('presentiel');
+interface Props {
+    formationsEnLigne: FormationEnLigne[];
+    formationsPresentiel: FormationPresentiel[];
+}
+
+export default function Formations({ formationsEnLigne, formationsPresentiel }: Props) {
+    const { url } = usePage();
+
+    // ✅ Détecter l'ancre dans l'URL
+    const getInitialTab = () => {
+        if (typeof window !== 'undefined') {
+            const hash = window.location.hash;
+            if (hash === '#enligne') return 'enligne';
+            if (hash === '#presentiel') return 'presentiel';
+        }
+        return 'presentiel';
+    };
+
+    const [activeTab, setActiveTab] = useState<'presentiel' | 'enligne'>(getInitialTab);
     const [selectedFormation, setSelectedFormation] = useState<any>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [inscriptionModalOpen, setInscriptionModalOpen] = useState(false);
@@ -54,6 +82,28 @@ export default function Formations({ formationsEnLigne }: Props) {
         formation_id: '',
         formation_nom: '',
     });
+
+    // ✅ Mettre à jour l'URL quand l'onglet change
+    const handleTabChange = (tab: 'presentiel' | 'enligne') => {
+        setActiveTab(tab);
+        if (typeof window !== 'undefined') {
+            window.location.hash = tab;
+        }
+    };
+
+    // ✅ Écouter les changements d'ancre
+    useEffect(() => {
+        const handleHashChange = () => {
+            if (typeof window !== 'undefined') {
+                const hash = window.location.hash;
+                if (hash === '#enligne') setActiveTab('enligne');
+                else if (hash === '#presentiel') setActiveTab('presentiel');
+            }
+        };
+
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
 
     const openModal = (formation: any) => {
         const scrollY = window.scrollY;
@@ -139,11 +189,6 @@ export default function Formations({ formationsEnLigne }: Props) {
             setIsSubmitting(false);
             return;
         }
-        if (!formData.email.trim() || !formData.email.includes('@')) {
-            setSubmitError('Veuillez entrer un email valide');
-            setIsSubmitting(false);
-            return;
-        }
         if (!formData.telephone.trim()) {
             setSubmitError('Veuillez entrer votre numéro de téléphone');
             setIsSubmitting(false);
@@ -186,11 +231,11 @@ export default function Formations({ formationsEnLigne }: Props) {
     };
 
     const formationNames = (formationsEnLigne || []).map(f => f.name).join(', ');
-    const presentielNames = formationsPresentiel.map(f => f.title).join(', ');
+    const presentielNames = (formationsPresentiel || []).map(f => f.title).join(', ');
 
     // ✅ JSON-LD Schema.org enrichi
     const jsonLdCourses = [
-        ...formationsPresentiel.map((f, index) => ({
+        ...(formationsPresentiel || []).map((f, index) => ({
             "@type": "ListItem",
             "position": index + 1,
             "item": {
@@ -214,7 +259,7 @@ export default function Formations({ formationsEnLigne }: Props) {
         })),
         ...(formationsEnLigne || []).map((f, index) => ({
             "@type": "ListItem",
-            "position": formationsPresentiel.length + index + 1,
+            "position": (formationsPresentiel || []).length + index + 1,
             "item": {
                 "@type": "Course",
                 "name": f.name,
@@ -244,13 +289,15 @@ export default function Formations({ formationsEnLigne }: Props) {
         "itemListElement": jsonLdCourses
     };
 
+    // ✅ Vérifier que les données existent
+    const hasPresentiel = formationsPresentiel && formationsPresentiel.length > 0;
+    const hasEnLigne = formationsEnLigne && formationsEnLigne.length > 0;
+
     return (
         <>
             <Head>
-                {/* Title optimisé pour recherche d'intention */}
                 <title>Formations Professionnelles à Douala, Yaoundé, Bafoussam & En Ligne | CAB Informatique</title>
 
-                {/* Meta Description riche en mots-clés métiers & géolocalisés */}
                 <meta
                     name="description"
                     content="Découvrez le catalogue de formations professionnelles CAB Informatique à Douala, Yaoundé, Bafoussam et en ligne. Formations 100% pratiques : Infographie 2D, Secrétariat Bureautique, Comptabilité, Maintenance & Réseaux, Vidéosurveillance. Diplôme DQP reconnu."
@@ -261,10 +308,8 @@ export default function Formations({ formationsEnLigne }: Props) {
                 />
                 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
 
-                {/* Canonical URL */}
                 <link rel="canonical" href="https://cab-informatique.com/formations" />
 
-                {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Formations Professionnelles à Douala, Yaoundé, Bafoussam & En Ligne | CAB Informatique" />
                 <meta property="og:description" content="Catalogue complet des formations professionnelles certifiantes au Cameroun. Apprenez un métier d'avenir en présentiel ou à distance." />
@@ -275,14 +320,12 @@ export default function Formations({ formationsEnLigne }: Props) {
                 <meta property="og:locale" content="fr_CM" />
                 <meta property="og:url" content="https://cab-informatique.com/formations" />
 
-                {/* Twitter Cards */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@cabinfo" />
                 <meta name="twitter:title" content="Formations Professionnelles au Cameroun | CAB Informatique" />
                 <meta name="twitter:description" content="Formations pratiques en présentiel à Douala, Yaoundé, Bafoussam et en ligne. Diplômes reconnus." />
                 <meta name="twitter:image" content="https://cab-informatique.com/assets/images/og-cab-informatique.jpg" />
 
-                {/* Schema.org JSON-LD */}
                 <script type="application/ld+json">
                     {JSON.stringify(jsonLd)}
                 </script>
@@ -297,8 +340,8 @@ export default function Formations({ formationsEnLigne }: Props) {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center">
                             <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-    Nos <span className="text-[#d21f2f]">Formations</span>
-</h1>
+                                Nos <span className="text-[#d21f2f]">Formations</span>
+                            </h1>
                             <p
                                 className="mt-4 text-xl max-w-2xl mx-auto"
                                 style={{ color: 'rgba(255,255,255,0.85)' }}
@@ -310,8 +353,12 @@ export default function Formations({ formationsEnLigne }: Props) {
                                 className="mt-8 inline-flex rounded-xl p-1"
                                 style={{ backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)' }}
                             >
-                                <button
-                                    onClick={() => setActiveTab('presentiel')}
+                                <a
+                                    href="#presentiel"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleTabChange('presentiel');
+                                    }}
                                     className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
                                     style={
                                         activeTab === 'presentiel'
@@ -320,9 +367,13 @@ export default function Formations({ formationsEnLigne }: Props) {
                                     }
                                 >
                                     📍 Formations en Présentiel
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('enligne')}
+                                </a>
+                                <a
+                                    href="#enligne"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleTabChange('enligne');
+                                    }}
                                     className="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
                                     style={
                                         activeTab === 'enligne'
@@ -331,7 +382,7 @@ export default function Formations({ formationsEnLigne }: Props) {
                                     }
                                 >
                                     💻 Formations en Ligne
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -341,68 +392,85 @@ export default function Formations({ formationsEnLigne }: Props) {
                 <section className="py-16 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         {activeTab === 'presentiel' ? (
-                            <div>
+                            <div id="presentiel">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center sm:text-left">
                                     Formations en présentiel à Douala, Yaoundé et Bafoussam
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {formationsPresentiel.map((formation) => (
-                                        <article
-                                            key={formation.id}
-                                            className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col justify-between"
-                                        >
-                                            <div>
-                                                <div className="relative h-48 overflow-hidden">
-                                                    <img
-                                                        src={formation.image}
-                                                        alt={`Formation ${formation.title} en présentiel à Douala Yaoundé Bafoussam - CAB Informatique`}
-                                                        className="w-full h-full object-cover"
-                                                        loading="lazy"
-                                                    />
-                                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-cab-blue">
-                                                        {formation.price}
+                                {!hasPresentiel ? (
+                                    <div className="text-center py-16">
+                                        <AcademicCapIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                        <p className="text-gray-500 text-lg">Aucune formation en présentiel disponible pour le moment.</p>
+                                        <p className="text-gray-400 text-sm mt-2">Revenez plus tard pour découvrir nos formations.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {formationsPresentiel.map((formation) => (
+                                            <article
+                                                key={formation.id}
+                                                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col justify-between"
+                                            >
+                                                <div>
+                                                    <div className="relative h-48 overflow-hidden">
+                                                        <img
+                                                            src={formation.image}
+                                                            alt={`Formation ${formation.title} en présentiel à Douala Yaoundé Bafoussam - CAB Informatique`}
+                                                            className="w-full h-full object-cover"
+                                                            loading="lazy"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).src = '/assets/images/placeholder.jpg';
+                                                            }}
+                                                        />
+                                                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-cab-blue">
+                                                            {formation.price}
+                                                        </div>
+                                                        <div className="absolute bottom-3 left-3 bg-cab-blue/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white flex items-center gap-1">
+                                                            <span>{formation.icon}</span>
+                                                            {formation.abbreviation}
+                                                        </div>
                                                     </div>
-                                                    <div className="absolute bottom-3 left-3 bg-cab-blue/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white flex items-center gap-1">
-                                                        <span>{formation.icon}</span>
-                                                        {formation.abbreviation}
+                                                    <div className="p-6">
+                                                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                                            {formation.title}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-500 mb-3">⏱️ Durée : {formation.duration}</p>
+                                                        <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                                                            {formation.description}
+                                                        </p>
+                                                        <div className="flex flex-wrap gap-1.5 mb-4">
+                                                            {formation.tags.map((tag) => (
+                                                                <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                                                                    {tag}
+                                                                </span>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="p-6">
-                                                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                                        {formation.title}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-500 mb-3">⏱️ Durée : {formation.duration}</p>
-                                                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                                                        {formation.description}
-                                                    </p>
-                                                    <div className="flex flex-wrap gap-1.5 mb-4">
-                                                        {formation.tags.map((tag) => (
-                                                            <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                                                                {tag}
-                                                            </span>
-                                                        ))}
-                                                    </div>
+                                                <div className="p-6 pt-0">
+                                                    <button
+                                                        onClick={() => openModal({ ...formation, type: 'presentiel' })}
+                                                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-all group"
+                                                    >
+                                                        Découvrir le programme
+                                                        <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                    </button>
                                                 </div>
-                                            </div>
-                                            <div className="p-6 pt-0">
-                                                <button
-                                                    onClick={() => openModal({ ...formation, type: 'presentiel' })}
-                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-cab-blue text-white rounded-xl text-sm font-semibold hover:bg-cab-dark transition-all group"
-                                                >
-                                                    Découvrir le programme
-                                                    <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                                </button>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
+                                            </article>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ) : (
-                            <div>
+                            <div id="enligne">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center sm:text-left">
                                     Formations en ligne au Cameroun
                                 </h2>
-                                {formationsEnLigne && formationsEnLigne.length > 0 ? (
+                                {!hasEnLigne ? (
+                                    <div className="text-center py-16">
+                                        <AcademicCapIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                        <p className="text-gray-500 text-lg">Aucune formation en ligne disponible pour le moment.</p>
+                                        <p className="text-gray-400 text-sm mt-2">Consultez nos formations en présentiel ou repassez plus tard.</p>
+                                    </div>
+                                ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {formationsEnLigne.map((formation) => (
                                             <article
@@ -457,21 +525,13 @@ export default function Formations({ formationsEnLigne }: Props) {
                                             </article>
                                         ))}
                                     </div>
-                                ) : (
-                                    <div className="text-center py-16">
-                                        <AcademicCapIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                        <p className="text-gray-500 text-lg">Aucune formation en ligne disponible pour le moment.</p>
-                                        <p className="text-gray-400 text-sm mt-2">Consultez nos formations en présentiel ou repassez plus tard.</p>
-                                    </div>
                                 )}
                             </div>
                         )}
                     </div>
                 </section>
 
-                {/* ============================================================
-                    MODAL DÉTAILS
-                    ============================================================ */}
+                {/* MODAL DÉTAILS */}
                 {modalOpen && selectedFormation && (
                     <div
                         key={`modal-${selectedFormation.id || selectedFormation.title || Date.now()}`}
@@ -639,9 +699,7 @@ export default function Formations({ formationsEnLigne }: Props) {
                     </div>
                 )}
 
-                {/* ============================================================
-                    MODAL D'INSCRIPTION PRÉSENTIEL
-                    ============================================================ */}
+                {/* MODAL D'INSCRIPTION PRÉSENTIEL */}
                 {inscriptionModalOpen && (
                     <div
                         className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
@@ -711,7 +769,7 @@ export default function Formations({ formationsEnLigne }: Props) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Email <span className="text-red-500">*</span>
+                                                Email <span className="text-gray-400 text-xs">(Optionnel)</span>
                                             </label>
                                             <div className="relative">
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -723,7 +781,6 @@ export default function Formations({ formationsEnLigne }: Props) {
                                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                                     className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cab-blue focus:border-cab-blue transition-colors"
                                                     placeholder="votre@email.com"
-                                                    required
                                                 />
                                             </div>
                                         </div>

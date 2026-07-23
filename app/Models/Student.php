@@ -108,6 +108,10 @@ class Student extends Model
             ->where('tranches.formation_id', $formationId)
             ->max('tranches.numero') ?? 0;
     }
+    public function lessonVues()
+    {
+        return $this->hasMany(LessonVue::class);
+    }
 
     /**
      * Est-ce que cet étudiant peut accéder à un contenu nécessitant $trancheRequiseNumero ?

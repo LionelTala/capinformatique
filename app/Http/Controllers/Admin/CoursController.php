@@ -20,65 +20,113 @@ use Inertia\Inertia;
 
 class CoursController extends Controller
 {
-    public function index(Request $request)
-    {
-        Log::info('📚 [Cours] Index - Début', ['user' => auth()->id()]);
+    // app/Http/Controllers/Admin/CoursController.php
 
-        try {
-            $cours = Cours::with(['formation', 'vague', 'certification', 'trancheRequise', 'student'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10)
-                ->withQueryString()
-                ->through(function ($c) {
-                    // ✅ Calcul dynamique des destinataires
-                    $destinataires = $this->getDestinataires($c);
+public function index(Request $request)
+{
+    Log::info('📚 [Cours] Index - Début', ['user' => auth()->id()]);
 
-                    return [
-                        'id' => $c->id,
-                        'titre' => $c->titre,
-                        'description' => $c->description,
-                        'type' => $c->type,
-                        'viewed_count' => $c->viewed_count,
-                        'is_active' => $c->is_active,
-                        'has_video' => $c->is_video,
-                        'has_files' => !empty($c->contenu),
-                        'total_students' => $destinataires->count(),
-                        'mode_envoi' => $c->student_id ? 'individuel' : 'groupe',
-                        'tranche_requise' => $c->trancheRequise ? [
-                            'id' => $c->trancheRequise->id,
-                            'numero' => $c->trancheRequise->numero,
-                            'montant' => $c->trancheRequise->montant,
-                        ] : null,
-                        'formation' => $c->formation ? [
-                            'id' => $c->formation->id,
-                            'name' => $c->formation->name,
-                        ] : null,
-                        'vague' => $c->vague ? [
-                            'id' => $c->vague->id,
-                            'name' => $c->vague->name,
-                        ] : null,
-                        'certification' => $c->certification ? [
-                            'id' => $c->certification->id,
-                            'titre' => $c->certification->titre,
-                        ] : null,
-                        'created_at' => $c->created_at->format('d/m/Y H:i'),
-                        'notification_sent' => $c->has_notification_sent,
-                    ];
-                });
+    try {
+        $query = Cours::with(['formation', 'vague', 'certification', 'trancheRequise', 'student']);
 
-            Log::info('📚 [Cours] Index - Succès', ['total' => $cours->total()]);
-
-            return Inertia::render('Admin/Cours/Index', [
-                'cours' => $cours,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('❌ [Cours] Index - Erreur', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->with('error', '❌ Une erreur est survenue.');
+        // ✅ Uniquement le filtre par formation
+        if ($request->filled('formation_id')) {
+            $query->where('formation_id', $request->formation_id);
         }
+
+        // ✅ Recherche par titre
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('titre', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // ✅ Tri
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+        $allowedSorts = ['titre', 'type', 'viewed_count', 'created_at', 'is_active'];
+
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // ✅ Pagination
+        $cours = $query->paginate(15)->withQueryString()->through(function ($c) {
+            $lessonsCount = $c->lessons()->count();
+            $destinataires = $this->getDestinataires($c);
+
+            return [
+                'id' => $c->id,
+                'titre' => $c->titre,
+                'description' => $c->description,
+                'type' => $c->type,
+                'viewed_count' => $c->viewed_count,
+                'is_active' => $c->is_active,
+                'has_video' => $c->is_video,
+                'has_files' => !empty($c->contenu),
+                'total_students' => $destinataires->count(),
+                'lessons_count' => $lessonsCount,
+                'mode_envoi' => $c->student_id ? 'individuel' : 'groupe',
+                'tranche_requise' => $c->trancheRequise ? [
+                    'id' => $c->trancheRequise->id,
+                    'numero' => $c->trancheRequise->numero,
+                    'montant' => $c->trancheRequise->montant,
+                ] : null,
+                'formation' => $c->formation ? [
+                    'id' => $c->formation->id,
+                    'name' => $c->formation->name,
+                ] : null,
+                'vague' => $c->vague ? [
+                    'id' => $c->vague->id,
+                    'name' => $c->vague->name,
+                ] : null,
+                'certification' => $c->certification ? [
+                    'id' => $c->certification->id,
+                    'titre' => $c->certification->titre,
+                ] : null,
+                'created_at' => $c->created_at->format('d/m/Y H:i'),
+                'notification_sent' => $c->has_notification_sent,
+            ];
+        });
+
+        // ✅ Récupérer uniquement les formations pour le filtre
+        $formations = Formation::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'abbreviation']);
+
+        // ✅ Statistiques
+        $stats = [
+            'total' => Cours::count(),
+            'actifs' => Cours::where('is_active', true)->count(),
+            'inactifs' => Cours::where('is_active', false)->count(),
+            'vague' => Cours::where('type', 'vague')->count(),
+            'certification' => Cours::where('type', 'certification')->count(),
+        ];
+
+        Log::info('📚 [Cours] Index - Succès', ['total' => $cours->total()]);
+
+        return Inertia::render('Admin/Cours/Index', [
+            'cours' => $cours,
+            'formations' => $formations,
+            'stats' => $stats,
+            'filters' => $request->only(['search', 'formation_id']),
+            'sort' => [
+                'field' => $sortField,
+                'direction' => $sortDirection,
+            ],
+        ]);
+    } catch (\Exception $e) {
+        Log::error('❌ [Cours] Index - Erreur', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->back()->with('error', '❌ Une erreur est survenue.');
     }
+}
 
     public function create()
     {
@@ -482,89 +530,108 @@ class CoursController extends Controller
     }
 
     public function show(Cours $cours)
-    {
-        Log::info('👁️ [Cours] Show - Début', ['cours_id' => $cours->id, 'user' => auth()->id()]);
+{
+    Log::info('👁️ [Cours] Show - Début', ['cours_id' => $cours->id, 'user' => auth()->id()]);
 
-        try {
-            $cours->load(['formation', 'vague', 'certification', 'student', 'trancheRequise']);
+    try {
+        // ✅ AJOUTER 'lessons' dans le load()
+        $cours->load(['formation', 'vague', 'certification', 'student', 'trancheRequise', 'lessons']);
 
-            // ✅ Calcul dynamique des destinataires
-            $destinataires = $this->getDestinataires($cours);
+        // ✅ Calcul dynamique des destinataires
+        $destinataires = $this->getDestinataires($cours);
 
-            $viewedStudents = $cours->vues()->with('student')->get()->map(function ($vue) {
-                return [
-                    'id' => $vue->student->id,
-                    'name' => $vue->student->full_name,
-                    'matricule' => $vue->student->matricule,
-                    'viewed_at' => $vue->viewed_at->format('d/m/Y H:i'),
-                ];
-            });
+        $viewedStudents = $cours->vues()->with('student')->get()->map(function ($vue) {
+            return [
+                'id' => $vue->student->id,
+                'name' => $vue->student->full_name,
+                'matricule' => $vue->student->matricule,
+                'viewed_at' => $vue->viewed_at->format('d/m/Y H:i'),
+            ];
+        });
 
-            Log::info('✅ [Cours] Show - Succès', [
-                'cours_id' => $cours->id,
-                'viewed_count' => $viewedStudents->count(),
-                'total_students' => $destinataires->count()
-            ]);
+        Log::info('✅ [Cours] Show - Succès', [
+            'cours_id' => $cours->id,
+            'viewed_count' => $viewedStudents->count(),
+            'total_students' => $destinataires->count(),
+            'lessons_count' => $cours->lessons->count(), // ✅ Ajouté
+        ]);
 
-            return Inertia::render('Admin/Cours/Show', [
-                'cours' => [
-                    'id' => $cours->id,
-                    'titre' => $cours->titre,
-                    'description' => $cours->description,
-                    'contenu' => $cours->contenu,
-                    'video_url' => $cours->video_url,
-                    'video_title' => $cours->video_title,
-                    'video_embed_url' => $cours->embed_video_url,
-                    'video_thumbnail' => $cours->video_thumbnail,
-                    'type' => $cours->type,
-                    'mode_envoi' => $cours->student_id ? 'individuel' : 'groupe',
-                    'viewed_count' => $cours->viewed_count,
-                    'total_students' => $destinataires->count(),
-                    'has_notification_sent' => $cours->has_notification_sent,
-                    'notification_sent_at' => $cours->notification_sent_at?->format('d/m/Y H:i'),
-                    'formation' => $cours->formation ? [
-                        'id' => $cours->formation->id,
-                        'name' => $cours->formation->name,
-                    ] : null,
-                    'vague' => $cours->vague ? [
-                        'id' => $cours->vague->id,
-                        'name' => $cours->vague->name,
-                    ] : null,
-                    'certification' => $cours->certification ? [
-                        'id' => $cours->certification->id,
-                        'titre' => $cours->certification->titre,
-                    ] : null,
-                    'student' => $cours->student ? [
-                        'id' => $cours->student->id,
-                        'name' => $cours->student->full_name,
-                        'matricule' => $cours->student->matricule,
-                    ] : null,
-                    'tranche_requise' => $cours->trancheRequise ? [
-                        'id' => $cours->trancheRequise->id,
-                        'numero' => $cours->trancheRequise->numero,
-                        'montant' => $cours->trancheRequise->montant,
-                    ] : null,
-                ],
-                'viewedStudents' => $viewedStudents,
-                'notViewedStudents' => $destinataires->reject(function ($student) use ($viewedStudents) {
-                    return $viewedStudents->contains('id', $student->id);
-                })->map(function ($student) {
+        return Inertia::render('Admin/Cours/Show', [
+            'cours' => [
+                'id' => $cours->id,
+                'titre' => $cours->titre,
+                'description' => $cours->description,
+                'contenu' => $cours->contenu,
+                'video_url' => $cours->video_url,
+                'video_title' => $cours->video_title,
+                'video_embed_url' => $cours->embed_video_url,
+                'video_thumbnail' => $cours->video_thumbnail,
+                'type' => $cours->type,
+                'mode_envoi' => $cours->student_id ? 'individuel' : 'groupe',
+                'viewed_count' => $cours->viewed_count,
+                'total_students' => $destinataires->count(),
+                'has_notification_sent' => $cours->has_notification_sent,
+                'notification_sent_at' => $cours->notification_sent_at?->format('d/m/Y H:i'),
+                'formation' => $cours->formation ? [
+                    'id' => $cours->formation->id,
+                    'name' => $cours->formation->name,
+                ] : null,
+                'vague' => $cours->vague ? [
+                    'id' => $cours->vague->id,
+                    'name' => $cours->vague->name,
+                ] : null,
+                'certification' => $cours->certification ? [
+                    'id' => $cours->certification->id,
+                    'titre' => $cours->certification->titre,
+                ] : null,
+                'student' => $cours->student ? [
+                    'id' => $cours->student->id,
+                    'name' => $cours->student->full_name,
+                    'matricule' => $cours->student->matricule,
+                ] : null,
+                'tranche_requise' => $cours->trancheRequise ? [
+                    'id' => $cours->trancheRequise->id,
+                    'numero' => $cours->trancheRequise->numero,
+                    'montant' => $cours->trancheRequise->montant,
+                ] : null,
+                // ✅ AJOUTER LES LEÇONS
+                'lessons' => $cours->lessons->map(function ($lesson) {
                     return [
-                        'id' => $student->id,
-                        'name' => $student->full_name,
-                        'matricule' => $student->matricule,
+                        'id' => $lesson->id,
+                        'titre' => $lesson->titre,
+                        'description' => $lesson->description,
+                        'contenu' => $lesson->contenu,
+                        'video_url' => $lesson->video_url,
+                        'video_title' => $lesson->video_title,
+                        'has_video' => $lesson->has_video,
+                        'has_files' => $lesson->has_files,
+                        'files' => $lesson->files,
+                        'order' => $lesson->order,
+                        'is_active' => $lesson->is_active,
+                        'created_at' => $lesson->created_at->format('d/m/Y H:i'),
                     ];
-                })->values(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('❌ [Cours] Show - Erreur', [
-                'cours_id' => $cours->id,
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            return redirect()->back()->with('error', '❌ Une erreur est survenue.');
-        }
+                }),
+            ],
+            'viewedStudents' => $viewedStudents,
+            'notViewedStudents' => $destinataires->reject(function ($student) use ($viewedStudents) {
+                return $viewedStudents->contains('id', $student->id);
+            })->map(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->full_name,
+                    'matricule' => $student->matricule,
+                ];
+            })->values(),
+        ]);
+    } catch (\Exception $e) {
+        Log::error('❌ [Cours] Show - Erreur', [
+            'cours_id' => $cours->id,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->back()->with('error', '❌ Une erreur est survenue.');
     }
+}
 
     public function edit(Cours $cours)
     {
